@@ -218,7 +218,7 @@ L1TCaloSummary::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     for(uint32_t iEta = 0; iEta < 3; iEta++){
       bool activeStrip = false;
       for(uint32_t iPhi = 0; iPhi < 3; iPhi++){
-        if(object->boostedJetRegionET()[3*iEta+iPhi] > 30 && object->boostedJetRegionET()[3*iEta+iPhi] > object->et()*0.0625) activeStrip = true;
+        if(object->boostedJetRegionET()[3*iEta+iPhi] > 60 && object->boostedJetRegionET()[3*iEta+iPhi] > object->et()*0.0625) activeStrip = true;
       }
       if(activeStrip) activeRegionEtaPattern |= (0x1 << iEta);
     }
@@ -226,13 +226,14 @@ L1TCaloSummary::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     for(uint32_t iPhi = 0; iPhi < 3; iPhi++){
       bool activeStrip = false;
       for(uint32_t iEta = 0; iEta < 3; iEta++){
-        if(object->boostedJetRegionET()[3*iEta+iPhi] > 30 && object->boostedJetRegionET()[3*iEta+iPhi] > object->et()*0.0625) activeStrip = true;
+        if(object->boostedJetRegionET()[3*iEta+iPhi] > 60 && object->boostedJetRegionET()[3*iEta+iPhi] > object->et()*0.0625) activeStrip = true;
       }
       if(activeStrip) activeRegionPhiPattern |= (0x1 << iPhi);
     }
     string regionEta = activeRegionEtaPattern.to_string<char,std::string::traits_type,std::string::allocator_type>();
     string regionPhi = activeRegionPhiPattern.to_string<char,std::string::traits_type,std::string::allocator_type>();
-    if(pt > 80 && abs(eta) < 2.5 && (regionEta == "010" || regionPhi == "010" || regionEta == "110" || regionPhi == "110" || regionEta == "011" || regionPhi == "011") ) bJetCands->push_back(L1JetParticle(math::PtEtaPhiMLorentzVector(pt, eta, phi, mass), L1JetParticle::kCentral));
+    if(abs(eta) < 2.5 && pt > 110 && (regionEta == "010" || regionPhi == "010" || regionEta == "110" || regionPhi == "110" || regionEta == "011" || regionPhi == "011")) bJetCands->push_back(L1JetParticle(math::PtEtaPhiMLorentzVector(pt, eta, phi, mass), L1JetParticle::kCentral));
+    if(abs(eta) < 2.5 && pt < 110 && regionEta != "010" && regionPhi !="010" && (regionEta == "110" || regionPhi == "110" || regionEta == "011" || regionPhi == "011") ) bJetCands->push_back(L1JetParticle(math::PtEtaPhiMLorentzVector(pt, eta, phi, mass), L1JetParticle::kCentral));
   }
 
   iEvent.put(std::move(bJetCands), "Boosted");
