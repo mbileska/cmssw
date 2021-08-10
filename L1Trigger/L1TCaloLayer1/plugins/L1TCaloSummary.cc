@@ -149,6 +149,7 @@ L1TCaloSummary::L1TCaloSummary(const edm::ParameterSet& iConfig) :
 		  << "; Will use what is provided :(" << std::endl;
     }
   }
+  produces< L1JetParticleCollection >( "Stage3" ) ;
   produces< L1JetParticleCollection >( "Boosted" ) ;
   summaryCard = new UCTSummaryCard(&pumLUT, jetSeed, tauSeed, tauIsolationFactor, eGammaSeed, eGammaIsolationFactor);
 }
@@ -167,6 +168,7 @@ L1TCaloSummary::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   using namespace edm;
 
+  std::unique_ptr<L1JetParticleCollection> cJetCands(new L1JetParticleCollection);
   std::unique_ptr<L1JetParticleCollection> bJetCands(new L1JetParticleCollection);
 
   UCTGeometry g;
@@ -207,6 +209,15 @@ L1TCaloSummary::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   double eta = -999.;
   double phi = -999.;
   double mass = 0;
+
+  std::list<UCTObject*> centralJetObjs = summaryCard->getCentralJetObjs();
+  for(std::list<UCTObject*>::const_iterator i = centralJetObjs.begin(); i != centralJetObjs.end(); i++) {
+    const UCTObject* object = *i;
+    pt = ((double) object->et()) * caloScaleFactor;
+    eta = g.getUCTTowerEta(object->iEta());
+    phi = g.getUCTTowerPhi(object->iPhi());
+    cJetCands->push_back(L1JetParticle(math::PtEtaPhiMLorentzVector(pt, eta, phi, mass), L1JetParticle::kCentral));
+  }
   
   std::list<UCTObject*> boostedJetObjs = summaryCard->getBoostedJetObjs();
   for(std::list<UCTObject*>::const_iterator i = boostedJetObjs.begin(); i != boostedJetObjs.end(); i++) {
@@ -218,7 +229,7 @@ L1TCaloSummary::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     for(uint32_t iEta = 0; iEta < 3; iEta++){
       bool activeStrip = false;
       for(uint32_t iPhi = 0; iPhi < 3; iPhi++){
-        if(object->boostedJetRegionET()[3*iEta+iPhi] > 60 && object->boostedJetRegionET()[3*iEta+iPhi] > object->et()*0.0625) activeStrip = true;
+        if(object->boostedJetRegionET()[3*iEta+iPhi] > 30 && object->boostedJetRegionET()[3*iEta+iPhi] > object->et()*0.0625) activeStrip = true;
       }
       if(activeStrip) activeRegionEtaPattern |= (0x1 << iEta);
     }
@@ -226,16 +237,17 @@ L1TCaloSummary::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     for(uint32_t iPhi = 0; iPhi < 3; iPhi++){
       bool activeStrip = false;
       for(uint32_t iEta = 0; iEta < 3; iEta++){
-        if(object->boostedJetRegionET()[3*iEta+iPhi] > 60 && object->boostedJetRegionET()[3*iEta+iPhi] > object->et()*0.0625) activeStrip = true;
+        if(object->boostedJetRegionET()[3*iEta+iPhi] > 30 && object->boostedJetRegionET()[3*iEta+iPhi] > object->et()*0.0625) activeStrip = true;
       }
       if(activeStrip) activeRegionPhiPattern |= (0x1 << iPhi);
     }
     string regionEta = activeRegionEtaPattern.to_string<char,std::string::traits_type,std::string::allocator_type>();
     string regionPhi = activeRegionPhiPattern.to_string<char,std::string::traits_type,std::string::allocator_type>();
-    if(abs(eta) < 2.5 && pt > 110 && (regionEta == "010" || regionPhi == "010" || regionEta == "110" || regionPhi == "110" || regionEta == "011" || regionPhi == "011")) bJetCands->push_back(L1JetParticle(math::PtEtaPhiMLorentzVector(pt, eta, phi, mass), L1JetParticle::kCentral));
-    if(abs(eta) < 2.5 && pt < 110 && regionEta != "010" && regionPhi !="010" && (regionEta == "110" || regionPhi == "110" || regionEta == "011" || regionPhi == "011") ) bJetCands->push_back(L1JetParticle(math::PtEtaPhiMLorentzVector(pt, eta, phi, mass), L1JetParticle::kCentral));
+    if(abs(eta) < 2.5 && (regionEta == "101" || regionPhi == "101" || regionEta == "010" || regionPhi == "010" || regionEta == "110" || regionPhi == "110" || regionEta == "011" || regionPhi == "011")) bJetCands->push_back(L1JetParticle(math::PtEtaPhiMLorentzVector(pt, eta, phi, mass), L1JetParticle::kCentral));
+
   }
 
+  iEvent.put(std::move(cJetCands), "Stage3");
   iEvent.put(std::move(bJetCands), "Boosted");
 }
 
