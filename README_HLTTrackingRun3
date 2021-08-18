@@ -1,0 +1,31 @@
+*** Instructions to use HLT Run-3 tracking customisation ***
+
+** In CMSSW_12_0_0_pre6 (to allow to run also in samples with updated PU profile, e.g., /RelValTTbar_14TeV/CMSSW_12_0_0_pre6-PU_120X_mcRun3_2021_realistic_v4_JIRA_129-v1/GEN-SIM-DIGI-RAW):
+
+cmsrel CMSSW_12_0_0_pre6
+pushd CMSSW_12_0_0_pre6/src/
+cmsenv
+git cms-init
+git cms-addpkg HLTrigger/Configuration
+git cms-addpkg CommonTools/RecoAlgos
+git cms-remote add mmasciov
+git fetch mmasciov
+git merge mmasciov/forRun3HLTTracking_12X
+scram b -j 12
+
+** Example of hltGetConfiguration command:
+hltGetConfiguration /dev/CMSSW_12_0_0/GRun --paths HLTriggerFirstPath,MC_ReducedIterativeTracking_v12,HLTriggerFinalPath --offline --mc --unprescale --process TEST --globaltag 120X_mcRun3_2021_realistic_v4 --output none --input /store/relval/CMSSW_12_0_0_pre6/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/PU_120X_mcRun3_2021_realistic_v4-v1/00000/20a08d38-8b7f-4ce4-b24b-edc023ddd078.root --era Run3 --customise HLTrigger/Configuration/customizeHLTforRun3Tracking.customizeHLTforRun3Tracking
+
+* In order to use quadruplets from ALL pixel vertices (instead of hltTrimmedPixelVertices): HLTrigger/Configuration/customizeHLTforRun3Tracking.customizeHLTforRun3TrackingAllPixelVertices
+
+* Tested using MC_ReducedIterativeTracking_v12 and MC_PFMET_v17
+
+
+
+** In release other than CMSSW_12_0_0_pre6:
+
+git cms-remote add mmasciov
+git fetch mmasciov
+git cherry-pick ee03aa936d3246ae43d093479120f2d3315f7bdf # only needed to use quadruplets from ALL pixel vertices
+git cherry-pick cbbe7b2f13e0529868a632b44811de0e753e0562 # to get actual customisation functions
+scram b -j 12
