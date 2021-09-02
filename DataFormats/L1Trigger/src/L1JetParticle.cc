@@ -50,6 +50,9 @@ L1JetParticle::L1JetParticle(const LorentzVector& p4, JetType type, int bx)
 L1JetParticle::L1JetParticle(const PolarLorentzVector& p4, JetType type, int bx)
     : LeafCandidate((char)0, p4), type_(type), ref_(edm::Ref<L1GctJetCandCollection>()), bx_(bx) {}
 
+L1JetParticle::L1JetParticle(const PolarLorentzVector& p4, JetType type, std::string reta, std::string rphi, bool centerTauLike, bool centerEGammaLike, int bx)
+    : LeafCandidate((char)0, p4), type_(type), reta_(reta), rphi_(rphi), centerTauLike_(centerTauLike), centerEGammaLike_(centerEGammaLike), ref_(edm::Ref<L1GctJetCandCollection>()), bx_(bx) {}
+
 // L1JetParticle::L1JetParticle(const L1JetParticle& rhs)
 // {
 //    // do actual copying here;

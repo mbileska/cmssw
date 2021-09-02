@@ -40,6 +40,8 @@ namespace l1extra {
 
     L1JetParticle(const PolarLorentzVector& p4, JetType type = kUndefined, int bx = 0);
 
+    L1JetParticle(const PolarLorentzVector& p4, JetType type = kUndefined, std::string reta = "000", std::string rphi = "000", bool centerTauLike = false, bool centerEGammaLike = false, int bx = 0);
+
     ~L1JetParticle() override {}
 
     // ---------- const member functions ---------------------
@@ -48,6 +50,14 @@ namespace l1extra {
     const edm::Ref<L1GctJetCandCollection>& gctJetCandRef() const { return ref_; }
 
     const L1GctJetCand* gctJetCand() const { return ref_.get(); }
+
+    const std::string getRegionEta() const { return reta_; }
+
+    const std::string getRegionPhi() const { return rphi_; }
+
+    const bool getCenterTauLike() const { return centerTauLike_; }
+
+    const bool getCenterEGammaLike() const { return centerEGammaLike_; }
 
     L1JetParticle* clone() const override { return new L1JetParticle(*this); }
 
@@ -60,6 +70,14 @@ namespace l1extra {
 
     void setBx(int bx) { bx_ = bx; }
 
+    void setRegionEta(std::string reta) { reta_ = reta; }
+
+    void setRegionPhi(std::string rphi) { rphi_ = rphi; }
+
+    void setCenterTauLike(bool centerTauLike) { centerTauLike_ = centerTauLike; }
+
+    void setCenterEGammaLike(bool centerEGammaLike) { centerEGammaLike_ = centerEGammaLike; }
+
   private:
     // L1JetParticle(const L1JetParticle&); // stop default
 
@@ -67,6 +85,10 @@ namespace l1extra {
 
     // ---------- member data --------------------------------
     JetType type_;
+    std::string reta_;
+    std::string rphi_;
+    bool centerTauLike_;
+    bool centerEGammaLike_;
     edm::Ref<L1GctJetCandCollection> ref_;
     int bx_;
   };
