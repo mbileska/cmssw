@@ -357,6 +357,8 @@ bool UCTSummaryCard::processRegion(UCTRegionIndex center) {
   boostedJet->setNTaus(nTauLike);
   boostedJet->setBoostedJetRegionET(boostedJetRegionET);
   boostedJet->setBoostedJetRegionTauVeto(boostedJetRegionTauVeto);
+  boostedJet->setCenterIsTauLike(centralIsTauLike);
+  boostedJet->setCenterIsEgammaLike(centralIsEGammaLike);
   boostedJetObjs.push_back(boostedJet);
 
   // tau Object - a single region or a 2-region sum, where the neighbor with lower ET is located using matching hit calo towers

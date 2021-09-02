@@ -82,9 +82,13 @@ public:
   const uint32_t isolation() const {return myIsolation;}
   const uint32_t et3x3() const {return myEt3x3;}
   const uint32_t nTaus() const {return myNTaus;}
+  const bool centerIsTauLike() const {return myCenterIsTauLike;}
+  const bool centerIsEGammaLike() const {return myCenterIsEGammaLike;}
   const std::vector<uint32_t> boostedJetRegionET() const{return myBoostedJetRegionET;}
   const std::vector<uint32_t> boostedJetRegionTauVeto() const{return myBoostedJetRegionTauVeto;}
   bool setNTaus(uint32_t in){myNTaus = in; return true;}
+  bool setCenterIsTauLike(bool in){myCenterIsTauLike = in; return true;}
+  bool setCenterIsEgammaLike(bool in){myCenterIsEGammaLike = in; return true;}
   bool setActiveTowerEta(bitset<12> in){myActiveTowerEta = in; return true;}
   bool setActiveTowerPhi(bitset<12> in){myActiveTowerPhi = in; return true;}
   bool setBoostedJetTowers(std::vector<uint32_t> in){myBoostedJetTowers = in; return true;}
@@ -116,6 +120,8 @@ private:
   uint32_t myIsolation;
   uint32_t myEt3x3;
   uint32_t myNTaus;
+  bool myCenterIsTauLike;
+  bool myCenterIsEGammaLike;
   bitset<12> myActiveTowerEta;
   bitset<12> myActiveTowerPhi;
   std::vector<uint32_t> myBoostedJetTowers;
