@@ -216,7 +216,7 @@ L1TCaloSummary::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     pt = ((double) object->et()) * caloScaleFactor;
     eta = g.getUCTTowerEta(object->iEta());
     phi = g.getUCTTowerPhi(object->iPhi());
-    cJetCands->push_back(L1JetParticle(math::PtEtaPhiMLorentzVector(pt, eta, phi, mass), L1JetParticle::kCentral));
+    cJetCands->push_back(L1JetParticle(math::PtEtaPhiMLorentzVector(pt, eta, phi, mass), L1JetParticle::kCentral, "000", "000", true, true));
   }
   
   std::list<UCTObject*> boostedJetObjs = summaryCard->getBoostedJetObjs();
@@ -245,7 +245,27 @@ L1TCaloSummary::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     string regionPhi = activeRegionPhiPattern.to_string<char,std::string::traits_type,std::string::allocator_type>();
     bool centralHighest = object->boostedJetRegionET()[4] >= object->boostedJetRegionET()[0] && object->boostedJetRegionET()[4] >= object->boostedJetRegionET()[1] && object->boostedJetRegionET()[4] >= object->boostedJetRegionET()[2] && object->boostedJetRegionET()[4] >= object->boostedJetRegionET()[3] && object->boostedJetRegionET()[4] >= object->boostedJetRegionET()[5] && object->boostedJetRegionET()[4] >= object->boostedJetRegionET()[6] && object->boostedJetRegionET()[4] >= object->boostedJetRegionET()[7] && object->boostedJetRegionET()[4] >= object->boostedJetRegionET()[8];
 
-    if(abs(eta) < 2.5 && ((regionEta == "101" && (regionPhi == "110" || regionPhi == "101" || regionPhi == "010")) || ((regionEta == "110" || regionEta == "101" || regionEta == "010") && regionPhi == "101") || (regionEta != "101" && regionPhi != "101" && (regionEta == "010" || regionPhi == "010" || regionEta == "110" || regionPhi == "110" || regionEta == "011" || regionPhi == "011") && centralHighest))) bJetCands->push_back(L1JetParticle(math::PtEtaPhiMLorentzVector(pt, eta, phi, mass), L1JetParticle::kCentral));
+    bool centerIsTau = object->centerIsTauLike();
+    bool centerIsEGamma = object->centerIsEGammaLike();
+
+//    if(abs(eta) < 2.5 && ((regionEta == "101" && (regionPhi == "110" || regionPhi == "101" || regionPhi == "010")) || ((regionEta == "110" || regionEta == "101" || regionEta == "010") && regionPhi == "101") || (regionEta != "101" && regionPhi != "101" && (regionEta == "010" || regionPhi == "010" || regionEta == "110" || regionPhi == "110" || regionEta == "011" || regionPhi == "011") && centralHighest))) bJetCands->push_back(L1JetParticle(math::PtEtaPhiMLorentzVector(pt, eta, phi, mass), L1JetParticle::kCentral, regionEta, regionPhi));  // 10Aug
+
+    if(abs(eta) < 2.5 && 
+      ((regionEta == "101" && (regionPhi == "110" || regionPhi == "101" || regionPhi == "010")) || 
+      ((regionEta == "110" || regionEta == "101" || regionEta == "010") && regionPhi == "101") || 
+      (regionEta == "111" && (regionPhi == "110" || regionPhi == "010")) || 
+      ((regionEta == "110" || regionEta == "010") && regionPhi == "111") || 
+      ((regionEta == "010" || regionPhi == "010" || regionEta == "110" || regionPhi == "110" || regionEta == "011" || regionPhi == "011") && centralHighest))) bJetCands->push_back(L1JetParticle(math::PtEtaPhiMLorentzVector(pt, eta, phi, mass), L1JetParticle::kCentral, regionEta, regionPhi, centerIsTau, centerIsEGamma));  // 12 Aug
+
+//    if(abs(eta) < 2.5 &&
+//      ((regionEta == "101" && (regionPhi == "110" || regionPhi == "101" || regionPhi == "010")) ||
+//      ((regionEta == "110" || regionEta == "101" || regionEta == "010") && regionPhi == "101") ||
+//      (regionEta == "111" && (regionPhi == "110" || regionPhi == "010")) ||
+//      ((regionEta == "110" || regionEta == "010") && regionPhi == "111") ||
+//      (regionEta == "010" && regionPhi == "010" && !centerIsEGamma && centralHighest) ||
+//      ((regionEta == "110" || regionPhi == "110" || regionEta == "011" || regionPhi == "011") && centralHighest))) bJetCands->push_back(L1JetParticle(math::PtEtaPhiMLorentzVector(pt, eta, phi, mass), L1JetParticle::kCentral, regionEta, regionPhi, centerIsTau, centerIsEGamma));  // 23 Aug
+
+    //if(abs(eta) < 2.5 && (regionEta == "101" || regionPhi == "101" || regionEta == "010" || regionPhi == "010" || regionEta == "110" || regionPhi == "110" || regionEta == "011" || regionPhi == "011")) bJetCands->push_back(L1JetParticle(math::PtEtaPhiMLorentzVector(pt, eta, phi, mass), L1JetParticle::kCentral, regionEta, regionPhi)); 
   }
 
   iEvent.put(std::move(cJetCands), "Stage3");
