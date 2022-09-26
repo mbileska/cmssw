@@ -1,5 +1,15 @@
-<use name="DataFormats/Math"/>
+<use name="FWCore/Framework"/>
 <use name="FWCore/ParameterSet"/>
+<use name="FWCore/Utilities"/>
+
+<use name="DataFormats/Math"/>
+
+<use   name="CommonTools/Utils"/>
+
+<use   name="roottmva"/>
+
+
+<use   name="hls"/>
 <use   name="clhep"/>
 
 <export> 

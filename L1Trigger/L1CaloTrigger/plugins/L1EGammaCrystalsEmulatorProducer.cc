@@ -56,6 +56,8 @@ Implementation:
 #include "L1Trigger/L1TCalorimeter/interface/CaloTools.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 
+#include "Phase2L1CaloEGammaEmulator.h"
+
 static constexpr bool do_brem = true;
 
 static constexpr int n_eta_bins = 2;
@@ -385,7 +387,28 @@ void L1EGCrystalClusterEmulatorProducer::produce(edm::Event& iEvent, const edm::
       ehit.setPosition(GlobalVector(cell->getPosition().x(), cell->getPosition().y(), cell->getPosition().z()));
       ehit.setEnergy(et);
       ehit.setPt();
+
       ecalhits.push_back(ehit);
+
+      // Debugging purposes only: only use ECAL hits in Card 28 to make clusters
+      // int cc = 28;
+      // if (getCrystal_phiID(ehit.position().phi()) <= getPhiMax_card(cc) &&
+      // 	  getCrystal_phiID(ehit.position().phi()) >= getPhiMin_card(cc) &&
+      // 	  getCrystal_etaID(ehit.position().eta()) <= getEtaMax_card(cc) &&
+      // 	  getCrystal_etaID(ehit.position().eta()) >= getEtaMin_card(cc)){
+	
+      // 	// TEMP: only use ECAL hits in Card 28
+      // 	ecalhits.push_back(ehit);
+
+      // 	if ((getCrystal_etaID(ehit.position().eta()) > 29) && (getCrystal_etaID(ehit.position().eta()) < 35)) {
+      // 	  std::cout << "[CARD " << cc << "]: Found ECAL cell/hit with eta/phi "
+      // 		    << ehit.position().eta() << ", "
+      // 		    << ehit.position().phi() << ", and in-detector phiID and etaID "
+      // 		    << getCrystal_phiID(ehit.position().phi()) << ", "
+      // 		    << getCrystal_etaID(ehit.position().eta()) << ", and ET (GeV) " 
+      // 		    << et << std::endl;
+      // 	}
+      // }
     }
   }
 
@@ -451,6 +474,8 @@ void L1EGCrystalClusterEmulatorProducer::produce(edm::Event& iEvent, const edm::
   int showerShape_cluster_L1Card[n_links_card][n_clusters_link][n_towers_halfPhi];
   int showerShapeLooseTk_cluster_L1Card[n_links_card][n_clusters_link][n_towers_halfPhi];
   int photonShowerShape_cluster_L1Card[n_links_card][n_clusters_link][n_towers_halfPhi];
+  int c2x5_cluster_L1Card[n_links_card][n_clusters_link][n_towers_halfPhi];
+  int c5x5_cluster_L1Card[n_links_card][n_clusters_link][n_towers_halfPhi];
 
   for (int ii = 0; ii < n_links_card; ++ii) {
     for (int jj = 0; jj < n_towers_per_link; ++jj) {
@@ -478,8 +503,16 @@ void L1EGCrystalClusterEmulatorProducer::produce(edm::Event& iEvent, const edm::
   // After merging the clusters in different regions of a single L1 card
   vector<mycluster> cluster_list_merged[n_towers_halfPhi];
 
+
+  int theCard = -1;
+
+
   for (int cc = 0; cc < n_towers_halfPhi; ++cc) {  // Loop over 36 L1 cards
     // Loop over 3x4 etaxphi regions to search for max 5 clusters
+
+    // TEMP: only do one card
+    //    if (cc != theCard) continue;
+
     for (int nregion = 0; nregion <= n_clusters_max; ++nregion) {
       int nclusters = 0;
       bool build_cluster = true;
@@ -497,7 +530,9 @@ void L1EGCrystalClusterEmulatorProducer::produce(edm::Event& iEvent, const edm::
               // Check that the hit is in the good card
               getCrystal_etaID(hit.position().eta()) < getEtaMin_card(cc) + n_crystals_3towers * (nregion + 1) &&
               getCrystal_etaID(hit.position().eta()) >= getEtaMin_card(cc) + n_crystals_3towers * nregion &&
-              !hit.used() && hit.pt() >= 1.0 && hit.pt() > centerhit.pt())  // 3 towers x 5 crystals
+              !hit.used() && hit.pt() > centerhit.pt() 
+	      && hit.pt() >= 1.0  // TEMP: do not require the highest hit to have pt > 1
+	      )  // 3 towers x 5 crystals
           {
             // Highest hit in good region with pt>1 and not used in any other cluster
             centerhit = hit;
@@ -659,10 +694,13 @@ void L1EGCrystalClusterEmulatorProducer::produce(edm::Event& iEvent, const edm::
         }
       }
       if (cluster_list[cc][jj].cpt > 0) {
-        cluster_list[cc][jj].cpt =
-            cluster_list[cc][jj].cpt *
-            calib_(cluster_list[cc][jj].cpt,
-                   std::abs(cluster_list[cc][jj].craweta_));  //Mark's calibration as a function of eta and pt
+        cluster_list[cc][jj].cpt = cluster_list[cc][jj].cpt * calib_(cluster_list[cc][jj].cpt,
+								     std::abs(cluster_list[cc][jj].craweta_));  //Mark's calibration as a function of eta and pt
+	std::cout << "Calib factor for (pt, eta): " << cluster_list[cc][jj].cpt << ", " 
+		  << std::abs(cluster_list[cc][jj].craweta_) << " is: "
+		  << calib_(cluster_list[cc][jj].cpt,std::abs(cluster_list[cc][jj].craweta_)) 
+		  << std::endl;
+								   
         cluster_list_merged[cc].push_back(cluster_list[cc][jj]);
       }
     }
@@ -678,6 +716,8 @@ void L1EGCrystalClusterEmulatorProducer::produce(edm::Event& iEvent, const edm::
           getTowerID(cluster_list_merged[cc][jj].ceta_, cluster_list_merged[cc][jj].cphi_);
       energy_cluster_L1Card[jj % n_links_card][jj / n_links_card][cc] = cluster_list_merged[cc][jj].cpt;
       brem_cluster_L1Card[jj % n_links_card][jj / n_links_card][cc] = cluster_list_merged[cc][jj].cbrem_;
+      c2x5_cluster_L1Card[jj % n_links_card][jj / n_links_card][cc] = cluster_list_merged[cc][jj].c2x5_;
+      c5x5_cluster_L1Card[jj % n_links_card][jj / n_links_card][cc] = cluster_list_merged[cc][jj].c5x5_;
       if (passes_ss(cluster_list_merged[cc][jj].cpt,
                     cluster_list_merged[cc][jj].c2x5_ / cluster_list_merged[cc][jj].c5x5_))
         showerShape_cluster_L1Card[jj % n_links_card][jj / n_links_card][cc] = 1;
@@ -707,7 +747,8 @@ void L1EGCrystalClusterEmulatorProducer::produce(edm::Event& iEvent, const edm::
             for (int ii = 0; ii < n_towers_per_link; ++ii) {
               //Apply Mark's calibration at the same time (row of the lowest pT, as a function of eta)
               if ((getCrystal_etaID(hit.position().eta()) / n_crystals_towerEta) % n_towers_per_link == ii) {
-                ECAL_tower_L1Card[jj][ii][cc] += hit.pt() * calib_(0, std::abs(hit.position().eta()));
+		ECAL_tower_L1Card[jj][ii][cc] += hit.pt() * calib_(0, std::abs(hit.position().eta()));
+		ECAL_tower_L1Card[jj][ii][cc] += hit.pt();
                 iEta_tower_L1Card[jj][ii][cc] = getTower_absoluteEtaID(hit.position().eta());  //hit.id().ieta();
                 iPhi_tower_L1Card[jj][ii][cc] = getTower_absolutePhiID(hit.position().phi());  //hit.id().iphi();
               }
@@ -739,7 +780,7 @@ void L1EGCrystalClusterEmulatorProducer::produce(edm::Event& iEvent, const edm::
           if ((getCrystal_phiID(hit.position().phi()) / n_crystals_towerPhi) % n_links_card == jj) {
             for (int ii = 0; ii < n_towers_per_link; ++ii) {
               if ((getCrystal_etaID(hit.position().eta()) / n_crystals_towerEta) % n_towers_per_link == ii) {
-                HCAL_tower_L1Card[jj][ii][cc] += hit.pt();
+		HCAL_tower_L1Card[jj][ii][cc] += hit.pt();
                 iEta_tower_L1Card[jj][ii][cc] = getTower_absoluteEtaID(hit.position().eta());  //hit.id().ieta();
                 iPhi_tower_L1Card[jj][ii][cc] = getTower_absolutePhiID(hit.position().phi());  //hit.id().iphi();
               }
@@ -757,6 +798,24 @@ void L1EGCrystalClusterEmulatorProducer::produce(edm::Event& iEvent, const edm::
       }
     }
   }  //End of loop over cards
+
+  // Print Layer 1 outputs
+  // Write the emulator outputs to a .txt file
+  ofstream f;
+  f.open("cmsswProducerL1outputs.txt");
+  bool printOneCard = false;
+  //  unsigned int precision = 3;
+  // printL1ArrayInt(f, iEta_tower_L1Card, "iEta_tower_L1Card");
+  // printL1ArrayInt(f, iPhi_tower_L1Card, "iPhi_tower_L1Card");
+
+  printL1ArrayFloat(f, HCAL_tower_L1Card, "HCAL_tower_L1Card", printOneCard, theCard);
+  printL1ArrayFloat(f, ECAL_tower_L1Card, "ECAL_tower_L1Card", printOneCard, theCard);
+
+  // To-do: change these to support printing 4x3x36 (new emulator uses 4x2x36)
+  // printL1Array_ClusterFloat(f, energy_cluster_L1Card, "energy_cluster_L1Card (ap_uint<12> as float)", printOneCard, theCard);
+  // printL1Array_ClusterInt(f, towerID_cluster_L1Card, "towerID_cluster_L1Card (range: [0, 17*4): the tower that a cluster falls in)", printOneCard, theCard);
+  // printL1Array_ClusterInt(f, crystalID_cluster_L1Card, "crystalID_cluster_L1Card (range: [0, 25): the crystal that a cluster falls in (no info on which tower)", printOneCard, theCard);
+  f.close();
 
   //*********************************************************
   //******************** Do layer 2 *************************
@@ -778,6 +837,8 @@ void L1EGCrystalClusterEmulatorProducer::produce(edm::Event& iEvent, const edm::
   int showerShape_cluster_L2Card[n_links_GCTcard][n_clusters_per_link][n_GCTcards];
   int showerShapeLooseTk_cluster_L2Card[n_links_GCTcard][n_clusters_per_link][n_GCTcards];
   int photonShowerShape_cluster_L2Card[n_links_GCTcard][n_clusters_per_link][n_GCTcards];
+  int c2x5_cluster_L2Card[n_links_GCTcard][n_clusters_per_link][n_GCTcards];
+  int c5x5_cluster_L2Card[n_links_GCTcard][n_clusters_per_link][n_GCTcards];
 
   for (int ii = 0; ii < n_links_GCTcard; ++ii) {
     for (int jj = 0; jj < n_towers_per_link; ++jj) {
@@ -801,6 +862,8 @@ void L1EGCrystalClusterEmulatorProducer::produce(edm::Event& iEvent, const edm::
         photonShowerShape_cluster_L2Card[ii][jj][ll] = 0;
         showerShape_cluster_L2Card[ii][jj][ll] = 0;
         showerShapeLooseTk_cluster_L2Card[ii][jj][ll] = 0;
+	c2x5_cluster_L2Card[ii][jj][ll] = 0;
+	c5x5_cluster_L2Card[ii][jj][ll] = 0;
       }
     }
   }
@@ -827,6 +890,8 @@ void L1EGCrystalClusterEmulatorProducer::produce(edm::Event& iEvent, const edm::
                     crystalID_cluster_L1Card[ll % n_links_card][ll / n_links_card][card_right] % 5 -
                     5 * (towerID_cluster_L1Card[kk % n_links_card][kk / n_links_card][card_left]) % n_towers_per_link -
                     crystalID_cluster_L1Card[kk % n_links_card][kk / n_links_card][card_left] % 5) < 2) {
+
+	      std::cout << "Merging along phi edges..." << std::endl;
               if (energy_cluster_L1Card[kk % n_links_card][kk / n_links_card][card_left] >
                   energy_cluster_L1Card[ll % n_links_card][ll / n_links_card][card_right]) {
                 energy_cluster_L1Card[kk % n_links_card][kk / n_links_card][card_left] +=
@@ -871,6 +936,7 @@ void L1EGCrystalClusterEmulatorProducer::produce(edm::Event& iEvent, const edm::
                 if (towerID_cluster_L1Card[ll % n_links_card][ll / n_links_card][card_right] < n_towers_per_link &&
                     std::abs(5 + crystalID_cluster_L1Card[ll % n_links_card][ll / n_links_card][card_right] / 5 -
                              (crystalID_cluster_L1Card[kk % n_links_card][kk / n_links_card][card_left] / 5)) <= 5) {
+		  std::cout<< "Merging along phi edges for BREMS CORRECTIONS..."<< std::endl;
                   if (energy_cluster_L1Card[kk % n_links_card][kk / n_links_card][card_left] >
                           energy_cluster_L1Card[ll % n_links_card][ll / n_links_card][card_right] &&
                       energy_cluster_L1Card[ll % n_links_card][ll / n_links_card][card_right] >
@@ -914,6 +980,7 @@ void L1EGCrystalClusterEmulatorProducer::produce(edm::Event& iEvent, const edm::
                   crystalID_cluster_L1Card[kk % n_links_card][kk / n_links_card][card_bottom] / 5 -
                   5 * (towerID_cluster_L1Card[ll % n_links_card][ll / n_links_card][card_top] / n_towers_per_link) -
                   crystalID_cluster_L1Card[ll % n_links_card][ll / n_links_card][card_top] / 5) < 2) {
+	    std::cout<< "Merging along eta edges..."<< std::endl;
             if (energy_cluster_L1Card[kk % n_links_card][kk / n_links_card][card_bottom] >
                 energy_cluster_L1Card[ll % n_links_card][ll / n_links_card][card_bottom]) {
               energy_cluster_L1Card[kk % n_links_card][kk / n_links_card][card_bottom] +=
@@ -942,6 +1009,8 @@ void L1EGCrystalClusterEmulatorProducer::produce(edm::Event& iEvent, const edm::
         mc1.cshowershape_ = showerShape_cluster_L1Card[jj % n_links_card][jj / n_links_card][ii];
         mc1.cshowershapeloosetk_ = showerShapeLooseTk_cluster_L1Card[jj % n_links_card][jj / n_links_card][ii];
         mc1.cphotonshowershape_ = photonShowerShape_cluster_L1Card[jj % n_links_card][jj / n_links_card][ii];
+	mc1.c2x5_ = c2x5_cluster_L1Card[jj % n_links_card][jj / n_links_card][ii];
+	mc1.c5x5_ = c5x5_cluster_L1Card[jj % n_links_card][jj / n_links_card][ii];
         cluster_list_L2[ii].push_back(mc1);
       }
     }
@@ -1057,6 +1126,10 @@ void L1EGCrystalClusterEmulatorProducer::produce(edm::Event& iEvent, const edm::
                                        [ii / n_clusters_4link] = cluster_list_L2[ii][jj].cshowershapeloosetk_;
       photonShowerShape_cluster_L2Card[n_links_card * (ii % n_clusters_4link) + jj % n_links_card][jj / n_links_card]
                                       [ii / n_clusters_4link] = cluster_list_L2[ii][jj].cphotonshowershape_;
+      c2x5_cluster_L2Card[n_links_card * (ii % n_clusters_4link) + jj % n_links_card][jj / n_links_card]
+	                              [ii / n_clusters_4link] = cluster_list_L2[ii][jj].c2x5_;
+      c5x5_cluster_L2Card[n_links_card * (ii % n_clusters_4link) + jj % n_links_card][jj / n_links_card]
+	                              [ii / n_clusters_4link] = cluster_list_L2[ii][jj].c5x5_;
     }
   }
 
@@ -1093,9 +1166,9 @@ void L1EGCrystalClusterEmulatorProducer::produce(edm::Event& iEvent, const edm::
                                             -1000,
                                             float(brem_cluster_L2Card[ii][jj][ll]),
                                             -1000,
-                                            -1000,
-                                            energy_cluster_L2Card[ii][jj][ll],
-                                            -1,
+                                            c2x5_cluster_L2Card[ii][jj][ll],    // et2x5
+                                            energy_cluster_L2Card[ii][jj][ll],  // et3x5 (not computed)
+                                            c5x5_cluster_L2Card[ii][jj][ll],    // et5x5
                                             is_iso&& is_ss,
                                             is_iso&& is_ss,
                                             is_photon,
@@ -1103,6 +1176,9 @@ void L1EGCrystalClusterEmulatorProducer::produce(edm::Event& iEvent, const edm::
                                             is_looseTkiso&& is_looseTkss,
                                             is_iso&& is_ss);
           // Experimental parameters, don't want to bother with hardcoding them in data format
+	  // Print L2 array output
+	  //	  printL1Array_ClusterFloat(f, energy_cluster_L2Card, "energy_cluster_L2Card (float)", printOneCard, theCard);
+
           std::map<std::string, float> params;
           params["standaloneWP_showerShape"] = is_ss;
           params["standaloneWP_isolation"] = is_iso;
@@ -1176,28 +1252,45 @@ void L1EGCrystalClusterEmulatorProducer::produce(edm::Event& iEvent, const edm::
 }
 
 bool L1EGCrystalClusterEmulatorProducer::passes_iso(float pt, float iso) {
+  bool is_iso = true;
   if (pt < slideIsoPtThreshold) {
     if (!((a0_80 - a1_80 * pt) > iso))
-      return false;
+      is_iso = false;
   } else {
     if (iso > a0)
-      return false;
+      is_iso = false;
   }
-  return true;
+  if (pt > 130)
+    is_iso = true;
+  return is_iso;
 }
 
 bool L1EGCrystalClusterEmulatorProducer::passes_looseTkiso(float pt, float iso) {
-  return (b0 + b1 * std::exp(-b2 * pt) > iso);
+  bool is_iso = (b0 + b1 * std::exp(-b2 * pt) > iso);
+  if (pt > 130)
+    is_iso = true;
+  return is_iso;
 }
 
 bool L1EGCrystalClusterEmulatorProducer::passes_ss(float pt, float ss) {
-  return ((c0_ss + c1_ss * std::exp(-c2_ss * pt)) <= ss);
+  bool is_ss = ((c0_ss + c1_ss * std::exp(-c2_ss * pt)) <= ss);
+  if (pt > 130)
+    is_ss = true;
+  return is_ss;
 }
 
-bool L1EGCrystalClusterEmulatorProducer::passes_photon(float pt, float pss) { return (pss > d0 - d1 * pt); }
+bool L1EGCrystalClusterEmulatorProducer::passes_photon(float pt, float pss) {
+  bool is_ss = (pss > d0 - d1 * pt);
+  if (pt > 130)
+    is_ss = true;
+  return is_ss;
+}
 
 bool L1EGCrystalClusterEmulatorProducer::passes_looseTkss(float pt, float ss) {
-  return ((e0_looseTkss - e1_looseTkss * std::exp(-e2_looseTkss * pt)) <= ss);
+  bool is_ss = ((e0_looseTkss - e1_looseTkss * std::exp(-e2_looseTkss * pt)) <= ss);
+  if (pt > 130)
+    is_ss = true;
+  return is_ss;
 }
 
 //define this as a plug-in
