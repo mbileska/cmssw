@@ -25,5 +25,12 @@
   <class name="l1tp2::CaloJetsCollection" />
   <class name="edm::Wrapper<l1tp2::CaloJetsCollection>" />
 
+  <class name="l1tp2::CaloPFCluster"  ClassVersion="5">
+         <version ClassVersion="5" checksum="3171302808"/>
+  </class>
+  <class name="std::vector<l1tp2::CaloPFCluster>" />
+  <class name="l1tp2::CaloPFClusterCollection" />
+  <class name="edm::Wrapper<l1tp2::CaloPFClusterCollection>" />
+
 </lcgdict>
 
