@@ -122,12 +122,16 @@ void Phase2L1CaloPFClusterEmulator::produce(edm::Event& iEvent, const edm::Event
 
   iEvent.getByToken(caloTowerToken_, caloTowerCollection);
   float GCTintTowers[34][72];
+  float realEta[34][72];
+  float realPhi[34][72];
   for (const l1tp2::CaloTower &i : *caloTowerCollection) {
     std::cout << "Phase2L1CaloPFClusterEmulator: GCT FULL tower energy " << i.ecalTowerEt()
               << " at eta, phi: (" << i.towerIEta() << ", " << i.towerIPhi() << ")" << std::endl; 
 
     int ieta = i.towerIEta(); int iphi = i.towerIPhi();
     GCTintTowers[ieta][iphi] = i.ecalTowerEt();
+    realEta[ieta][iphi] = i.towerEta();
+    realPhi[ieta][iphi] = i.towerPhi();
 
     //l1tp2::CaloPFCluster l1CaloPFCluster;
     //l1CaloPFCluster.setClusterEt(i.ecalTowerEt());
@@ -210,12 +214,19 @@ void Phase2L1CaloPFClusterEmulator::produce(edm::Event& iEvent, const edm::Event
     tempPfclusters = pfcluster(temporary, etaoffset, phioffset);  
 
     for(int i=0; i<8; i++){
+      int gcteta = tempPfclusters.GCTpfclusters[i].eta;
+      int gctphi = tempPfclusters.GCTpfclusters[i].phi;
+      float towereta = realEta[gcteta][gctphi];
+      float towerphi = realPhi[gcteta][gctphi];
       std::cout << "Phase2L1CaloPFClusterEmulator: GCT Pfclusters energy " << tempPfclusters.GCTpfclusters[i].et
-                << " at eta, phi: (" << tempPfclusters.GCTpfclusters[i].eta << ", " << tempPfclusters.GCTpfclusters[i].phi << ")" << std::endl;
+                << " at ieta, iphi: (" << tempPfclusters.GCTpfclusters[i].eta << ", " << tempPfclusters.GCTpfclusters[i].phi << ")"
+                << " at eta, phi: (" << towereta << ", " << towerphi << ")" << std::endl;
       l1tp2::CaloPFCluster l1CaloPFCluster;
       l1CaloPFCluster.setClusterEt(tempPfclusters.GCTpfclusters[i].et);
-      l1CaloPFCluster.setClusterIEta(tempPfclusters.GCTpfclusters[i].eta);
-      l1CaloPFCluster.setClusterIPhi(tempPfclusters.GCTpfclusters[i].phi);
+      l1CaloPFCluster.setClusterIEta(gcteta);
+      l1CaloPFCluster.setClusterIPhi(gctphi);
+      l1CaloPFCluster.setClusterEta(towereta);
+      l1CaloPFCluster.setClusterPhi(towerphi);
       pfclusterCands->push_back(l1CaloPFCluster);
       //allPFClusters.push_back(tempPfclusters.GCTpfclusters[i]);
     }

@@ -235,7 +235,7 @@ void RemoveTmp(float temp[21][8], int eta, int phi){
   return;
 }
 
-GCTpfcluster_t recoPfcluster(float temporary[21][8]){ 
+GCTpfcluster_t recoPfcluster(float temporary[21][8], int etaoffset, int phioffset){
   GCTpfcluster_t pfclusterReturn;
 
   region_t region;
@@ -251,62 +251,22 @@ GCTpfcluster_t recoPfcluster(float temporary[21][8]){
   if(!(regionMax.eta >= 2 && regionMax.eta <= 18 && regionMax.phi >= 2 && regionMax.phi <= 5)) pfcluster_et = 0;
 
   pfclusterReturn.et  = pfcluster_et;
-  pfclusterReturn.eta = regionMax.eta;
-  pfclusterReturn.phi = regionMax.phi;
-
-  //pfclusterReturn.range(11, 0) = pfcluster_et;
-  //pfclusterReturn.range(18, 12) = regionMax.eta;
-  //pfclusterReturn.range(23, 19) = regionMax.phi;
+  pfclusterReturn.eta = regionMax.eta - 2 + etaoffset;
+  pfclusterReturn.phi = regionMax.phi - 2 + phioffset;
 
   return pfclusterReturn ;
 }
 
-GCTPfcluster_t pfcluster(float temporary[21][8], int etaoffset, int phioffset) {
+GCTPfcluster_t pfcluster(float temporary[21][8], int etaoffset, int phioffset){
   GCTpfcluster_t pfcluster[8];
 
   for(int i=0; i<8; i++){
-    pfcluster[i] = recoPfcluster(temporary);
+    pfcluster[i] = recoPfcluster(temporary, etaoffset, phioffset);
   }
-
-//  ap_uint<24> temp_cluster0 = recoPfcluster(temporary) ;
-//  pfcluster[0].range(11, 0) = temp_cluster0.range(11, 0);
-//  pfcluster[0].range(18, 12) = temp_cluster0.range(18, 12) - 2 + etaoffset;
-//  pfcluster[0].range(23, 19) = temp_cluster0.range(23, 19) - 2 + phioffset;
-//  ap_uint<24> temp_cluster1 = recoPfcluster(temporary) ;
-//  pfcluster[1].range(11, 0) =  temp_cluster1.range(11, 0);
-//  pfcluster[1].range(18, 12) =  temp_cluster1.range(18, 12) - 2 + etaoffset;
-//  pfcluster[1].range(23, 19) =  temp_cluster1.range(23, 19) - 2 + phioffset;
-//  ap_uint<24> temp_cluster2 = recoPfcluster(temporary) ;
-//  pfcluster[2].range(11, 0) =  temp_cluster2.range(11, 0);
-//  pfcluster[2].range(18, 12) =  temp_cluster2.range(18, 12) - 2 + etaoffset;
-//  pfcluster[2].range(23, 19) =  temp_cluster2.range(23, 19) - 2 + phioffset;
-//  ap_uint<24> temp_cluster3 = recoPfcluster(temporary) ;
-//  pfcluster[3].range(11, 0) =  temp_cluster3.range(11, 0);
-//  pfcluster[3].range(18, 12) =  temp_cluster3.range(18, 12) - 2 + etaoffset;
-//  pfcluster[3].range(23, 19) =  temp_cluster3.range(23, 19) - 2 + phioffset;
-//  ap_uint<24> temp_cluster4 = recoPfcluster(temporary) ;
-//  pfcluster[4].range(11, 0) =  temp_cluster4.range(11, 0);
-//  pfcluster[4].range(18, 12) =  temp_cluster4.range(18, 12) - 2 + etaoffset;
-//  pfcluster[4].range(23, 19) =  temp_cluster4.range(23, 19) - 2 + phioffset;
-//  ap_uint<24> temp_cluster5 = recoPfcluster(temporary) ;
-//  pfcluster[5].range(11, 0) =  temp_cluster5.range(11, 0);
-//  pfcluster[5].range(18, 12) =  temp_cluster5.range(18, 12) - 2 + etaoffset;
-//  pfcluster[5].range(23, 19) =  temp_cluster5.range(23, 19) - 2 + phioffset;
-//  ap_uint<24> temp_cluster6 = recoPfcluster(temporary) ;
-//  pfcluster[6].range(11, 0) =  temp_cluster6.range(11, 0);
-//  pfcluster[6].range(18, 12) =  temp_cluster6.range(18, 12) - 2 + etaoffset;
-//  pfcluster[6].range(23, 19) =  temp_cluster6.range(23, 19) - 2 + phioffset;
-//  ap_uint<24> temp_cluster7 = recoPfcluster(temporary) ;
-//  pfcluster[7].range(11, 0) =  temp_cluster7.range(11, 0);
-//  pfcluster[7].range(18, 12) =  temp_cluster7.range(18, 12) - 2 + etaoffset;
-//  pfcluster[7].range(23, 19) =  temp_cluster7.range(23, 19) - 2 + phioffset;
 
   GCTPfcluster_t GCTPfclusters;
 
   for(int i=0; i<8; i++){
-    //GCTPfclusters.GCTpfclusters[i].et = pfcluster[i].range(11, 0);
-    //GCTPfclusters.GCTpfclusters[i].eta = pfcluster[i].range(18, 12);
-    //GCTPfclusters.GCTpfclusters[i].phi = pfcluster[i].range(23, 19);
     GCTPfclusters.GCTpfclusters[i].et = pfcluster[i].et;
     GCTPfclusters.GCTpfclusters[i].eta = pfcluster[i].eta;
     GCTPfclusters.GCTpfclusters[i].phi = pfcluster[i].phi;
