@@ -5,7 +5,7 @@
 //
 /**\class Phase2L1CaloPFClusterEmulator Phase2L1CaloPFClusterEmulator.cc L1Trigger/L1CaloTrigger/plugins/Phase2L1CaloPFClusterEmulator.cc
 
- Description: [one line class summary]
+ Description: Creates 3x3 PF clusters from GCTintTowers to be sent to correlator. Follows firmware logic, creates 8 clusters per (2+17+2)x(2+4+2).
 
  Implementation:
      [Notes on implementation]
