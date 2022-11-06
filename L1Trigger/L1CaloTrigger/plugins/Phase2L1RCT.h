@@ -515,7 +515,7 @@ class towerHCAL {
 
   // set members
   inline void zeroOut() { et = 0; fb = 0; };
-  inline void addEt(ap_uint<6> newEt) { et += newEt; };
+  inline void addEt(ap_uint<10> newEt) { et += newEt; };
 
   // get members
   inline ap_uint<10> getEt() { return et; };
