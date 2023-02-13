@@ -7,12 +7,10 @@ using std::bitset;
 #include <string>
 using std::string;
 
-#include "UCTRegion.hh"
-
-#include "UCTGeometry.hh"
-#include "UCTLogging.hh"
-
-#include "UCTTower.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTRegion.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTGeometry.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTLogging.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTTower.hh"
 
 using namespace l1tcalo;
 
@@ -175,6 +173,9 @@ bool UCTRegion::process() {
       if (activeStrip)
         activeTowerEtaPattern |= (0x1 << iEta);
     }
+    //std::cout<<"activeTowerEtaPattern: "<<activeTowerEtaPattern<<std::endl;
+    //setActiveTowerEta(activeTowerEtaPattern);
+    //activeTowerEta_m = activeTowerEtaPattern;
     bitset<4> activeTowerPhiPattern = 0;
     for (uint32_t iPhi = 0; iPhi < nPhi; iPhi++) {
       bool activeStrip = false;
@@ -185,6 +186,9 @@ bool UCTRegion::process() {
       if (activeStrip)
         activeTowerPhiPattern |= (0x1 << iPhi);
     }
+    //setActiveTowerPhi(activeTowerPhiPattern);
+    //std::cout<<"activeTowerPhiPattern: "<<activeTowerPhiPattern<<std::endl;
+    //activeTowerPhi_m = activeTowerPhiPattern;
     // Calculate veto bits for eg and tau patterns
     bool veto = vetoBit(activeTowerEtaPattern, activeTowerPhiPattern);
     bool egVeto = veto;
