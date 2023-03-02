@@ -892,7 +892,7 @@ void L1EGCrystalClusterEmulatorProducer::produce(edm::Event& iEvent, const edm::
   int crystalID_cluster_L2Card[n_links_GCTcard][n_clusters_per_link][n_GCTcards];
   float isolation_cluster_L2Card[n_links_GCTcard][n_clusters_per_link][n_GCTcards];
   float raw_isolation_cluster_L2Card[n_links_GCTcard][n_clusters_per_link][n_GCTcards];
-  float HE_cluster_L2Card[n_links_GCTcard][n_clusters_per_link][n_GCTcards];
+  //float HE_cluster_L2Card[n_links_GCTcard][n_clusters_per_link][n_GCTcards];
   int showerShape_cluster_L2Card[n_links_GCTcard][n_clusters_per_link][n_GCTcards];
   int showerShapeLooseTk_cluster_L2Card[n_links_GCTcard][n_clusters_per_link][n_GCTcards];
   int photonShowerShape_cluster_L2Card[n_links_GCTcard][n_clusters_per_link][n_GCTcards];
@@ -916,7 +916,7 @@ void L1EGCrystalClusterEmulatorProducer::produce(edm::Event& iEvent, const edm::
         crystalID_cluster_L2Card[ii][jj][ll] = 0;
         isolation_cluster_L2Card[ii][jj][ll] = 0;
         raw_isolation_cluster_L2Card[ii][jj][ll] = 0;
-        HE_cluster_L2Card[ii][jj][ll] = 0;
+        //HE_cluster_L2Card[ii][jj][ll] = 0;
         photonShowerShape_cluster_L2Card[ii][jj][ll] = 0;
         showerShape_cluster_L2Card[ii][jj][ll] = 0;
         showerShapeLooseTk_cluster_L2Card[ii][jj][ll] = 0;
@@ -1243,8 +1243,8 @@ void L1EGCrystalClusterEmulatorProducer::produce(edm::Event& iEvent, const edm::
                               [ii / n_clusters_4link] = cluster_list_L2[ii][jj].ciso_;
       raw_isolation_cluster_L2Card[n_links_card * (ii % n_clusters_4link) + jj % n_links_card][jj / n_links_card]
                               [ii / n_clusters_4link] = cluster_list_L2[ii][jj].crawIso_;
-      HE_cluster_L2Card[n_links_card * (ii % n_clusters_4link) + jj % n_links_card][jj / n_links_card]
-                       [ii / n_clusters_4link] = cluster_list_L2[ii][jj].chovere_;
+      //HE_cluster_L2Card[n_links_card * (ii % n_clusters_4link) + jj % n_links_card][jj / n_links_card]
+      //                 [ii / n_clusters_4link] = cluster_list_L2[ii][jj].chovere_;
       showerShape_cluster_L2Card[n_links_card * (ii % n_clusters_4link) + jj % n_links_card][jj / n_links_card]
                                 [ii / n_clusters_4link] = cluster_list_L2[ii][jj].cshowershape_;
       showerShapeLooseTk_cluster_L2Card[n_links_card * (ii % n_clusters_4link) + jj % n_links_card][jj / n_links_card]
