@@ -30,15 +30,15 @@ namespace l1tp2 {
 
   private:
     // ET
-    float clusterEt_ = 0.;
+    float clusterEt_;
     // GCT ieta
-    int clusterIEta_ = -99;
+    int clusterIEta_;
     // GCT iphi
-    int clusterIPhi_ = -99;
+    int clusterIPhi_;
     // Tower (real) eta
-    float clusterEta_ = -99.;
+    float clusterEta_;
     // Tower (real) phi
-    float clusterPhi_ = -99.;
+    float clusterPhi_;
     
   };
 
