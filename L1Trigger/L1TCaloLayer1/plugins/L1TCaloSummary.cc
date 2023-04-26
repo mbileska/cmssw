@@ -65,6 +65,27 @@ using namespace l1tcalo;
 using namespace l1extra;
 using namespace std;
 
+bool compareByPt (UCTObject* i, UCTObject* j) { return(i->et() > j->et()); };
+
+const ap_uint<8> ieta_lut[2][41] = {
+    {0x01, 0x03, 0x05, 0x07, 0x09, 0x0B, 0x0D, 0x0F, 0x11, 0x13, 0x15,
+     0x17, 0x19, 0x1B, 0x1D, 0x1F, 0x21, 0x23, 0x25, 0x27, 0x29, 0x2B,
+     0x2D, 0x30, 0x33, 0x37, 0x3B, 0x40, 0x00, 0x46, 0x4A, 0x4E, 0x52,
+     0x56, 0x5A, 0x5E, 0x62, 0x66, 0x6A, 0x6F, 0x72},
+    {0xFE, 0xFC, 0xFA, 0xF8, 0xF6, 0xF4, 0xF2, 0xF0, 0xEE, 0xEC, 0xEA,
+     0xE8, 0xE6, 0xE4, 0xE2, 0xE0, 0xDE, 0xDC, 0xDA, 0xD8, 0xD6, 0xD4,
+     0xD2, 0xCF, 0xCC, 0xC8, 0xC4, 0xBF, 0x00, 0xB9, 0xB5, 0xB1, 0xAD,
+     0xA9, 0xA5, 0xA1, 0x9D, 0x99, 0x95, 0x90, 0x8D}};
+
+const ap_uint<8> iphi_lut[72] = {
+    0x00, 0x02, 0x04, 0x06, 0x08, 0x0A, 0x0C, 0x0E, 0x10, 0x12, 0x14, 0x16,
+    0x18, 0x1A, 0x1C, 0x1E, 0x20, 0x22, 0x24, 0x26, 0x28, 0x2A, 0x2C, 0x2E,
+    0x30, 0x32, 0x34, 0x36, 0x38, 0x3A, 0x3C, 0x3E, 0x40, 0x42, 0x44, 0x46,
+    0x48, 0x4A, 0x4C, 0x4E, 0x50, 0x52, 0x54, 0x56, 0x58, 0x5A, 0x5C, 0x5E,
+    0x60, 0x62, 0x64, 0x66, 0x68, 0x6A, 0x6C, 0x6E, 0x70, 0x72, 0x74, 0x76,
+    0x78, 0x7A, 0x7C, 0x7E, 0x80, 0x82, 0x84, 0x86, 0x88, 0x8A, 0x8C, 0x8E};
+
+
 //
 // class declaration
 //
@@ -231,6 +252,8 @@ void L1TCaloSummary::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) 
     exit(1);
   }
 
+  std::vector<UCTObject*> tempJets;
+  tempJets.clear();
   double pt = 0;
   double eta = -999.;
   double phi = -999.;
@@ -238,10 +261,11 @@ void L1TCaloSummary::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) 
 
   std::list<UCTObject*> boostedJetObjs = summaryCard.getBoostedJetObjs();
   for (std::list<UCTObject*>::const_iterator i = boostedJetObjs.begin(); i != boostedJetObjs.end(); i++) {
-    const UCTObject* object = *i;
-    pt = ((double)object->et()) * caloScaleFactor * boostedJetPtFactor;
-    eta = g.getUCTTowerEta(object->iEta());
-    phi = g.getUCTTowerPhi(object->iPhi());
+    UCTObject* object = *i;
+    //pt = ((double)object->et()) * caloScaleFactor * boostedJetPtFactor;
+    //eta = g.getUCTTowerEta(object->iEta());
+    //phi = g.getUCTTowerPhi(object->iPhi());
+    double temp_eta = g.getUCTTowerEta(object->iEta());
     bitset<3> activeRegionEtaPattern = 0;
     for (uint32_t iEta = 0; iEta < 3; iEta++) {
       bool activeStrip = false;
@@ -276,14 +300,42 @@ void L1TCaloSummary::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) 
                           object->boostedJetRegionET()[4] >= object->boostedJetRegionET()[7] &&
                           object->boostedJetRegionET()[4] >= object->boostedJetRegionET()[8];
 
-    if (abs(eta) < 2.4 && ((regionEta == "101" && (regionPhi == "110" || regionPhi == "101" || regionPhi == "010")) ||
+    if (abs(temp_eta) < 2.4 && ((regionEta == "101" && (regionPhi == "110" || regionPhi == "101" || regionPhi == "010")) ||
                            ((regionEta == "110" || regionEta == "101" || regionEta == "010") && regionPhi == "101") ||
                            (regionEta == "111" && (regionPhi == "110" || regionPhi == "010")) ||
                            ((regionEta == "110" || regionEta == "010") && regionPhi == "111") ||
                            ((regionEta == "010" || regionPhi == "010" || regionEta == "110" || regionPhi == "110" ||
                              regionEta == "011" || regionPhi == "011") &&
-                            centralHighest)))
-      bJetCands->push_back(L1JetParticle(math::PtEtaPhiMLorentzVector(pt, eta, phi, mass), L1JetParticle::kCentral));
+                            centralHighest))) {
+      //bJetCands->push_back(L1JetParticle(math::PtEtaPhiMLorentzVector(pt, eta, phi, mass), L1JetParticle::kCentral));
+      tempJets.push_back(object);
+    }
+  }
+
+  if(tempJets.size() > 1){  std::sort(tempJets.begin(), tempJets.end(), compareByPt);}
+
+  int njets = 0;
+  uint32_t output[6] = {0};
+  output[0] |= ((0x1 & modelResult[0].range(10, 10)) << 28);
+  output[1] |= ((0xF & modelResult[0].range(9, 6)) << 28);
+  output[2] |= ((0xF & modelResult[0].range(5, 1)) << 28 );
+  output[3] |= ((0x1 & modelResult[0].range(0, 0)) << 31 );
+
+  for(auto object:tempJets){
+    pt = ((double)object->et()) * caloScaleFactor * boostedJetPtFactor;
+    eta = g.getUCTTowerEta(object->iEta());
+    phi = g.getUCTTowerPhi(object->iPhi());
+    output[njets] |= (0x000007FF & object->et());
+    if(eta > 0) output[njets] |= ((0xFF & ieta_lut[0][object->iEta() - 1]) << 11);
+    else output[njets] |= ((0xFF & ieta_lut[1][object->iEta() - 1]) << 11);
+    output[njets] |= ((0xFF & iphi_lut[object->iPhi()]) << 19);
+    bJetCands->push_back(L1JetParticle(math::PtEtaPhiMLorentzVector(pt, eta, phi, mass), L1JetParticle::kCentral));
+    njets++;
+    if(njets == 6) break;
+  }
+
+  for(int i = 0; i < 6; i++){
+    std::cout<<hex<<output[i]<<std::endl;
   }
 
   iEvent.put(std::move(bJetCands), "Boosted");
