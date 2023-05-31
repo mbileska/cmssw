@@ -99,7 +99,9 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
 
     int ieta = i.towerIEta();
     int iphi = i.towerIPhi();
-    GCTintTowers[ieta][iphi] = i.ecalTowerEt();
+    if(i.ecalTowerEt() > 1.) GCTintTowers[ieta][iphi] = i.ecalTowerEt(); // suppress 1 GeV towers
+    else GCTintTowers[ieta][iphi] = 0;
+    //GCTintTowers[ieta][iphi] = i.ecalTowerEt();
     realEta[ieta][iphi] = i.towerEta();
     realPhi[ieta][iphi] = i.towerPhi();
   }

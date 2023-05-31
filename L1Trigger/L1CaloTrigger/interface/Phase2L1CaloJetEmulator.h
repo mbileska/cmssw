@@ -299,7 +299,7 @@ jetInfo getJetPosition(GCTsupertower_t temp[nSTEta][nSTPhi]){
 jetInfo getJetValues(GCTsupertower_t tempX[nSTEta][nSTPhi], int seed_eta, int seed_phi ){
   float temp[nSTEta+2][nSTPhi+2] ;
   float eta_slice[3] ;
-  float phi_slice[3];
+  //float phi_slice[3];
   jetInfo jet_tmp;
   //float debug[3][3];
 
@@ -316,9 +316,9 @@ jetInfo getJetValues(GCTsupertower_t tempX[nSTEta][nSTPhi], int seed_eta, int se
   }
 
   int seed_eta1,  seed_phi1 ;
-  int center_eta, center_phi;
-  center_eta = seed_eta;
-  center_phi = seed_phi;
+  //int center_eta, center_phi;
+  //center_eta = seed_eta;
+  //center_phi = seed_phi;
 
   seed_eta1 = seed_eta ; //to start from corner
   seed_phi1 = seed_phi ; //to start from corner
@@ -343,22 +343,24 @@ jetInfo getJetValues(GCTsupertower_t tempX[nSTEta][nSTPhi], int seed_eta, int se
           tmp3 = temp[j+m][k+2] ;
           eta_slice[m] = tmp1 + tmp2 + tmp3 ;
 
-          tmp1 = temp[j][k+m] ;
-          tmp2 = temp[j+1][k+m] ;
-          tmp3 = temp[j+2][k+m] ;
-          phi_slice[m] = tmp1 + tmp2 + tmp3 ;
+          //tmp1 = temp[j][k+m] ;
+          //tmp2 = temp[j+1][k+m] ;
+          //tmp3 = temp[j+2][k+m] ;
+          //phi_slice[m] = tmp1 + tmp2 + tmp3 ;
         }
 
-        center_eta = getEtCenterOf3(eta_slice[0], eta_slice[1], eta_slice[2]);
-        center_phi = getEtCenterOf3(phi_slice[0], phi_slice[1], phi_slice[2]);
+        //center_eta = getEtCenterOf3(eta_slice[0], eta_slice[1], eta_slice[2]);
+        //center_phi = getEtCenterOf3(phi_slice[0], phi_slice[1], phi_slice[2]);
       }
     }
   }
 
   jet_tmp.energy = eta_slice[0] + eta_slice[1] + eta_slice[2] ;
   // To find the jet centre: note that seed supertower is always (1, 1)
-  jet_tmp.etaCenter = 3*(seed_eta - 1 + center_eta) + tempX[seed_eta - 1 + center_eta][seed_phi - 1 + center_phi].centerEta;
-  jet_tmp.phiCenter = 3*(seed_phi - 1 + center_phi) + tempX[seed_eta - 1 + center_eta][seed_phi - 1 + center_phi].centerPhi;
+  //jet_tmp.etaCenter = 3*(seed_eta - 1 + center_eta) + tempX[seed_eta - 1 + center_eta][seed_phi - 1 + center_phi].centerEta;
+  //jet_tmp.phiCenter = 3*(seed_phi - 1 + center_phi) + tempX[seed_eta - 1 + center_eta][seed_phi - 1 + center_phi].centerPhi;
+  jet_tmp.etaCenter = 3*seed_eta + tempX[seed_eta][seed_phi].centerEta;
+  jet_tmp.phiCenter = 3*seed_phi + tempX[seed_eta][seed_phi].centerPhi;
 
   // DEBUG jet energy and seed
   //std::cout<<"inside getJetValues:"<<std::endl;
