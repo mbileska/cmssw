@@ -154,6 +154,14 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
       float towerphi = realPhi[gcttowereta+k*nTowerEta/2][gcttowerphi];
       tempJet.setTowerEta(towereta);
       tempJet.setTowerPhi(towerphi);
+      // add LorentzVector information
+      reco::Candidate::PolarLorentzVector tempJetp4;
+      tempJetp4.SetPt(tempJet.jetEt());
+      tempJetp4.SetEta(tempJet.jetEta());
+      tempJetp4.SetPhi(tempJet.jetPhi());
+      tempJetp4.SetM(0.);
+      tempJet.setP4(tempJetp4);
+
       halfJets.push_back(tempJet);
     }
 
