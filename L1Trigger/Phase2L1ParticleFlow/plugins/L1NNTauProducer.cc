@@ -266,14 +266,12 @@ void L1NNTauProducer::makeTau_HW(const l1t::PFCandidate& seed,
   float pNNVec[80];
   for (unsigned i0 = 0; i0 < 80; i0++)
     pNNVec[i0] = float(lNNVector[i0]);
-  L1TauEmu::etaphi_t eta = etaphi_t(seed.eta() * L1TauEmu::etaphi_base);
-  L1TauEmu::etaphi_t phi = etaphi_t(seed.phi() * L1TauEmu::etaphi_base);
 
   //Firmware Tau
   l1ct::Tau l1ctTau;
   l1ctTau.hwPt = l1ct::pt_t(pt);  //l1gt is <16,11> and currently <16,14>
-  l1ctTau.hwEta = l1ct::Scales::makeGlbEta(float(eta));
-  l1ctTau.hwPhi = l1ct::Scales::makeGlbPhi(float(phi));
+  l1ctTau.hwEta = l1ct::Scales::makeGlbEta(seed.eta()); // seed.eta() and seed.phi() are in physical coordinates
+  l1ctTau.hwPhi = l1ct::Scales::makeGlbPhi(seed.phi());
 
   l1ctTau.hwSeedPt = seed.pt();
   l1ctTau.hwSeedZ0 = seed.hwZ0();
