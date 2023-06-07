@@ -1,10 +1,12 @@
-#ifndef UCTRegion_hh
-#define UCTRegion_hh
+#ifndef L1Trigger_L1TCaloLayer1_UCTRegion_hh
+#define L1Trigger_L1TCaloLayer1_UCTRegion_hh
 
 #include <vector>
 #include <iostream>
+#include <bitset>
+using std::bitset;
 
-#include "UCTTower.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTTower.hh"
 
 namespace l1tcalo {
   constexpr uint32_t RegionETMask{0x000003FF};
@@ -42,7 +44,7 @@ public:
 
   // To setData for towers before processing
 
-  const std::vector<UCTTower*>& getTowers() { return towers; }
+  //std::vector<UCTTower*> towers;
 
   // To process event
 
@@ -52,6 +54,24 @@ public:
   bool setRegionSummary(
       uint16_t regionData);  // Use when the region collection is available and no direct access to TPGs
   bool process();
+
+//  bool setActiveTowerEta(bitset<4> activeTowerEta_in){
+//    activeTowerEta_m = activeTowerEta_in;
+//    return true;
+//  }
+//  bool setActiveTowerPhi(bitset<4> activeTowerPhi_in){
+//    activeTowerPhi_m = activeTowerPhi_in;
+//    return true;
+//  }
+//  bitset<4> activeTowerEta_m = 0;
+//  bitset<4> activeTowerPhi_m = 0;
+//
+//  const bitset<4> activeTowerEta() const {
+//    return activeTowerEta_m;
+//  }
+//  const bitset<4> activeTowerPhi() const {
+//    return activeTowerPhi_m;
+//  }
 
   // Packed data access
 
@@ -76,6 +96,7 @@ public:
   }
 
   const uint32_t compressedData() const { return regionSummary; }
+  const std::vector<UCTTower*> regionTowers() const{ return towers; }
 
   // Access functions for convenience
   // Note that the bit fields are limited in hardware
@@ -113,6 +134,8 @@ protected:
   std::vector<UCTTower*> towers;
 
   uint32_t regionSummary;
+//  bitset<4> activeTowerEta_m;
+//  bitset<4> activeTowerPhi_m;
 
   const int fwVersion;
 };

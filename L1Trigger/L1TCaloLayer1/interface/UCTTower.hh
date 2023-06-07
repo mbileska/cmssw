@@ -1,7 +1,7 @@
-#ifndef UCTTower_hh
-#define UCTTower_hh
+#ifndef L1Trigger_L1TCaloLayer1_UCTTower_hh
+#define L1Trigger_L1TCaloLayer1_UCTTower_hh
 
-#include "UCTGeometry.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTGeometry.hh"
 
 #include <array>
 

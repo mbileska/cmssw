@@ -2,10 +2,10 @@
 #include <cstdlib>
 #include <cstdint>
 
-#include "UCTCard.hh"
-#include "UCTRegion.hh"
-#include "UCTGeometry.hh"
-#include "UCTLogging.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTCard.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTRegion.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTGeometry.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTLogging.hh"
 
 UCTCard::UCTCard(uint32_t crt, uint32_t crd, int fwv) : crate(crt), card(crd), cardSummary(0), fwVersion(fwv) {
   UCTGeometry g;
@@ -29,7 +29,9 @@ bool UCTCard::process() {
   cardSummary = 0;
   for (uint32_t i = 0; i < regions.size(); i++) {
     if (regions[i] != nullptr)
+      //std::cout<<"processing UCTCard...."<<std::endl;
       regions[i]->process();
+      //std::cout<<"done"<<std::endl;
     cardSummary += regions[i]->et();
   }
   return true;

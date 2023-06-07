@@ -1,7 +1,7 @@
-#ifndef UCTGeometryExtended_hh
-#define UCTGeometryExtended_hh
+#ifndef L1Trigger_L1TCaloLayer1_UCTGeometryExtended_hh
+#define L1Trigger_L1TCaloLayer1_UCTGeometryExtended_hh
 
-#include "UCTGeometry.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTGeometry.hh"
 
 class UCTGeometryExtended : public UCTGeometry {
 public:

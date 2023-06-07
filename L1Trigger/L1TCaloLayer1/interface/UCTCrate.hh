@@ -1,9 +1,9 @@
-#ifndef UCTCrate_hh
-#define UCTCrate_hh
+#ifndef L1Trigger_L1TCaloLayer1_UCTCrate_hh
+#define L1Trigger_L1TCaloLayer1_UCTCrate_hh
 
 #include <vector>
 
-#include "UCTGeometry.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTGeometry.hh"
 
 class UCTCard;
 

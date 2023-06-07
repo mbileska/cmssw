@@ -1,5 +1,5 @@
-#ifndef UCTLogging_hh
-#define UCTLogging_hh
+#ifndef L1Trigger_L1TCaloLayer1_UCTLogging_hh
+#define L1Trigger_L1TCaloLayer1_UCTLogging_hh
 
 #define CMSSW
 

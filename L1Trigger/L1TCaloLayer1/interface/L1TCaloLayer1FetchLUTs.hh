@@ -1,7 +1,7 @@
-#ifndef L1TCaloLayer1FetchLUTs_hh
-#define L1TCaloLayer1FetchLUTs_hh
+#ifndef L1Trigger_L1TCaloLayer1_L1TCaloLayer1FetchLUTs_hh
+#define L1Trigger_L1TCaloLayer1_L1TCaloLayer1FetchLUTs_hh
 
-#include "UCTGeometry.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTGeometry.hh"
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/Utilities/interface/ESGetToken.h"
 #include <vector>

@@ -102,7 +102,7 @@ private:
   edm::EDGetTokenT<L1CaloRegionCollection> regionToken;
 
   UCTLayer1* layer1;
-  UCTSummaryCard* summaryCard;
+  //UCTSummaryCard* summaryCard;
 };
 
 //
@@ -148,12 +148,12 @@ L1TCaloSummary::L1TCaloSummary(const edm::ParameterSet& iConfig)
     }
   }
   produces<L1JetParticleCollection>("Boosted");
-  summaryCard = new UCTSummaryCard(&pumLUT, jetSeed, tauSeed, tauIsolationFactor, eGammaSeed, eGammaIsolationFactor);
+  //summaryCard = new UCTSummaryCard(&pumLUT, jetSeed, tauSeed, tauIsolationFactor, eGammaSeed, eGammaIsolationFactor);
 }
 
 L1TCaloSummary::~L1TCaloSummary() {
-  if (summaryCard != nullptr)
-    delete summaryCard;
+  //if (summaryCard != nullptr)
+  //  delete summaryCard;
 }
 
 //
@@ -172,7 +172,8 @@ void L1TCaloSummary::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) 
   // independently creating regions from TPGs for processing by the summary card. This results
   // in a single region vector of size 252 whereas from independent creation we had 3*6 vectors
   // of size 7*2. Indices are mapped in UCTSummaryCard accordingly.
-  summaryCard->clearRegions();
+  //summaryCard->clearRegions();
+  UCTSummaryCard summaryCard = UCTSummaryCard(&pumLUT, jetSeed, tauSeed, tauIsolationFactor, eGammaSeed, eGammaIsolationFactor);
   std::vector<UCTRegion*> inputRegions;
   inputRegions.clear();
   edm::Handle<std::vector<L1CaloRegion>> regionCollection;
@@ -191,12 +192,16 @@ void L1TCaloSummary::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) 
     uint32_t card = g.getCard(t.first, t.second);
     uint32_t region = g.getRegion(absCaloEta, absCaloPhi);
     UCTRegion* test = new UCTRegion(crate, card, negativeEta, region, fwVersion);
+    //std::cout<<"processing L1TCaloSummary...."<<std::endl;
+    //if(!test->process()) std::cout<<"L1TCaloSummary: failed to process region"<<std::endl;
     test->setRegionSummary(i.raw());
     inputRegions.push_back(test);
   }
-  summaryCard->setRegionData(inputRegions);
+  //summaryCard->setRegionData(inputRegions);
+  summaryCard.setRegionData(inputRegions);
 
-  if (!summaryCard->process()) {
+  //if (!summaryCard->process()) {
+  if (!summaryCard.process()) {
     edm::LogError("L1TCaloSummary") << "UCT: Failed to process summary card" << std::endl;
     exit(1);
   }
@@ -206,7 +211,8 @@ void L1TCaloSummary::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) 
   double phi = -999.;
   double mass = 0;
 
-  std::list<UCTObject*> boostedJetObjs = summaryCard->getBoostedJetObjs();
+  //std::list<UCTObject*> boostedJetObjs = summaryCard->getBoostedJetObjs();
+  std::list<UCTObject*> boostedJetObjs = summaryCard.getBoostedJetObjs();
   for (std::list<UCTObject*>::const_iterator i = boostedJetObjs.begin(); i != boostedJetObjs.end(); i++) {
     const UCTObject* object = *i;
     pt = ((double)object->et()) * caloScaleFactor * boostedJetPtFactor;
@@ -257,6 +263,7 @@ void L1TCaloSummary::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) 
   }
 
   iEvent.put(std::move(bJetCands), "Boosted");
+  inputRegions.clear();
 }
 
 void L1TCaloSummary::print() {}

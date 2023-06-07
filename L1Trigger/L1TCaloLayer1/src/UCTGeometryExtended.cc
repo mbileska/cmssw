@@ -2,7 +2,7 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "UCTGeometryExtended.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTGeometryExtended.hh"
 using namespace l1tcalo;
 
 UCTRegionIndex UCTGeometryExtended::getUCTRegionNorth(UCTRegionIndex center) {

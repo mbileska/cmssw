@@ -3,8 +3,8 @@
 #include <cstdint>
 #include <array>
 
-#include "UCTGeometry.hh"
-#include "UCTLogging.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTGeometry.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTLogging.hh"
 using namespace l1tcalo;
 
 UCTGeometry::UCTGeometry() {}

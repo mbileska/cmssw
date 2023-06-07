@@ -1,10 +1,10 @@
-#ifndef UCTSummaryCard_hh
-#define UCTSummaryCard_hh
+#ifndef L1Trigger_L1TCaloLayer1_UCTSummaryCard_hh
+#define L1Trigger_L1TCaloLayer1_UCTSummaryCard_hh
 
 #include <vector>
 #include <list>
 
-#include "UCTGeometryExtended.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTGeometryExtended.hh"
 
 class UCTLayer1;
 class UCTObject;
@@ -66,7 +66,7 @@ private:
 
   // Parameters specified at constructor level
 
-  //  const UCTLayer1 *uctLayer1;
+  //const UCTLayer1 *uctLayer1;
   const std::vector<std::vector<std::vector<uint32_t> > >* pumLUT;
   uint32_t jetSeed;
   uint32_t tauSeed;

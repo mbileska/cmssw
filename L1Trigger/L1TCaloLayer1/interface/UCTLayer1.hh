@@ -1,13 +1,14 @@
-#ifndef UCTLayer1_hh
-#define UCTLayer1_hh
+#ifndef L1Trigger_L1TCaloLayer1_UCTLayer1_hh
+#define L1Trigger_L1TCaloLayer1_UCTLayer1_hh
 
 #include <vector>
 
+class UCTParameters;
 class UCTCrate;
 class UCTRegion;
 class UCTTower;
 
-#include "UCTGeometry.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTGeometry.hh"
 
 class UCTLayer1 {
 public:

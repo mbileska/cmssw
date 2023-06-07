@@ -1,5 +1,5 @@
-#ifndef UCTObject_hh
-#define UCTObject_hh
+#ifndef L1Trigger_L1TCaloLayer1_UCTObject_hh
+#define L1Trigger_L1TCaloLayer1_UCTObject_hh
 
 #include <bitset>
 using std::bitset;

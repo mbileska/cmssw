@@ -2,10 +2,10 @@
 #include <cstdlib>
 #include <cstdint>
 
-#include "UCTCrate.hh"
-#include "UCTCard.hh"
-#include "UCTGeometry.hh"
-#include "UCTLogging.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTCrate.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTCard.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTGeometry.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTLogging.hh"
 
 UCTCrate::UCTCrate(uint32_t crt, int fwv) : crate(crt), crateSummary(0), fwVersion(fwv) {
   UCTGeometry g;

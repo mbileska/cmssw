@@ -1,5 +1,5 @@
-#ifndef UCTGeometry_hh
-#define UCTGeometry_hh
+#ifndef L1Trigger_L1TCaloLayer1_UCTGeometry_hh
+#define L1Trigger_L1TCaloLayer1_UCTGeometry_hh
 
 // UCT Geometric mapping between EB+EE/HB+HE & HF TPGs to CPT7s
 // Access methods check if the mapping is correct
