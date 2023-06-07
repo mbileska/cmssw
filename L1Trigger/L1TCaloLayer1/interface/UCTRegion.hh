@@ -44,6 +44,8 @@ public:
 
   // To setData for towers before processing
 
+  const std::vector<UCTTower*>& getTowers() { return towers; }
+
   //std::vector<UCTTower*> towers;
 
   // To process event

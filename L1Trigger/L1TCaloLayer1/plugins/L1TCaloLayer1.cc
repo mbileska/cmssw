@@ -31,14 +31,14 @@
 #include "DataFormats/EcalDigi/interface/EcalDigiCollections.h"
 #include "DataFormats/HcalDigi/interface/HcalDigiCollections.h"
 
-#include "L1Trigger/L1TCaloLayer1/src/UCTLayer1.hh"
-#include "L1Trigger/L1TCaloLayer1/src/UCTCrate.hh"
-#include "L1Trigger/L1TCaloLayer1/src/UCTCard.hh"
-#include "L1Trigger/L1TCaloLayer1/src/UCTRegion.hh"
-#include "L1Trigger/L1TCaloLayer1/src/UCTTower.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTLayer1.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTCrate.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTCard.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTRegion.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTTower.hh"
 
-#include "L1Trigger/L1TCaloLayer1/src/UCTGeometry.hh"
-#include "L1Trigger/L1TCaloLayer1/src/UCTLogging.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTGeometry.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTLogging.hh"
 
 #include "DataFormats/L1TCalorimeter/interface/CaloTower.h"
 #include "DataFormats/L1CaloTrigger/interface/L1CaloCollections.h"
@@ -46,7 +46,7 @@
 
 #include "L1Trigger/L1TCalorimeter/interface/CaloTools.h"
 
-#include "L1Trigger/L1TCaloLayer1/src/L1TCaloLayer1FetchLUTs.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/L1TCaloLayer1FetchLUTs.hh"
 
 using namespace l1t;
 using namespace l1tcalo;

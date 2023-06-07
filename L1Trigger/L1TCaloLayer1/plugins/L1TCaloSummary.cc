@@ -31,16 +31,16 @@
 #include "DataFormats/EcalDigi/interface/EcalDigiCollections.h"
 #include "DataFormats/HcalDigi/interface/HcalDigiCollections.h"
 
-#include "L1Trigger/L1TCaloLayer1/src/UCTLayer1.hh"
-#include "L1Trigger/L1TCaloLayer1/src/UCTCrate.hh"
-#include "L1Trigger/L1TCaloLayer1/src/UCTCard.hh"
-#include "L1Trigger/L1TCaloLayer1/src/UCTRegion.hh"
-#include "L1Trigger/L1TCaloLayer1/src/UCTTower.hh"
-#include "L1Trigger/L1TCaloLayer1/src/UCTGeometry.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTLayer1.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTCrate.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTCard.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTRegion.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTTower.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTGeometry.hh"
 
-#include "L1Trigger/L1TCaloLayer1/src/UCTObject.hh"
-#include "L1Trigger/L1TCaloLayer1/src/UCTSummaryCard.hh"
-#include "L1Trigger/L1TCaloLayer1/src/UCTGeometryExtended.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTObject.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTSummaryCard.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTGeometryExtended.hh"
 
 #include "DataFormats/L1Trigger/interface/L1EmParticle.h"
 #include "DataFormats/L1Trigger/interface/L1EmParticleFwd.h"
@@ -54,7 +54,7 @@
 
 #include "DataFormats/Math/interface/LorentzVector.h"
 
-#include "L1Trigger/L1TCaloLayer1/src/UCTLogging.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTLogging.hh"
 #include <bitset>
 
 using namespace l1tcalo;

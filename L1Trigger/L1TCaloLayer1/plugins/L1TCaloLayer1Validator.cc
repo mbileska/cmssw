@@ -33,9 +33,9 @@
 #include "DataFormats/L1CaloTrigger/interface/L1CaloCollections.h"
 #include "DataFormats/L1CaloTrigger/interface/L1CaloRegion.h"
 
-#include "L1Trigger/L1TCaloLayer1/src/UCTGeometry.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTGeometry.hh"
 
-#include "L1Trigger/L1TCaloLayer1/src/UCTLogging.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTLogging.hh"
 
 using namespace l1t;
 
