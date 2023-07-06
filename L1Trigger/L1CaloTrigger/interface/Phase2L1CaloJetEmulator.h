@@ -397,6 +397,7 @@ jetInfo getRegion(GCTsupertower_t temp[nSTEta][nSTPhi]){
   return jet_tmp;
 }
 
+/*
 int makeEndcapHwIEta(float eta) {
   if (eta < 0) eta += 2.95775;
   float IETAHGCAL_LSB = 0.0845;
@@ -411,6 +412,7 @@ int makeEndcapHwIPhi(float phi) {
   int iphi = floor(phi/IETAPHI_LSB);
   return iphi;
 }
+*/
 
 bool compareByEt (l1tp2::Phase2L1CaloJet i, l1tp2::Phase2L1CaloJet j) { return(i.jetEt() > j.jetEt()); };
 

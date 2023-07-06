@@ -200,9 +200,10 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
   
   for (auto it = hgcalTowerColl.begin(0); it != hgcalTowerColl.end(0); it++) {
     float eta = it->eta();
-    int ieta = makeEndcapHwIEta(eta);
-    float phi = it->phi();
-    int iphi = makeEndcapHwIPhi(phi);
+    int ieta;
+    if(eta < 0) ieta = 17 - it->id().iEta();
+    else ieta = 18 + it->id().iEta();
+    int iphi = it->id().iPhi();
     if(it->etEm() + it->etHad() > 1.) hgcalTowers[ieta][iphi] = it->etEm() + it->etHad(); // suppress 1 GeV towers
   }
 
