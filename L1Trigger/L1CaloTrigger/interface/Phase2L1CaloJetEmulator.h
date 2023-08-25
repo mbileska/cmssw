@@ -3,8 +3,8 @@
 
 #include <cstdlib>
 
-static constexpr int nTowerEta = 34;
-static constexpr int nTowerPhi = 72;
+static constexpr int nBarrelEta = 34;
+static constexpr int nBarrelPhi = 72;
 static constexpr int nHgcalEta = 36;
 static constexpr int nHgcalPhi = 72;
 static constexpr int nHfEta = 24;
@@ -115,7 +115,7 @@ typedef struct {
 } GCTtower_t ;
 
 typedef struct {
-  GCTtower_t GCTtower[nTowerEta/2][nTowerPhi] ;
+  GCTtower_t GCTtower[nBarrelEta/2][nBarrelPhi] ;
 } GCTintTowers_t ;
 
 int getPeakBinOf3(float et0, float et1, float et2) {
@@ -140,24 +140,24 @@ int getEtCenterOf3(float et0, float et1, float et2) {
   return iAve;
 }
 
-void makeST(const float GCTintTowers[nTowerEta/2][nTowerPhi], GCTsupertower_t supertower_return[nSTEta][nSTPhi]){
+void makeST(const float GCTintTowers[nBarrelEta/2][nBarrelPhi], GCTsupertower_t supertower_return[nSTEta][nSTPhi]){
   float et_sumEta[nSTEta][nSTPhi][3];
   float stripEta[nSTEta][nSTPhi][3];
   float stripPhi[nSTEta][nSTPhi][3];
 
-  float ex_et[nTowerEta/2+1][nTowerPhi];
-  for(int j = 0; j< nTowerPhi; j++){
-    ex_et[nTowerEta/2][j] = 0;
-    for(int i = 0; i < nTowerEta/2; i++){
+  float ex_et[nBarrelEta/2+1][nBarrelPhi];
+  for(int j = 0; j< nBarrelPhi; j++){
+    ex_et[nBarrelEta/2][j] = 0;
+    for(int i = 0; i < nBarrelEta/2; i++){
       ex_et[i][j] = GCTintTowers[i][j];
     }
   }
 
   int index_i = 0;
   int index_j = 0;
-  for(int i = 0; i < nTowerEta/2+1; i += 3){ // 17+1 to divide into 6 super towers
+  for(int i = 0; i < nBarrelEta/2+1; i += 3){ // 17+1 to divide into 6 super towers
     index_j = 0;
-    for(int j = 0; j < nTowerPhi; j+=3){ // 72 phi to 24 super towers
+    for(int j = 0; j < nBarrelPhi; j+=3){ // 72 phi to 24 super towers
       stripEta[index_i][index_j][0] = ex_et[i][j] + ex_et[i][j+1] + ex_et[i][j+2];
       stripEta[index_i][index_j][1] = ex_et[i+1][j] + ex_et[i+1][j+1] + ex_et[i+1][j+2];
       stripEta[index_i][index_j][2] = ex_et[i+2][j] + ex_et[i+2][j+1] + ex_et[i+2][j+2];
@@ -437,9 +437,9 @@ jetInfo getRegion(GCTsupertower_t temp[nSTEta][nSTPhi]){
   jet_tmp = getJetPosition(temp) ;
   int seed_phi = jet_tmp.phi ;
   int seed_eta = jet_tmp.eta ;
-  float seed_energy = jet_tmp.energyMax ;
+  float seed_energy = jet_tmp.seedEnergy ;
   jet = getJetValues(temp, seed_eta, seed_phi) ;
-  if(seed_energy > 5.) jet_tmp.energy = jet.energy; // suppress <= 5 GeV ST as seed
+  if(seed_energy > 10.) jet_tmp.energy = jet.energy; // suppress <= 10 GeV ST as seed
   else jet_tmp.energy = 0.;
   jet_tmp.etaCenter = jet.etaCenter; // this is the ET weighted eta centre of the ST
   jet_tmp.phiCenter = jet.phiCenter; // this is the ET weighted eta centre of the ST

@@ -5,10 +5,10 @@
 //
 /**\class Phase2L1CaloJetEmulator Phase2L1CaloJetEmulator.cc L1Trigger/L1CaloTrigger/plugins/Phase2L1CaloJetEmulator.cc
 
- Description: [one line class summary]
+ Description: Producing GCT calo jets using GCT barrel, HGCal and HF towers, based on firmware logic.
 
  Implementation:
-     [Notes on implementation]
+     Depends on producers for CaloTowerCollection, HGCalTowerBxCollection and HcalTrigPrimDigiCollection.
 */
 //
 // Original Author:  Pallabi Das
@@ -104,16 +104,15 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
     edm::LogError("Phase2L1CaloJetEmulator") << "Failed to get towers from caloTowerCollection!";
 
   iEvent.getByToken(caloTowerToken_, caloTowerCollection);
-  float GCTintTowers[nTowerEta][nTowerPhi];
-  float realEta[nTowerEta][nTowerPhi];
-  float realPhi[nTowerEta][nTowerPhi];
+  float GCTintTowers[nBarrelEta][nBarrelPhi];
+  float realEta[nBarrelEta][nBarrelPhi];
+  float realPhi[nBarrelEta][nBarrelPhi];
   for (const l1tp2::CaloTower& i : *caloTowerCollection) {
 
     int ieta = i.towerIEta();
     int iphi = i.towerIPhi();
     if(i.ecalTowerEt() > 1.) GCTintTowers[ieta][iphi] = i.ecalTowerEt(); // suppress <= 1 GeV towers
     else GCTintTowers[ieta][iphi] = 0;
-    //GCTintTowers[ieta][iphi] = i.ecalTowerEt();
     realEta[ieta][iphi] = i.towerEta();
     realPhi[ieta][iphi] = i.towerPhi();
   }
@@ -122,7 +121,7 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
   //Then we create 6x24 super towers in each eta-half
   //Find 6 jets in each eta-half
 
-  float temporary[nTowerEta/2][nTowerPhi];
+  float temporary[nBarrelEta/2][nBarrelPhi];
 
   // HGCal info
   edm::Handle<l1t::HGCalTowerBxCollection> hgcalTowerCollection;
@@ -138,8 +137,8 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
   for(int iphi = 0; iphi < nHgcalPhi; iphi++) {
     for(int ieta = 0; ieta < nHgcalEta; ieta++) {
       hgcalTowers[ieta][iphi] = 0;
-      if(ieta < nHgcalEta/2) hgcalEta[ieta][iphi] = -2.95775 + ieta*0.0845;
-      else hgcalEta[ieta][iphi] = 1.52125 + (ieta-18)*0.0845;
+      if(ieta < nHgcalEta/2) hgcalEta[ieta][iphi] = -3.045 + ieta*0.087 + 0.0435;
+      else hgcalEta[ieta][iphi] = 1.479 + (ieta-nHgcalEta/2)*0.087 + 0.0435;
       hgcalPhi[ieta][iphi] = - M_PI + (iphi*M_PI/36) + (M_PI/72);
     }
   }
@@ -147,10 +146,11 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
   for (auto it = hgcalTowerColl.begin(0); it != hgcalTowerColl.end(0); it++) {
     float eta = it->eta();
     int ieta;
-    if(eta < 0) ieta = 17 - it->id().iEta();
-    else ieta = 18 + it->id().iEta();
+    if(eta < 0) ieta = 19 - it->id().iEta();
+    else ieta = 20 + it->id().iEta();
+    if(eta > 1.479) ieta = ieta - 4;
     int iphi = it->id().iPhi();
-    if(it->etEm() + it->etHad() > 1.) hgcalTowers[ieta][iphi] = it->etEm() + it->etHad(); // suppress <= 1 GeV towers
+    if((it->etEm() + it->etHad() > 1.) && abs(eta) > 1.479) hgcalTowers[ieta][iphi] = it->etEm() + it->etHad(); // suppress <= 1 GeV towers
   }
 
   //Assign ETs to each eta-half of the endcap region (18x72)
@@ -176,15 +176,12 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
       else temp = ieta - 12 + 30;
       hfEta[ieta][iphi] = l1t::CaloTools::towerEta(temp);
       hfPhi[ieta][iphi] = - M_PI + (iphi*M_PI/36) + (M_PI/72);
-      //hfPhi[ieta][iphi] = l1t::CaloTools::towerPhi(temp, iphi);
-      //std::cout<<hfEta[ieta][iphi]<<"\t"<<hfPhi[ieta][iphi]<<std::endl;
     }
   }
 
   const auto& decoder = iSetup.getData(decoderTag_);
   for (const auto& hit : *hfHandle.product()) {
     double et = decoder.hcaletValue(hit.id(), hit.t0());
-    //std::cout<<hit.id().ieta()<<"\t"<<hit.id().iphi()<<"\t"<<et<<std::endl;
     int ieta = 0;
     if (abs(hit.id().ieta()) < l1t::CaloTools::kHFBegin) continue;
     if (abs(hit.id().ieta()) > l1t::CaloTools::kHFEnd) continue;
@@ -194,7 +191,6 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
     else if (hit.id().ieta() >= 30) {
       ieta = 12 + (hit.id().ieta() - 30);
     }
-    //int iphi = hit.id().iphi();
     int iphi = 0;
     if (hit.id().iphi() <= 36) iphi = hit.id().iphi() + 35;
     else if (hit.id().iphi() > 36) iphi = hit.id().iphi() - 37;
@@ -221,10 +217,10 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
     jetInfo jet[30] ;
 
     // BARREL
-    for (int iphi = 0; iphi < nTowerPhi; iphi++) {
-      for (int ieta = 0; ieta < nTowerEta/2; ieta++) {
+    for (int iphi = 0; iphi < nBarrelPhi; iphi++) {
+      for (int ieta = 0; ieta < nBarrelEta/2; ieta++) {
         if(k == 0) temporary[ieta][iphi] = GCTintTowers[ieta][iphi];
-        else temporary[ieta][iphi] = GCTintTowers[nTowerEta/2 + ieta][iphi];
+        else temporary[ieta][iphi] = GCTintTowers[nBarrelEta/2 + ieta][iphi];
       }
     }
 
@@ -237,19 +233,19 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
       tempJet.setJetEt(jet[i].energy);
       int gctjeteta = jet[i].etaCenter;
       int gctjetphi = jet[i].phiCenter;
-      tempJet.setJetIEta(gctjeteta+k*nTowerEta/2);
+      tempJet.setJetIEta(gctjeteta+k*nBarrelEta/2);
       tempJet.setJetIPhi(gctjetphi);
-      float jeteta = realEta[gctjeteta+k*nTowerEta/2][gctjetphi];
-      float jetphi = realPhi[gctjeteta+k*nTowerEta/2][gctjetphi];
+      float jeteta = realEta[gctjeteta+k*nBarrelEta/2][gctjetphi];
+      float jetphi = realPhi[gctjeteta+k*nBarrelEta/2][gctjetphi];
       tempJet.setJetEta(jeteta);
       tempJet.setJetPhi(jetphi);
       tempJet.setTowerEt(jet[i].energyMax);
       int gcttowereta = jet[i].etaMax;
       int gcttowerphi = jet[i].phiMax;
-      tempJet.setTowerIEta(gcttowereta+k*nTowerEta/2);
+      tempJet.setTowerIEta(gcttowereta+k*nBarrelEta/2);
       tempJet.setTowerIPhi(gcttowerphi);
-      float towereta = realEta[gcttowereta+k*nTowerEta/2][gcttowerphi];
-      float towerphi = realPhi[gcttowereta+k*nTowerEta/2][gcttowerphi];
+      float towereta = realEta[gcttowereta+k*nBarrelEta/2][gcttowerphi];
+      float towerphi = realPhi[gcttowereta+k*nBarrelEta/2][gcttowerphi];
       tempJet.setTowerEta(towereta);
       tempJet.setTowerPhi(towerphi);
       reco::Candidate::PolarLorentzVector tempJetp4;
@@ -351,7 +347,7 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
 
     for (size_t i = 0; i < halfHgcalJets.size(); i++) {
       if (halfHgcalJets.at(i).jetIEta() > 15 && halfHgcalJets.at(i).jetIEta() < 20) {
-        float hgcal_ieta = k*nTowerEta + halfHgcalJets.at(i).jetIEta();
+        float hgcal_ieta = k*nBarrelEta + halfHgcalJets.at(i).jetIEta();
         for (size_t j = 0; j < halfBarrelJets.size(); j++) {
           float barrel_ieta = nHgcalEta/2 + halfBarrelJets.at(j).jetIEta();
           if (abs(barrel_ieta - hgcal_ieta) < 3 && abs(halfBarrelJets.at(j).jetIPhi() - halfHgcalJets.at(i).jetIPhi()) < 3) {
@@ -380,9 +376,9 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
         }
       }
       else if (halfHgcalJets.at(i).jetIEta() < 2 || halfHgcalJets.at(i).jetIEta() > 33) {
-        float hgcal_ieta = k*nTowerEta + nHfEta/2 + halfHgcalJets.at(i).jetIEta();
+        float hgcal_ieta = k*nBarrelEta + nHfEta/2 + halfHgcalJets.at(i).jetIEta();
         for (size_t j = 0; j < halfHfJets.size(); j++) {
-          float hf_ieta = k*nTowerEta + k*nHgcalEta + halfHfJets.at(j).jetIEta();
+          float hf_ieta = k*nBarrelEta + k*nHgcalEta + halfHfJets.at(j).jetIEta();
           if(abs(hgcal_ieta - hf_ieta) < 3 && abs(halfHfJets.at(j).jetIPhi() - halfHgcalJets.at(i).jetIPhi()) < 3) {
             float totalet = halfHfJets.at(j).jetEt() + halfHgcalJets.at(i).jetEt();
             if (halfHfJets.at(j).jetEt() > halfHgcalJets.at(i).jetEt()) {
