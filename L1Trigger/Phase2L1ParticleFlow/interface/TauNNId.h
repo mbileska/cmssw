@@ -17,6 +17,7 @@ public:
 
   void setNNVectorVar();
   float EvaluateNN();
+  float *NNVectorVar() { return NNvectorVar_.data(); }
   float compute(const l1t::PFCandidate &iSeed, l1t::PFCandidateCollection &iParts);
 
 private:
