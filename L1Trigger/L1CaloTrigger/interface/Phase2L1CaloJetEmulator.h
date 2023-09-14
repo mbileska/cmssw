@@ -52,6 +52,7 @@ class jetInfo{
   public:
   float seedEnergy;
   float energy;
+  float tauEt;
   int phi;
   int eta;
   float energyMax;
@@ -63,6 +64,7 @@ class jetInfo{
   jetInfo(){
     seedEnergy = 0;
     energy = 0;
+    tauEt = 0;
     phi = 0;
     eta = 0;
     energyMax = 0;
@@ -75,6 +77,7 @@ class jetInfo{
   jetInfo& operator=(const jetInfo& rhs){
     seedEnergy = rhs.seedEnergy;
     energy = rhs.energy;
+    tauEt = rhs.tauEt;
     phi = rhs.phi;
     eta = rhs.eta;
     energyMax = rhs.energyMax;
@@ -366,6 +369,7 @@ jetInfo getJetPosition(GCTsupertower_t temp[nSTEta][nSTPhi]){
 
   jet.seedEnergy = peakIn6.energy;
   jet.energy = 0;
+  jet.tauEt = 0;
   jet.eta = peakIn6.eta;
   jet.phi = peakIn6.phi;
   jet.energyMax = peakIn6.energyMax;
@@ -414,6 +418,7 @@ jetInfo getJetValues(GCTsupertower_t tempX[nSTEta][nSTPhi], int seed_eta, int se
   }
 
   jet_tmp.energy = eta_slice[0] + eta_slice[1] + eta_slice[2] ;
+  jet_tmp.tauEt = eta_slice[1]; //set tau Pt to be sum of ST energies in center eta slice */
   // To find the jet centre: note that seed supertower is always (1, 1)
   jet_tmp.etaCenter = 3*seed_eta + tempX[seed_eta][seed_phi].centerEta; //this is the ET weighted eta centre of the ST
   jet_tmp.phiCenter = 3*seed_phi + tempX[seed_eta][seed_phi].centerPhi; //this is the ET weighted phi centre of the ST
@@ -439,8 +444,14 @@ jetInfo getRegion(GCTsupertower_t temp[nSTEta][nSTPhi]){
   int seed_eta = jet_tmp.eta ;
   float seed_energy = jet_tmp.seedEnergy ;
   jet = getJetValues(temp, seed_eta, seed_phi) ;
-  if(seed_energy > 10.) jet_tmp.energy = jet.energy; // suppress <= 10 GeV ST as seed
-  else jet_tmp.energy = 0.;
+  if(seed_energy > 10.) { // suppress <= 10 GeV ST as seed
+    jet_tmp.energy = jet.energy; 
+    jet_tmp.tauEt = jet.tauEt;
+  }
+  else { 
+    jet_tmp.energy = 0.;
+    jet_tmp.tauEt = 0.;
+  }
   jet_tmp.etaCenter = jet.etaCenter; // this is the ET weighted eta centre of the ST
   jet_tmp.phiCenter = jet.phiCenter; // this is the ET weighted eta centre of the ST
   jet_tmp.etaMax = jet.etaMax; // this is the leading tower eta in the ST
