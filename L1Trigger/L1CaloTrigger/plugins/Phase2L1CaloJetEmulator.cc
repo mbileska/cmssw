@@ -434,14 +434,14 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
 
     std::sort(halfHgcalJets.begin(), halfHgcalJets.end(), gctobj::compareByEt);
     for (size_t i = 0; i < halfHgcalJets.size(); i++) {
-      //if (halfHgcalJets.at(i).jetEt() > 0. && i < 6)
-        //allJets.push_back(halfHgcalJets.at(i));
+      if (halfHgcalJets.at(i).jetEt() > 0. && i < 6)
+        allJets.push_back(halfHgcalJets.at(i));
     }
 
     std::sort(halfHfJets.begin(), halfHfJets.end(), gctobj::compareByEt);
     for (size_t i = 0; i < halfHfJets.size(); i++) {
-      //if (halfHfJets.at(i).jetEt() > 0. && i < 6)
-        //allJets.push_back(halfHfJets.at(i));
+      if (halfHfJets.at(i).jetEt() > 0. && i < 6)
+        allJets.push_back(halfHfJets.at(i));
     }
   }
 

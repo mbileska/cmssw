@@ -1,6 +1,7 @@
 #ifndef _PHASE_2_L1_CALO_JET_EMULATOR_H_
 #define _PHASE_2_L1_CALO_JET_EMULATOR_H_
 
+#include "DataFormats/L1TCalorimeterPhase2/interface/Phase2L1CaloJet.h"
 #include <cstdlib>
 
 static constexpr int nBarrelEta = 34;
