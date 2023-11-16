@@ -1018,7 +1018,7 @@ inline void p2eg::getECALTowersEt(p2eg::crystal tempX[p2eg::CRYSTAL_IN_ETA][p2eg
   ap_uint<12> towerEtN[3][4][5];
   for (int i = 0; i < p2eg::CRYSTAL_IN_ETA; i++) {
     for (int k = 0; k < p2eg::CRYSTAL_IN_PHI; k++) {
-      temp[i][k] = tempX[i][k].energy;
+      temp[i][k] = tempX[i][k].energy >> 2;
     }
   }
 
@@ -1180,7 +1180,7 @@ inline p2eg::clusterInfo p2eg::getBremsValuesPos(p2eg::crystal tempX[p2eg::CRYST
   // except shifted +1 in eta, and -3 in phi.
   for (int i = 0; i < (p2eg::CRYSTAL_IN_ETA); i++) {
     for (int j = 0; j < (p2eg::CRYSTAL_IN_PHI - 3); j++) {
-      temp[i + 1][j] = tempX[i][j + 3].energy;
+      temp[i + 1][j] = tempX[i][j + 3].energy >> 2;
     }
   }
 
@@ -1257,7 +1257,7 @@ inline p2eg::clusterInfo p2eg::getBremsValuesNeg(p2eg::crystal tempX[p2eg::CRYST
   // except shifted in +1 in eta and +7 in phi
   for (int i = 0; i < (p2eg::CRYSTAL_IN_ETA); i++) {
     for (int j = 0; j < (p2eg::CRYSTAL_IN_PHI - 1); j++) {
-      temp[i + 1][j + 7] = tempX[i][j].energy;
+      temp[i + 1][j + 7] = tempX[i][j].energy >> 2;
     }
   }
 
@@ -1331,7 +1331,7 @@ inline p2eg::clusterInfo p2eg::getClusterValues(p2eg::crystal tempX[p2eg::CRYSTA
   // Copy input array energies into temp array with +2 eta and +2 phi offset.
   for (int i = 0; i < (p2eg::CRYSTAL_IN_ETA); i++) {
     for (int k = 0; k < (p2eg::CRYSTAL_IN_PHI); k++) {
-      temp[i + 2][k + 2] = tempX[i][k].energy;
+      temp[i + 2][k + 2] = tempX[i][k].energy >> 2;
     }
   }
 
