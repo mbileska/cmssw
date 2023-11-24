@@ -709,7 +709,7 @@ namespace p2eg {
       float newEt = getEt() * factor;
 
       // Convert the new pT to an unsigned int (16 bits so we can take the logical OR with the bit mask later)
-      ap_uint<16> newEt_uint = (ap_uint<16>)(int)(newEt * 8.0);
+      ap_uint<16> newEt_uint = (ap_uint<16>)(int)(newEt / ECAL_LSB);
       // Make sure the first four bits are zero
       newEt_uint = (newEt_uint & 0x0FFF);
 
@@ -721,9 +721,7 @@ namespace p2eg {
     /*
      * For towers: Calculate H/E ratio given the ECAL and HCAL energies and modify the hoe() value.
      */
-    void getHoverE(ap_uint<12> ECAL, ap_uint<12> HCAL_inHcalConvention) {
-      // Convert HCAL ET to ECAL ET convention
-      ap_uint<12> HCAL = convertHcalETtoEcalET(HCAL_inHcalConvention);
+    void getHoverE(ap_uint<12> ECAL, ap_uint<12> HCAL) {
       ap_uint<4> hoeOut;
       ap_uint<1> hoeLSB = 0;
       ap_uint<4> hoe = 0;

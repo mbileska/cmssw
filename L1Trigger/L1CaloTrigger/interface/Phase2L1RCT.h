@@ -1427,7 +1427,7 @@ inline p2eg::Cluster p2eg::getClusterFromRegion3x4(p2eg::crystal temp[p2eg::CRYS
 
   cluster_tmp = p2eg::getClusterPosition(ecalRegion);
 
-  float seedEnergyFloat = cluster_tmp.seedEnergy / 8.0;
+  float seedEnergyFloat = cluster_tmp.seedEnergy * ECAL_LSB;
 
   // Do not make cluster if seed is less than 1.0 GeV
   if (seedEnergyFloat < 1.0) {
@@ -1448,10 +1448,10 @@ inline p2eg::Cluster p2eg::getClusterFromRegion3x4(p2eg::crystal temp[p2eg::CRYS
   cluster_tmp.brems = 0;
 
   // Create a cluster
-  if ((cluster_tmpBneg.energy > cluster_tmpCenter.energy / 8) && (cluster_tmpBneg.energy > cluster_tmpBpos.energy)) {
+  if ((cluster_tmpBneg.energy > cluster_tmpCenter.energy * ECAL_LSB) && (cluster_tmpBneg.energy > cluster_tmpBpos.energy)) {
     cluster_tmp.energy = (cluster_tmpCenter.energy + cluster_tmpBneg.energy);
     cluster_tmp.brems = 1;
-  } else if (cluster_tmpBpos.energy > cluster_tmpCenter.energy / 8) {
+  } else if (cluster_tmpBpos.energy > cluster_tmpCenter.energy * ECAL_LSB) {
     cluster_tmp.energy = (cluster_tmpCenter.energy + cluster_tmpBpos.energy);
     cluster_tmp.brems = 2;
   }
