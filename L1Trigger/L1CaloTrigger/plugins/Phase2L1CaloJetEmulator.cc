@@ -47,6 +47,7 @@
 #include <iostream>
 #include <stdio.h>
 #include "L1Trigger/L1CaloTrigger/interface/Phase2L1CaloJetEmulator.h"
+#include "TF1.h"
 
 //
 // class declaration
@@ -67,6 +68,13 @@ private:
   edm::EDGetTokenT<l1t::HGCalTowerBxCollection> hgcalTowerToken_;
   edm::EDGetTokenT<HcalTrigPrimDigiCollection> hfToken_;
   edm::ESGetToken<CaloTPGTranscoder, CaloTPGRecord> decoderTag_;
+  std::vector<edm::ParameterSet> nHits_to_nvtx_params;
+  std::vector<edm::ParameterSet> nvtx_to_PU_sub_params;
+  std::map<std::string, TF1> nHits_to_nvtx_funcs;
+  std::map<std::string, TF1> hgcalEM_nvtx_to_PU_sub_funcs;
+  std::map<std::string, TF1> hgcalHad_nvtx_to_PU_sub_funcs;
+  std::map<std::string, TF1> hf_nvtx_to_PU_sub_funcs;
+  std::map<std::string, std::map<std::string, TF1> > all_nvtx_to_PU_sub_funcs;
 };
 
 //
@@ -84,7 +92,31 @@ Phase2L1CaloJetEmulator::Phase2L1CaloJetEmulator(const edm::ParameterSet& iConfi
     : caloTowerToken_(consumes<l1tp2::CaloTowerCollection>(iConfig.getParameter<edm::InputTag>("gctFullTowers"))),
       hgcalTowerToken_(consumes<l1t::HGCalTowerBxCollection>(iConfig.getParameter<edm::InputTag>("hgcalTowers"))),
       hfToken_(consumes<HcalTrigPrimDigiCollection>(iConfig.getParameter<edm::InputTag>("hcalDigis"))),
-      decoderTag_(esConsumes<CaloTPGTranscoder, CaloTPGRecord>(edm::ESInputTag("", ""))) {
+      decoderTag_(esConsumes<CaloTPGTranscoder, CaloTPGRecord>(edm::ESInputTag("", ""))),
+      nHits_to_nvtx_params(iConfig.getParameter<std::vector<edm::ParameterSet> >("nHits_to_nvtx_params")),
+      nvtx_to_PU_sub_params(iConfig.getParameter<std::vector<edm::ParameterSet> >("nvtx_to_PU_sub_params")) {
+  for (uint i = 0; i < nHits_to_nvtx_params.size(); i++) {
+    edm::ParameterSet* pset = &nHits_to_nvtx_params.at(i);
+    std::string calo = pset->getParameter<std::string>("fit");
+    nHits_to_nvtx_funcs[calo.c_str()] = TF1(calo.c_str(), "[0] + [1] * x");
+    nHits_to_nvtx_funcs[calo.c_str()].SetParameter(0, pset->getParameter<std::vector<double> >("params").at(0));
+    nHits_to_nvtx_funcs[calo.c_str()].SetParameter(1, pset->getParameter<std::vector<double> >("params").at(1));
+  }
+  all_nvtx_to_PU_sub_funcs["hgcalEM"] = hgcalEM_nvtx_to_PU_sub_funcs;
+  all_nvtx_to_PU_sub_funcs["hgcalHad"] = hgcalHad_nvtx_to_PU_sub_funcs;
+  all_nvtx_to_PU_sub_funcs["hf"] = hf_nvtx_to_PU_sub_funcs;
+  for (uint i = 0; i < nvtx_to_PU_sub_params.size(); i++) {
+    edm::ParameterSet* pset = &nvtx_to_PU_sub_params.at(i);
+    std::string calo = pset->getParameter<std::string>("calo");
+    std::string iEta = pset->getParameter<std::string>("iEta");
+    double p1 = pset->getParameter<std::vector<double> >("params").at(0);
+    double p2 = pset->getParameter<std::vector<double> >("params").at(1);
+
+    all_nvtx_to_PU_sub_funcs[calo.c_str()][iEta.c_str()] = TF1(calo.c_str(), "[0] + [1] * x");
+    all_nvtx_to_PU_sub_funcs[calo.c_str()][iEta.c_str()].SetParameter(0, p1);
+    all_nvtx_to_PU_sub_funcs[calo.c_str()][iEta.c_str()].SetParameter(1, p2);
+  }
+
   produces<l1tp2::Phase2L1CaloJetCollection>("GCTJet");
 }
 
@@ -111,7 +143,7 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
 
     int ieta = i.towerIEta();
     int iphi = i.towerIPhi();
-    if(i.ecalTowerEt() > 1.) GCTintTowers[ieta][iphi] = i.ecalTowerEt(); // suppress <= 1 GeV towers
+    if (i.ecalTowerEt() > 1.) GCTintTowers[ieta][iphi] = i.ecalTowerEt(); // suppress <= 1 GeV towers
     else GCTintTowers[ieta][iphi] = 0;
     realEta[ieta][iphi] = i.towerEta();
     realPhi[ieta][iphi] = i.towerPhi();
@@ -123,34 +155,92 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
 
   float temporary[nBarrelEta/2][nBarrelPhi];
 
-  // HGCal info
   edm::Handle<l1t::HGCalTowerBxCollection> hgcalTowerCollection;
   if (!iEvent.getByToken(hgcalTowerToken_, hgcalTowerCollection))
     edm::LogError("Phase2L1CaloJetEmulator") << "Failed to get towers from hgcalTowerCollection!";
   l1t::HGCalTowerBxCollection hgcalTowerColl;
   iEvent.getByToken(hgcalTowerToken_, hgcalTowerCollection);
   hgcalTowerColl = (*hgcalTowerCollection.product());
+
+  edm::Handle<HcalTrigPrimDigiCollection> hfHandle;
+  if (!iEvent.getByToken(hfToken_, hfHandle))
+    edm::LogError("Phase2L1CaloJetEmulator") << "Failed to get HcalTrigPrimDigi for HF!";
+  iEvent.getByToken(hfToken_, hfHandle);
+
+  int i_hgcalEM_hits_leq_threshold = 0;
+  int i_hgcalHad_hits_leq_threshold = 0;
+  int i_hf_hits_leq_threshold = 0;
+  for (auto it = hgcalTowerColl.begin(0); it != hgcalTowerColl.end(0); it++) {
+    if (it->etEm() <= 1.75 && it->etEm() >= 1.25) {
+      i_hgcalEM_hits_leq_threshold++;
+    }
+    if (it->etHad() <= 1.25 && it->etHad() >= 0.75) {
+      i_hgcalHad_hits_leq_threshold++;
+    }
+  }
+  const auto& decoder = iSetup.getData(decoderTag_);
+  for (const auto& hit : *hfHandle.product()) {
+    double et = decoder.hcaletValue(hit.id(), hit.t0());
+    if (abs(hit.id().ieta()) < l1t::CaloTools::kHFBegin) continue;
+    if (abs(hit.id().ieta()) > l1t::CaloTools::kHFEnd) continue;
+    if (et <= 15.0 && et >= 10.0) i_hf_hits_leq_threshold++;
+  }
+
+  double hgcalEM_nvtx = nHits_to_nvtx_funcs["hgcalEM"].Eval(i_hgcalEM_hits_leq_threshold);
+  if (hgcalEM_nvtx < 0) hgcalEM_nvtx = 0;
+  double hgcalHad_nvtx = nHits_to_nvtx_funcs["hgcalHad"].Eval(i_hgcalHad_hits_leq_threshold);
+  if (hgcalHad_nvtx < 0) hgcalHad_nvtx = 0;
+  double hf_nvtx = nHits_to_nvtx_funcs["hf"].Eval(i_hf_hits_leq_threshold);
+  if (hf_nvtx < 0) hf_nvtx = 0;
+  double EstimatedNvtx = (hgcalEM_nvtx + hgcalHad_nvtx + hf_nvtx) / 3.;
+    
+  // HGCal info 
   float hgcalTowers[nHgcalEta][nHgcalPhi];
   float hgcalEta[nHgcalEta][nHgcalPhi];
   float hgcalPhi[nHgcalEta][nHgcalPhi];
 
-  for(int iphi = 0; iphi < nHgcalPhi; iphi++) {
-    for(int ieta = 0; ieta < nHgcalEta; ieta++) {
+  for (int iphi = 0; iphi < nHgcalPhi; iphi++) {
+    for (int ieta = 0; ieta < nHgcalEta; ieta++) {
       hgcalTowers[ieta][iphi] = 0;
-      if(ieta < nHgcalEta/2) hgcalEta[ieta][iphi] = -3.045 + ieta*0.087 + 0.0435;
+      if (ieta < nHgcalEta/2) hgcalEta[ieta][iphi] = -3.045 + ieta*0.087 + 0.0435;
       else hgcalEta[ieta][iphi] = 1.479 + (ieta-nHgcalEta/2)*0.087 + 0.0435;
       hgcalPhi[ieta][iphi] = - M_PI + (iphi*M_PI/36) + (M_PI/72);
     }
   }
-  
+
   for (auto it = hgcalTowerColl.begin(0); it != hgcalTowerColl.end(0); it++) {
     float eta = it->eta();
     int ieta;
-    if(eta < 0) ieta = 19 - it->id().iEta();
+    if (eta < 0) ieta = 19 - it->id().iEta();
     else ieta = 20 + it->id().iEta();
-    if(eta > 1.479) ieta = ieta - 4;
+    if (eta > 1.479) ieta = ieta - 4;
     int iphi = it->id().iPhi();
-    if((it->etEm() + it->etHad() > 1.) && abs(eta) > 1.479) hgcalTowers[ieta][iphi] = it->etEm() + it->etHad(); // suppress <= 1 GeV towers
+    float hgcal_etEm = it->etEm(); 
+    float hgcal_etHad = it->etHad();
+    if (abs(eta) <= 1.8) {
+      hgcal_etEm = it->etEm() - all_nvtx_to_PU_sub_funcs["hgcalEM"]["er1p4to1p8"].Eval(EstimatedNvtx);
+      hgcal_etHad = it->etHad() - all_nvtx_to_PU_sub_funcs["hgcalHad"]["er1p4to1p8"].Eval(EstimatedNvtx);
+    }
+    if (abs(eta) <= 2.1 && abs(eta) > 1.8) {
+      hgcal_etEm = it->etEm() - all_nvtx_to_PU_sub_funcs["hgcalEM"]["er1p8to2p1"].Eval(EstimatedNvtx);
+      hgcal_etHad = it->etHad() - all_nvtx_to_PU_sub_funcs["hgcalHad"]["er1p8to2p1"].Eval(EstimatedNvtx);
+    }
+    if (abs(eta) <= 2.4 && abs(eta) > 2.1) {
+      hgcal_etEm = it->etEm() - all_nvtx_to_PU_sub_funcs["hgcalEM"]["er2p1to2p4"].Eval(EstimatedNvtx);
+      hgcal_etHad = it->etHad() - all_nvtx_to_PU_sub_funcs["hgcalHad"]["er2p1to2p4"].Eval(EstimatedNvtx);
+    }
+    if (abs(eta) <= 2.7 && abs(eta) > 2.4) {
+      hgcal_etEm = it->etEm() - all_nvtx_to_PU_sub_funcs["hgcalEM"]["er2p4to2p7"].Eval(EstimatedNvtx);
+      hgcal_etHad = it->etHad() - all_nvtx_to_PU_sub_funcs["hgcalHad"]["er2p4to2p7"].Eval(EstimatedNvtx);
+    }
+    if (abs(eta) <= 3.1 && abs(eta) > 2.7) {
+      hgcal_etEm = it->etEm() - all_nvtx_to_PU_sub_funcs["hgcalEM"]["er2p7to3p1"].Eval(EstimatedNvtx);
+      hgcal_etHad = it->etHad() - all_nvtx_to_PU_sub_funcs["hgcalHad"]["er2p7to3p1"].Eval(EstimatedNvtx);
+    }
+    if (hgcal_etEm < 0) hgcal_etEm = 0;
+    if (hgcal_etHad < 0) hgcal_etHad = 0;
+    if (hgcal_etEm + hgcal_etHad > 1. && abs(eta) > 1.479) hgcalTowers[ieta][iphi] = hgcal_etEm + hgcal_etHad; // suppress <= 1 GeV towers
+    //std::cout<<(it->etEm()+it->etHad())<<"\t"<<(hgcal_etEm + hgcal_etHad)<<std::endl;
   }
 
   //Assign ETs to each eta-half of the endcap region (18x72)
@@ -160,26 +250,22 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
   float temporary_hgcal[nHgcalEta/2][nHgcalPhi];
 
   // HF info
-  edm::Handle<HcalTrigPrimDigiCollection> hfHandle;
-  if (!iEvent.getByToken(hfToken_, hfHandle))
-    edm::LogError("Phase2L1CaloJetEmulator") << "Failed to get HcalTrigPrimDigi for HF!";
-  iEvent.getByToken(hfToken_, hfHandle);
   float hfTowers[nHfEta][nHfPhi];
   float hfEta[nHfEta][nHfPhi];
   float hfPhi[nHfEta][nHfPhi];
 
-  for(int iphi = 0; iphi < nHfPhi; iphi++) {
-    for(int ieta = 0; ieta < nHfEta; ieta++) {
+  for (int iphi = 0; iphi < nHfPhi; iphi++) {
+    for (int ieta = 0; ieta < nHfEta; ieta++) {
       hfTowers[ieta][iphi] = 0;
       int temp = ieta;
-      if(ieta < 12) temp = ieta - 41;
+      if (ieta < 12) temp = ieta - 41;
       else temp = ieta - 12 + 30;
       hfEta[ieta][iphi] = l1t::CaloTools::towerEta(temp);
       hfPhi[ieta][iphi] = - M_PI + (iphi*M_PI/36) + (M_PI/72);
     }
   }
 
-  const auto& decoder = iSetup.getData(decoderTag_);
+  //const auto& decoder = iSetup.getData(decoderTag_);
   for (const auto& hit : *hfHandle.product()) {
     double et = decoder.hcaletValue(hit.id(), hit.t0());
     int ieta = 0;
@@ -194,7 +280,11 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
     int iphi = 0;
     if (hit.id().iphi() <= 36) iphi = hit.id().iphi() + 35;
     else if (hit.id().iphi() > 36) iphi = hit.id().iphi() - 37;
-    if(et > 1.) hfTowers[ieta][iphi] = et; // suppress <= 1 GeV towers
+    if (abs(hit.id().ieta()) <= 33 && abs(hit.id().ieta()) >= 29) et = et - all_nvtx_to_PU_sub_funcs["hf"]["er29to33"].Eval(EstimatedNvtx);
+    if (abs(hit.id().ieta()) <= 37 && abs(hit.id().ieta()) >= 34) et = et - all_nvtx_to_PU_sub_funcs["hf"]["er34to37"].Eval(EstimatedNvtx);
+    if (abs(hit.id().ieta()) <= 41 && abs(hit.id().ieta()) >= 38) et = et - all_nvtx_to_PU_sub_funcs["hf"]["er38to41"].Eval(EstimatedNvtx);
+    if (et < 0) et = 0;
+    if (et > 1.) hfTowers[ieta][iphi] = et; // suppress <= 1 GeV towers
   }
 
   //Assign ETs to each eta-half of the endcap region (12x72)
@@ -219,7 +309,7 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
     // BARREL
     for (int iphi = 0; iphi < nBarrelPhi; iphi++) {
       for (int ieta = 0; ieta < nBarrelEta/2; ieta++) {
-        if(k == 0) temporary[ieta][iphi] = GCTintTowers[ieta][iphi];
+        if (k == 0) temporary[ieta][iphi] = GCTintTowers[ieta][iphi];
         else temporary[ieta][iphi] = GCTintTowers[nBarrelEta/2 + ieta][iphi];
       }
     }
@@ -256,13 +346,13 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
       tempJetp4.SetM(0.);
       tempJet.setP4(tempJetp4);
 
-      if(jet[i].energy > 0.) halfBarrelJets.push_back(tempJet);
+      if (jet[i].energy > 0.) halfBarrelJets.push_back(tempJet);
     }
 
     // ENDCAP
     for (int iphi = 0; iphi < nHgcalPhi; iphi++) {
       for (int ieta = 0; ieta < nHgcalEta/2; ieta++) {
-        if(k == 0) temporary_hgcal[ieta][iphi] = hgcalTowers[ieta][iphi];
+        if (k == 0) temporary_hgcal[ieta][iphi] = hgcalTowers[ieta][iphi];
         else temporary_hgcal[ieta][iphi] = hgcalTowers[nHgcalEta/2 + ieta][iphi];
       }
     }
@@ -298,13 +388,13 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
       tempJetp4.SetM(0.);
       tempJet.setP4(tempJetp4);
 
-      if(jet[i].energy > 0.) halfHgcalJets.push_back(tempJet);
+      if (jet[i].energy > 0.) halfHgcalJets.push_back(tempJet);
     }
 
     // HF
     for (int iphi = 0; iphi < nHfPhi; iphi++) {
       for (int ieta = 0; ieta < nHfEta/2; ieta++) {
-        if(k == 0) temporary_hf[ieta][iphi] = hfTowers[ieta][iphi];
+        if (k == 0) temporary_hf[ieta][iphi] = hfTowers[ieta][iphi];
         else temporary_hf[ieta][iphi] = hfTowers[nHfEta/2 + ieta][iphi];
       }
     }
@@ -340,7 +430,7 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
       tempJetp4.SetM(0.);
       tempJet.setP4(tempJetp4);
 
-      if(jet[i].energy > 0.) halfHfJets.push_back(tempJet);
+      if (jet[i].energy > 0.) halfHfJets.push_back(tempJet);
     }
 
     // Stitching:
@@ -387,7 +477,7 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
         float hgcal_ieta = k*nBarrelEta + nHfEta/2 + halfHgcalJets.at(i).jetIEta();
         for (size_t j = 0; j < halfHfJets.size(); j++) {
           float hf_ieta = k*nBarrelEta + k*nHgcalEta + halfHfJets.at(j).jetIEta();
-          if(abs(hgcal_ieta - hf_ieta) < 3 && abs(halfHfJets.at(j).jetIPhi() - halfHgcalJets.at(i).jetIPhi()) < 3) {
+          if (abs(hgcal_ieta - hf_ieta) < 3 && abs(halfHfJets.at(j).jetIPhi() - halfHgcalJets.at(i).jetIPhi()) < 3) {
             float totalet = halfHfJets.at(j).jetEt() + halfHgcalJets.at(i).jetEt();
 	    float totalTauEt = halfHfJets.at(j).tauEt() + halfHgcalJets.at(i).tauEt();
             if (halfHfJets.at(j).jetEt() > halfHgcalJets.at(i).jetEt()) {
