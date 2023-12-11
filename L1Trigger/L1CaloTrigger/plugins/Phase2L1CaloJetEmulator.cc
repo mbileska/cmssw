@@ -62,6 +62,8 @@ public:
 
 private:
   void produce(edm::Event&, const edm::EventSetup&) override;
+  float get_jet_pt_calibration(float &jet_pt, float &jet_eta) const;
+  float get_tau_pt_calibration(float &tau_pt, float &tau_eta) const;
 
   // ----------member data ---------------------------
   edm::EDGetTokenT<l1tp2::CaloTowerCollection> caloTowerToken_;
@@ -75,6 +77,31 @@ private:
   std::map<std::string, TF1> hgcalHad_nvtx_to_PU_sub_funcs;
   std::map<std::string, TF1> hf_nvtx_to_PU_sub_funcs;
   std::map<std::string, std::map<std::string, TF1> > all_nvtx_to_PU_sub_funcs;
+
+  // For fetching jet pt calibrations
+  std::vector<double> jetPtBins;
+  std::vector<double> absEtaBinsBarrel;
+  std::vector<double> jetCalibrationsBarrel;
+  std::vector<double> absEtaBinsHGCal;
+  std::vector<double> jetCalibrationsHGCal;
+  std::vector<double> absEtaBinsHF;
+  std::vector<double> jetCalibrationsHF;
+
+  // For fetching tau pt calibrations
+  std::vector<double> tauPtBins;
+  std::vector<double> tauAbsEtaBinsBarrel;
+  std::vector<double> tauCalibrationsBarrel;
+  std::vector<double> tauAbsEtaBinsHGCal;
+  std::vector<double> tauCalibrationsHGCal;
+
+  // For storing jet calibrations 
+  std::vector<std::vector<double>> calibrationsBarrel;
+  std::vector<std::vector<double>> calibrationsHGCal;
+  std::vector<std::vector<double>> calibrationsHF;
+
+  // For storing tau calibrations
+  std::vector<std::vector<double>> tauPtCalibrationsBarrel;
+  std::vector<std::vector<double>> tauPtCalibrationsHGCal;
 };
 
 //
@@ -94,7 +121,19 @@ Phase2L1CaloJetEmulator::Phase2L1CaloJetEmulator(const edm::ParameterSet& iConfi
       hfToken_(consumes<HcalTrigPrimDigiCollection>(iConfig.getParameter<edm::InputTag>("hcalDigis"))),
       decoderTag_(esConsumes<CaloTPGTranscoder, CaloTPGRecord>(edm::ESInputTag("", ""))),
       nHits_to_nvtx_params(iConfig.getParameter<std::vector<edm::ParameterSet> >("nHits_to_nvtx_params")),
-      nvtx_to_PU_sub_params(iConfig.getParameter<std::vector<edm::ParameterSet> >("nvtx_to_PU_sub_params")) {
+      nvtx_to_PU_sub_params(iConfig.getParameter<std::vector<edm::ParameterSet> >("nvtx_to_PU_sub_params")), 
+      jetPtBins(iConfig.getParameter<std::vector<double>>("jetPtBins")),
+      absEtaBinsBarrel(iConfig.getParameter<std::vector<double>>("absEtaBinsBarrel")),
+      jetCalibrationsBarrel(iConfig.getParameter<std::vector<double>>("jetCalibrationsBarrel")),
+      absEtaBinsHGCal(iConfig.getParameter<std::vector<double>>("absEtaBinsHGCal")),
+      jetCalibrationsHGCal(iConfig.getParameter<std::vector<double>>("jetCalibrationsHGCal")),
+      absEtaBinsHF(iConfig.getParameter<std::vector<double>>("absEtaBinsHF")),
+      jetCalibrationsHF(iConfig.getParameter<std::vector<double>>("jetCalibrationsHF")),
+      tauPtBins(iConfig.getParameter<std::vector<double>>("tauPtBins")),
+      tauAbsEtaBinsBarrel(iConfig.getParameter<std::vector<double>>("tauAbsEtaBinsBarrel")),
+      tauCalibrationsBarrel(iConfig.getParameter<std::vector<double>>("tauCalibrationsBarrel")),
+      tauAbsEtaBinsHGCal(iConfig.getParameter<std::vector<double>>("tauAbsEtaBinsHGCal")),
+      tauCalibrationsHGCal(iConfig.getParameter<std::vector<double>>("tauCalibrationsHGCal")) {
   for (uint i = 0; i < nHits_to_nvtx_params.size(); i++) {
     edm::ParameterSet* pset = &nHits_to_nvtx_params.at(i);
     std::string calo = pset->getParameter<std::string>("fit");
@@ -115,6 +154,70 @@ Phase2L1CaloJetEmulator::Phase2L1CaloJetEmulator(const edm::ParameterSet& iConfi
     all_nvtx_to_PU_sub_funcs[calo.c_str()][iEta.c_str()] = TF1(calo.c_str(), "[0] + [1] * x");
     all_nvtx_to_PU_sub_funcs[calo.c_str()][iEta.c_str()].SetParameter(0, p1);
     all_nvtx_to_PU_sub_funcs[calo.c_str()][iEta.c_str()].SetParameter(1, p2);
+  }
+
+  // Fill the jet pt calibration 2D vector
+  // Dimension 1 is AbsEta bin
+  // Dimension 2 is jet pT bin which is filled with the actual callibration value
+  // size()-1 b/c the inputs have lower and upper bounds
+  // Do Barrel, then HGCal, then HF
+  int index = 0;
+  for (unsigned int abs_eta = 0; abs_eta < absEtaBinsBarrel.size() - 1; abs_eta++) {
+    std::vector<double> pt_bin_calibs;
+    for (unsigned int pt = 0; pt < jetPtBins.size() - 1; pt++) {
+      pt_bin_calibs.push_back(jetCalibrationsBarrel.at(index));
+      index++;
+    }
+    calibrationsBarrel.push_back(pt_bin_calibs);
+  }
+
+  index = 0;
+  for (unsigned int abs_eta = 0; abs_eta < absEtaBinsHGCal.size() - 1; abs_eta++) {
+    std::vector<double> pt_bin_calibs;
+    for (unsigned int pt = 0; pt < jetPtBins.size() - 1; pt++) {
+      pt_bin_calibs.push_back(jetCalibrationsHGCal.at(index));
+      index++;
+    }
+    calibrationsHGCal.push_back(pt_bin_calibs);
+  }
+
+  index = 0;
+  for (unsigned int abs_eta = 0; abs_eta < absEtaBinsHF.size() - 1; abs_eta++) {
+    std::vector<double> pt_bin_calibs;
+    for (unsigned int pt = 0; pt < jetPtBins.size() - 1; pt++) {
+      pt_bin_calibs.push_back(jetCalibrationsHF.at(index));
+      index++;
+    }
+    calibrationsHF.push_back(pt_bin_calibs);
+  }
+
+  // Fill the tau pt calibration 2D vector
+  // Dimension 1 is AbsEta bin
+  // Dimension 2 is tau pT bin which is filled with the actual callibration value
+  // size()-1 b/c the inputs have lower and upper bounds (except L1EG b/c that is a cound)
+  // Do Barrel, then HGCal
+  //
+  // Note to future developers: be very concious of the order in which the calibrations are printed
+  // out in tool which makse the cfg files.  You need to match that exactly when loading them and
+  // using the calibrations below.
+  index = 0;
+  for (unsigned int abs_eta = 0; abs_eta < tauAbsEtaBinsBarrel.size() - 1; abs_eta++) {
+    std::vector<double> pt_bin_calibs;
+    for (unsigned int pt = 0; pt < tauPtBins.size() - 1; pt++) {
+      pt_bin_calibs.push_back(tauCalibrationsBarrel.at(index));
+      index++;
+    }
+    tauPtCalibrationsBarrel.push_back(pt_bin_calibs);
+  }
+
+  index = 0;
+  for (unsigned int abs_eta = 0; abs_eta < tauAbsEtaBinsHGCal.size() - 1; abs_eta++) {
+    std::vector<double> pt_bin_calibs;
+    for (unsigned int pt = 0; pt < tauPtBins.size() - 1; pt++) {
+      pt_bin_calibs.push_back(tauCalibrationsHGCal.at(index));
+      index++;
+    }
+    tauPtCalibrationsHGCal.push_back(pt_bin_calibs);
   }
 
   produces<l1tp2::Phase2L1CaloJetCollection>("GCTJet");
@@ -320,8 +423,6 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
     for (int i = 0; i < 10; i++) {
       jet[i] = getRegion(tempST);
       l1tp2::Phase2L1CaloJet tempJet;
-      tempJet.setJetEt(jet[i].energy);
-      tempJet.setTauEt(jet[i].tauEt);
       int gctjeteta = jet[i].etaCenter;
       int gctjetphi = jet[i].phiCenter;
       tempJet.setJetIEta(gctjeteta+k*nBarrelEta/2);
@@ -330,6 +431,8 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
       float jetphi = realPhi[gctjeteta+k*nBarrelEta/2][gctjetphi];
       tempJet.setJetEta(jeteta);
       tempJet.setJetPhi(jetphi);
+      tempJet.setJetEt(get_jet_pt_calibration(jet[i].energy, jeteta));
+      tempJet.setTauEt(get_tau_pt_calibration(jet[i].tauEt, jeteta));
       tempJet.setTowerEt(jet[i].energyMax);
       int gcttowereta = jet[i].etaMax;
       int gcttowerphi = jet[i].phiMax;
@@ -362,8 +465,6 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
     for (int i = 10; i < 20; i++) {
       jet[i] = getRegion(tempST_hgcal);
       l1tp2::Phase2L1CaloJet tempJet;
-      tempJet.setJetEt(jet[i].energy);
-      tempJet.setTauEt(jet[i].tauEt);
       int hgcaljeteta = jet[i].etaCenter;
       int hgcaljetphi = jet[i].phiCenter;
       tempJet.setJetIEta(hgcaljeteta+k*nHgcalEta/2);
@@ -372,6 +473,8 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
       float jetphi = hgcalPhi[hgcaljeteta+k*nHgcalEta/2][hgcaljetphi];
       tempJet.setJetEta(jeteta);
       tempJet.setJetPhi(jetphi);
+      tempJet.setJetEt(get_jet_pt_calibration(jet[i].energy, jeteta));
+      tempJet.setTauEt(get_tau_pt_calibration(jet[i].tauEt, jeteta));
       tempJet.setTowerEt(jet[i].energyMax);
       int hgcaltowereta = jet[i].etaMax;
       int hgcaltowerphi = jet[i].phiMax;
@@ -404,8 +507,6 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
     for (int i = 20; i < 30; i++) {
       jet[i] = getRegion(tempST_hf);
       l1tp2::Phase2L1CaloJet tempJet;
-      tempJet.setJetEt(jet[i].energy);
-      tempJet.setTauEt(jet[i].tauEt);
       int hfjeteta = jet[i].etaCenter;
       int hfjetphi = jet[i].phiCenter;
       tempJet.setJetIEta(hfjeteta+k*nHfEta/2);
@@ -414,6 +515,8 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
       float jetphi = hfPhi[hfjeteta+k*nHfEta/2][hfjetphi];
       tempJet.setJetEta(jeteta);
       tempJet.setJetPhi(jetphi);
+      tempJet.setJetEt(get_jet_pt_calibration(jet[i].energy, jeteta));
+      tempJet.setTauEt(get_tau_pt_calibration(jet[i].tauEt, jeteta));
       tempJet.setTowerEt(jet[i].energyMax);
       int hftowereta = jet[i].etaMax;
       int hftowerphi = jet[i].phiMax;
@@ -573,6 +676,124 @@ void Phase2L1CaloJetEmulator::fillDescriptions(edm::ConfigurationDescriptions& d
   edm::ParameterSetDescription desc;
   desc.setUnknown();
   descriptions.addDefault(desc);
+}
+
+// Apply calibrations to HCAL energy based on Jet Eta, Jet pT
+float Phase2L1CaloJetEmulator::get_jet_pt_calibration(float &jet_pt, float &jet_eta) const {
+  float abs_eta = std::abs(jet_eta);
+  float tmp_jet_pt = jet_pt;
+  if (tmp_jet_pt > 499)
+    tmp_jet_pt = 499;
+
+  // Different indices sizes in different calo regions.
+  // Barrel...
+  size_t eta_index = 0;
+  size_t pt_index = 0;
+  float calib = 1.0;
+  if (abs_eta <= 1.5) {
+    // Start loop checking 2nd value
+    for (unsigned int i = 1; i < absEtaBinsBarrel.size(); i++) {
+      if (abs_eta <= absEtaBinsBarrel.at(i))
+        break;
+      eta_index++;
+    }
+
+    // Start loop checking 2nd value
+    for (unsigned int i = 1; i < jetPtBins.size(); i++) {
+      if (tmp_jet_pt <= jetPtBins.at(i))
+        break;
+      pt_index++;
+    }
+    calib = calibrationsBarrel[eta_index][pt_index];
+  }                         // end Barrel
+  else if (abs_eta <= 3.0)  // HGCal
+    {
+      // Start loop checking 2nd value
+      for (unsigned int i = 1; i < absEtaBinsHGCal.size(); i++) {
+	if (abs_eta <= absEtaBinsHGCal.at(i))
+	  break;
+	eta_index++;
+      }
+
+      // Start loop checking 2nd value
+      for (unsigned int i = 1; i < jetPtBins.size(); i++) {
+	if (tmp_jet_pt <= jetPtBins.at(i))
+	  break;
+	pt_index++;
+      }
+      calib = calibrationsHGCal[eta_index][pt_index];
+    }     // end HGCal
+  else  // HF
+    {
+      // Start loop checking 2nd value
+      for (unsigned int i = 1; i < absEtaBinsHF.size(); i++) {
+	if (abs_eta <= absEtaBinsHF.at(i))
+	  break;
+	eta_index++;
+      }
+
+      // Start loop checking 2nd value
+      for (unsigned int i = 1; i < jetPtBins.size(); i++) {
+	if (tmp_jet_pt <= jetPtBins.at(i))
+	  break;
+	pt_index++;
+      }
+      calib = calibrationsHF[eta_index][pt_index];
+    }  // end HF
+
+  return jet_pt*calib;
+}
+
+// Apply calibrations to tau pT based on L1EG info, EM Fraction, Tau Eta, Tau pT
+float Phase2L1CaloJetEmulator::get_tau_pt_calibration(float &tau_pt, float &tau_eta) const {
+  float abs_eta = std::abs(tau_eta);
+  float tmp_tau_pt = tau_pt;
+  if (tmp_tau_pt > 199)
+    tmp_tau_pt = 199;
+
+  // Different indices sizes in different calo regions.
+  // Barrel...
+  size_t eta_index = 0;
+  size_t pt_index = 0;
+  float calib = 1.0;
+  // HERE
+  if (abs_eta <= 1.5) {
+    // Start loop checking 2nd value
+    for (unsigned int i = 1; i < tauAbsEtaBinsBarrel.size(); i++) {
+      if (abs_eta <= tauAbsEtaBinsBarrel.at(i))
+        break;
+      eta_index++;
+    }
+
+    // Start loop checking 2nd value
+    for (unsigned int i = 1; i < tauPtBins.size(); i++) {
+      if (tmp_tau_pt <= tauPtBins.at(i))
+        break;
+      pt_index++;
+    }
+    calib = tauPtCalibrationsBarrel[eta_index][pt_index];
+  }                         // end Barrel
+  else if (abs_eta <= 3.0)  // HGCal
+    {
+      // Start loop checking 2nd value
+      for (unsigned int i = 1; i < tauAbsEtaBinsHGCal.size(); i++) {
+	if (abs_eta <= tauAbsEtaBinsHGCal.at(i))
+	  break;
+	eta_index++;
+      }
+
+      // Start loop checking 2nd value
+      for (unsigned int i = 1; i < tauPtBins.size(); i++) {
+	if (tmp_tau_pt <= tauPtBins.at(i))
+	  break;
+	pt_index++;
+      }
+      calib = tauPtCalibrationsHGCal[eta_index][pt_index];
+    }  // end HGCal
+  else
+    return calib;
+
+  return tau_pt*calib;
 }
 
 //define this as a plug-in
