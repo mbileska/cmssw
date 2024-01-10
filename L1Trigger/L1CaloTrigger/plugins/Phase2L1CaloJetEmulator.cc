@@ -62,8 +62,8 @@ public:
 
 private:
   void produce(edm::Event&, const edm::EventSetup&) override;
-  float get_jet_pt_calibration(float& jet_pt, float& jet_eta) const;
-  float get_tau_pt_calibration(float& tau_pt, float& tau_eta) const;
+  float get_jet_pt_calibration(const float& jet_pt, const float& jet_eta) const;
+  float get_tau_pt_calibration(const float& tau_pt, const float& tau_eta) const;
 
   // ----------member data ---------------------------
   edm::EDGetTokenT<l1tp2::CaloTowerCollection> caloTowerToken_;
@@ -319,28 +319,25 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
     if (eta > 1.479)
       ieta = ieta - 4;
     int iphi = it->id().iPhi();
+
     float hgcal_etEm = it->etEm();
     float hgcal_etHad = it->etHad();
-    if (abs(eta) <= 1.8) {
-      hgcal_etEm = it->etEm() - all_nvtx_to_PU_sub_funcs["hgcalEM"]["er1p4to1p8"].Eval(EstimatedNvtx);
-      hgcal_etHad = it->etHad() - all_nvtx_to_PU_sub_funcs["hgcalHad"]["er1p4to1p8"].Eval(EstimatedNvtx);
+    std::string etaKey = "";
+    if (abs(eta) <= 1.8)
+      etaKey = "er1p4to1p8";
+    else if (abs(eta) <= 2.1 && abs(eta) > 1.8)
+      etaKey = "er1p8to2p1";
+    else if (abs(eta) <= 2.4 && abs(eta) > 2.1)
+      etaKey = "er2p1to2p4";
+    else if (abs(eta) <= 2.7 && abs(eta) > 2.4)
+      etaKey = "er2p4to2p7";
+    else if (abs(eta) <= 3.1 && abs(eta) > 2.7)
+      etaKey = "er2p7to3p1";
+    if (!etaKey.empty()) {
+      hgcal_etEm = it->etEm() - all_nvtx_to_PU_sub_funcs["hgcalEM"][etaKey].Eval(EstimatedNvtx);
+      hgcal_etHad = it->etHad() - all_nvtx_to_PU_sub_funcs["hgcalHad"][etaKey].Eval(EstimatedNvtx);
     }
-    if (abs(eta) <= 2.1 && abs(eta) > 1.8) {
-      hgcal_etEm = it->etEm() - all_nvtx_to_PU_sub_funcs["hgcalEM"]["er1p8to2p1"].Eval(EstimatedNvtx);
-      hgcal_etHad = it->etHad() - all_nvtx_to_PU_sub_funcs["hgcalHad"]["er1p8to2p1"].Eval(EstimatedNvtx);
-    }
-    if (abs(eta) <= 2.4 && abs(eta) > 2.1) {
-      hgcal_etEm = it->etEm() - all_nvtx_to_PU_sub_funcs["hgcalEM"]["er2p1to2p4"].Eval(EstimatedNvtx);
-      hgcal_etHad = it->etHad() - all_nvtx_to_PU_sub_funcs["hgcalHad"]["er2p1to2p4"].Eval(EstimatedNvtx);
-    }
-    if (abs(eta) <= 2.7 && abs(eta) > 2.4) {
-      hgcal_etEm = it->etEm() - all_nvtx_to_PU_sub_funcs["hgcalEM"]["er2p4to2p7"].Eval(EstimatedNvtx);
-      hgcal_etHad = it->etHad() - all_nvtx_to_PU_sub_funcs["hgcalHad"]["er2p4to2p7"].Eval(EstimatedNvtx);
-    }
-    if (abs(eta) <= 3.1 && abs(eta) > 2.7) {
-      hgcal_etEm = it->etEm() - all_nvtx_to_PU_sub_funcs["hgcalEM"]["er2p7to3p1"].Eval(EstimatedNvtx);
-      hgcal_etHad = it->etHad() - all_nvtx_to_PU_sub_funcs["hgcalHad"]["er2p7to3p1"].Eval(EstimatedNvtx);
-    }
+
     if (hgcal_etEm < 0)
       hgcal_etEm = 0;
     if (hgcal_etHad < 0)
@@ -656,7 +653,7 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
 }
 
 // Apply calibrations to HCAL energy based on Jet Eta, Jet pT
-float Phase2L1CaloJetEmulator::get_jet_pt_calibration(float& jet_pt, float& jet_eta) const {
+float Phase2L1CaloJetEmulator::get_jet_pt_calibration(const float& jet_pt, const float& jet_eta) const {
   float abs_eta = std::abs(jet_eta);
   float tmp_jet_pt = jet_pt;
   if (tmp_jet_pt > 499)
@@ -719,7 +716,7 @@ float Phase2L1CaloJetEmulator::get_jet_pt_calibration(float& jet_pt, float& jet_
 }
 
 // Apply calibrations to tau pT based on L1EG info, EM Fraction, Tau Eta, Tau pT
-float Phase2L1CaloJetEmulator::get_tau_pt_calibration(float& tau_pt, float& tau_eta) const {
+float Phase2L1CaloJetEmulator::get_tau_pt_calibration(const float& tau_pt, const float& tau_eta) const {
   float abs_eta = std::abs(tau_eta);
   float tmp_tau_pt = tau_pt;
   if (tmp_tau_pt > 199)

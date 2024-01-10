@@ -721,7 +721,7 @@ namespace p2eg {
     /*
      * For towers: Calculate H/E ratio given the ECAL and HCAL energies and modify the hoe() value.
      */
-    void getHoverE(ap_uint<12> ECAL, ap_uint<12> HCAL) {
+    void addHoverEToTower(ap_uint<12> ECAL, ap_uint<12> HCAL) {
       ap_uint<4> hoeOut;
       ap_uint<1> hoeLSB = 0;
       ap_uint<4> hoe = 0;

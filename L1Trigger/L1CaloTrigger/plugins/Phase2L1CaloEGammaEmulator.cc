@@ -441,7 +441,7 @@ void Phase2L1CaloEGammaEmulator::produce(edm::Event& iEvent, const edm::EventSet
       for (int jj = 0; jj < p2eg::n_towers_cardPhi; ++jj) {  // 4 towers per card in phi
         ap_uint<12> ecalEt = towerECALCard[ii][jj][cc].et();
         ap_uint<12> hcalEt = towerHCALCard[ii][jj][cc].et();
-        towerECALCard[ii][jj][cc].getHoverE(ecalEt, hcalEt);
+        towerECALCard[ii][jj][cc].addHoverEToTower(ecalEt, hcalEt);
       }
     }
 

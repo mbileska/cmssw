@@ -1036,30 +1036,15 @@ inline void p2eg::getECALTowersEt(p2eg::crystal tempX[p2eg::CRYSTAL_IN_ETA][p2eg
     }
   }
 
-  towerEt[0] = (towerEtN[0][0][0] >> 2) + (towerEtN[0][0][1] >> 2) + (towerEtN[0][0][2] >> 2) +
-               (towerEtN[0][0][3] >> 2) + (towerEtN[0][0][4] >> 2);
-  towerEt[1] = (towerEtN[0][1][0] >> 2) + (towerEtN[0][1][1] >> 2) + (towerEtN[0][1][2] >> 2) +
-               (towerEtN[0][1][3] >> 2) + (towerEtN[0][1][4] >> 2);
-  towerEt[2] = (towerEtN[0][2][0] >> 2) + (towerEtN[0][2][1] >> 2) + (towerEtN[0][2][2] >> 2) +
-               (towerEtN[0][2][3] >> 2) + (towerEtN[0][2][4] >> 2);
-  towerEt[3] = (towerEtN[0][3][0] >> 2) + (towerEtN[0][3][1] >> 2) + (towerEtN[0][3][2] >> 2) +
-               (towerEtN[0][3][3] >> 2) + (towerEtN[0][3][4] >> 2);
-  towerEt[4] = (towerEtN[1][0][0] >> 2) + (towerEtN[1][0][1] >> 2) + (towerEtN[1][0][2] >> 2) +
-               (towerEtN[1][0][3] >> 2) + (towerEtN[1][0][4] >> 2);
-  towerEt[5] = (towerEtN[1][1][0] >> 2) + (towerEtN[1][1][1] >> 2) + (towerEtN[1][1][2] >> 2) +
-               (towerEtN[1][1][3] >> 2) + (towerEtN[1][1][4] >> 2);
-  towerEt[6] = (towerEtN[1][2][0] >> 2) + (towerEtN[1][2][1] >> 2) + (towerEtN[1][2][2] >> 2) +
-               (towerEtN[1][2][3] >> 2) + (towerEtN[1][2][4] >> 2);
-  towerEt[7] = (towerEtN[1][3][0] >> 2) + (towerEtN[1][3][1] >> 2) + (towerEtN[1][3][2] >> 2) +
-               (towerEtN[1][3][3] >> 2) + (towerEtN[1][3][4] >> 2);
-  towerEt[8] = (towerEtN[2][0][0] >> 2) + (towerEtN[2][0][1] >> 2) + (towerEtN[2][0][2] >> 2) +
-               (towerEtN[2][0][3] >> 2) + (towerEtN[2][0][4] >> 2);
-  towerEt[9] = (towerEtN[2][1][0] >> 2) + (towerEtN[2][1][1] >> 2) + (towerEtN[2][1][2] >> 2) +
-               (towerEtN[2][1][3] >> 2) + (towerEtN[2][1][4] >> 2);
-  towerEt[10] = (towerEtN[2][2][0] >> 2) + (towerEtN[2][2][1] >> 2) + (towerEtN[2][2][2] >> 2) +
-                (towerEtN[2][2][3] >> 2) + (towerEtN[2][2][4] >> 2);
-  towerEt[11] = (towerEtN[2][3][0] >> 2) + (towerEtN[2][3][1] >> 2) + (towerEtN[2][3][2] >> 2) +
-                (towerEtN[2][3][3] >> 2) + (towerEtN[2][3][4] >> 2);
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 4; j++) {
+      int index = j + 4 * i;
+      towerEt[index] = 0;
+      for (int k = 0; k < 5; k++) {
+        towerEt[index] += (towerEtN[i][j][k] >> 2);
+      }
+    }
+  }
 
   ap_uint<12> totalEt;
   for (int i = 0; i < 12; i++) {
