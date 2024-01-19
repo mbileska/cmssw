@@ -303,6 +303,12 @@ void L1TCaloSummary<INPUT, OUTPUT>::fillDescriptions(edm::ConfigurationDescripti
 
 typedef L1TCaloSummary<ap_ufixed<10, 10>, ap_fixed<11, 5>> L1TCaloSummaryCICADAv1;
 typedef L1TCaloSummary<ap_uint<10>, ap_ufixed<16, 8>> L1TCaloSummaryCICADAv2;
+typedef L1TCaloSummary<ap_uint<10>, ap_ufixed<16,8,AP_RND,AP_SAT,AP_SAT>> L1TCaloSummaryCICADAv1p1p1;
+typedef L1TCaloSummary<ap_uint<10>, ap_ufixed<16,8,AP_RND,AP_SAT,AP_SAT>> L1TCaloSummaryCICADAv2p1p1;
+typedef L1TCaloSummary<ap_uint<10>, ap_ufixed<16,8,AP_RND_CONV,AP_SAT>> L1TCaloSummaryCICADAvUniversal;
 //define type version plugins
 DEFINE_FWK_MODULE(L1TCaloSummaryCICADAv1);
 DEFINE_FWK_MODULE(L1TCaloSummaryCICADAv2);
+DEFINE_FWK_MODULE(L1TCaloSummaryCICADAv1p1p1);
+DEFINE_FWK_MODULE(L1TCaloSummaryCICADAv2p1p1);
+DEFINE_FWK_MODULE(L1TCaloSummaryCICADAvUniversal);
