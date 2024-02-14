@@ -7,12 +7,10 @@ using std::bitset;
 #include <string>
 using std::string;
 
-#include "UCTRegion.hh"
-
-#include "UCTGeometry.hh"
-#include "UCTLogging.hh"
-
-#include "UCTTower.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTRegion.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTGeometry.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTLogging.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTTower.hh"
 
 using namespace l1tcalo;
 

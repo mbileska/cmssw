@@ -6,8 +6,8 @@
 #include <cstdlib>
 #include <cstdint>
 
-#include "UCTTower.hh"
-#include "UCTLogging.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTTower.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTLogging.hh"
 
 using namespace l1tcalo;
 

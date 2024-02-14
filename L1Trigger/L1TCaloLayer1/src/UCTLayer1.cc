@@ -3,15 +3,13 @@
 #include <cstdlib>
 #include <cstdint>
 
-#include "UCTLayer1.hh"
-
-#include "UCTCrate.hh"
-#include "UCTCard.hh"
-#include "UCTRegion.hh"
-#include "UCTTower.hh"
-
-#include "UCTGeometry.hh"
-#include "UCTLogging.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTLayer1.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTCrate.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTCard.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTRegion.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTTower.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTGeometry.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTLogging.hh"
 
 using namespace l1tcalo;
 

@@ -21,8 +21,8 @@
 #include "Geometry/HcalTowerAlgo/interface/HcalTrigTowerGeometry.h"
 #include "Geometry/Records/interface/CaloGeometryRecord.h"
 
-#include "L1TCaloLayer1FetchLUTs.hh"
-#include "UCTLogging.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/L1TCaloLayer1FetchLUTs.hh"
+#include "L1Trigger/L1TCaloLayer1/interface/UCTLogging.hh"
 
 using namespace l1tcalo;
 

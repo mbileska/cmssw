@@ -44,7 +44,7 @@ simCaloStage2Layer1Summary = cms.EDProducer('L1TCaloSummaryCICADAv2',
     tauIsolationFactor = cms.double(0.3),
     eGammaSeed = cms.uint32(5),
     eGammaIsolationFactor = cms.double(0.3),
-    boostedJetPtFactor = cms.double(1.5),
+    boostedJetPtFactor = cms.double(1.0),
     verbose = cms.bool(False),
     # See UCTLayer1.hh for firmware version
     firmwareVersion = cms.int32(1),
