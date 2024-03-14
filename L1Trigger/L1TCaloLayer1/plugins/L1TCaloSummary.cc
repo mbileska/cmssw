@@ -61,6 +61,8 @@
 #include "ap_fixed.h"
 #include "hls4ml/emulator.h"
 
+const unsigned int central_super_region_idx[252] = { 0,  0,  1,  1,  2,  2,  3,  3,  4,  4,  5,  5,  6,  6,  0,  0,  1,  1,  2,  2,  3,  3,  4,  4,  5,  5,  6,  6,  7,  7,  8,  8,  9,  9,  10,  10,  11,  11,  12,  12,  13,  13,  7,  7,  8,  8,  9,  9,  10,  10,  11,  11,  12,  12,  13,  13,  14,  14,  15,  15,  16,  16,  17,  17,  18,  18,  19,  19,  20,  20,  14,  14,  15,  15,  16,  16,  17,  17,  18,  18,  19,  19,  20,  20,  21,  21,  22,  22,  23,  23,  24,  24,  25,  25,  26,  26,  27,  27,  21,  21,  22,  22,  23,  23,  24,  24,  25,  25,  26,  26,  27,  27,  28,  28,  29,  29,  30,  30,  31,  31,  32,  32,  33,  33,  34,  34,  28,  28,  29,  29,  30,  30,  31,  31,  32,  32,  33,  33,  34,  34,  35,  35,  36,  36,  37,  37,  38,  38,  39,  39,  40,  40,  41,  41,  35,  35,  36,  36,  37,  37,  38,  38,  39,  39,  40,  40,  41,  41,  42,  42,  43,  43,  44,  44,  45,  45,  46,  46,  47,  47,  48,  48,  42,  42,  43,  43,  44,  44,  45,  45,  46,  46,  47,  47,  48,  48,  49,  49,  50,  50,  51,  51,  52,  52,  53,  53,  54,  54,  55,  55,  49,  49,  50,  50,  51,  51,  52,  52,  53,  53,  54,  54,  55,  55,  56,  56,  57,  57,  58,  58,  59,  59,  60,  60,  61,  61,  62,  62,  56,  56,  57,  57,  58,  58,  59,  59,  60,  60,  61,  61,  62,  62 };
+
 using namespace l1tcalo;
 using namespace l1extra;
 using namespace std;
@@ -236,6 +238,12 @@ void L1TCaloSummary<INPUT, OUTPUT>::produce(edm::Event& iEvent, const edm::Event
   double eta = -999.;
   double phi = -999.;
   double mass = 0;
+  int supperregion_eta = -99;
+  int supperregion_phi = -99;
+  unsigned int supperregion_index = 999;
+  double supperregion_jet_pt[64] = {0.};
+  double supperregion_jet_eta[64] = {-99.};
+  double supperregion_jet_phi[64] = {-99.};
 
   std::list<UCTObject*> boostedJetObjs = summaryCard.getBoostedJetObjs();
   for (std::list<UCTObject*>::const_iterator i = boostedJetObjs.begin(); i != boostedJetObjs.end(); i++) {
@@ -243,6 +251,14 @@ void L1TCaloSummary<INPUT, OUTPUT>::produce(edm::Event& iEvent, const edm::Event
     pt = ((double)object->et()) * caloScaleFactor * boostedJetPtFactor;
     eta = g.getUCTTowerEta(object->iEta());
     phi = g.getUCTTowerPhi(object->iPhi());
+    // find out the superregion
+    if(object->iEta() < 0) supperregion_eta = floor((object->iEta() + 28) / 4);
+    else supperregion_eta = 7 + floor((object->iEta() - 1) / 4);
+//    unsigned int temp_phi = floor(object->iPhi() / 4);
+    if(object->iPhi() < 3 || object->iPhi() > 70) supperregion_phi = 0; // iphi: 71,72,1,2 => index 0
+    else supperregion_phi = floor((object->iPhi()+1) / 4);
+    supperregion_index = central_super_region_idx[14 * supperregion_phi + supperregion_eta];
+    //std::cout<<object->et()<<"\t"<<object->iEta()<<"\t"<<supperregion_eta<<"\t"<<object->iPhi()<<"\t"<<supperregion_phi<<"\t"<<(14 * supperregion_phi + supperregion_eta)<<"\t"<<supperregion_index<<std::endl;
     bitset<3> activeRegionEtaPattern = 0;
     for (uint32_t iEta = 0; iEta < 3; iEta++) {
       bool activeStrip = false;
@@ -277,15 +293,24 @@ void L1TCaloSummary<INPUT, OUTPUT>::produce(edm::Event& iEvent, const edm::Event
                           object->boostedJetRegionET()[4] >= object->boostedJetRegionET()[7] &&
                           object->boostedJetRegionET()[4] >= object->boostedJetRegionET()[8];
 
-    if (abs(eta) < 2.5 && ((regionEta == "101" && (regionPhi == "110" || regionPhi == "101" || regionPhi == "010")) ||
+    if (pt > supperregion_jet_pt[supperregion_index] && abs(object->iEta()) < 25 &&
+		           ((regionEta == "101" && (regionPhi == "110" || regionPhi == "101" || regionPhi == "010")) ||
                            ((regionEta == "110" || regionEta == "101" || regionEta == "010") && regionPhi == "101") ||
                            (regionEta == "111" && (regionPhi == "110" || regionPhi == "010")) ||
                            ((regionEta == "110" || regionEta == "010") && regionPhi == "111") ||
                            ((regionEta == "010" || regionPhi == "010" || regionEta == "110" || regionPhi == "110" ||
-                             regionEta == "011" || regionPhi == "011") &&
-                            centralHighest)))
-      bJetCands->push_back(L1JetParticle(math::PtEtaPhiMLorentzVector(pt, eta, phi, mass), L1JetParticle::kCentral));
+                             regionEta == "011" || regionPhi == "011") && centralHighest))){
+      supperregion_jet_pt[supperregion_index] = pt;
+      supperregion_jet_eta[supperregion_index] = eta;
+      supperregion_jet_phi[supperregion_index] = phi;
+      //std::cout<<"L1TCaloSummary: "<<regionEta<<"\t"<<regionPhi<<"\t"<<centralHighest<<"\t"<<object->iEta()<<"\t"<<object->iPhi()<<"\t"<<supperregion_eta<<"\t"<<supperregion_phi<<"\t"<<supperregion_index<<std::endl;
+      //std::cout<<"L1TCaloSummary: "<<object->boostedJetRegionET()[4]<<"\t"<<object->boostedJetRegionET()[3]<<"\t"<<object->boostedJetRegionET()[7]<<"\t"<<object->boostedJetRegionET()[1]<<"\t"<<object->boostedJetRegionET()[5]<<"\t"<<object->boostedJetRegionET()[6]<<"\t"<<object->boostedJetRegionET()[0]<<"\t"<<object->boostedJetRegionET()[8]<<"\t"<<object->boostedJetRegionET()[2]<<std::endl;
+    }
   }
+
+  for (int i = 0; i < 64; i++){
+      if(supperregion_jet_pt[i] > 0.) bJetCands->push_back(L1JetParticle(math::PtEtaPhiMLorentzVector(supperregion_jet_pt[i], supperregion_jet_eta[i], supperregion_jet_phi[i], mass), L1JetParticle::kCentral));
+  } 
 
   iEvent.put(std::move(bJetCands), "Boosted");
   //Write out anomaly score
