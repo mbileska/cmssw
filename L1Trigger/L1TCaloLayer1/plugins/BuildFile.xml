@@ -7,5 +7,6 @@
 <use name="L1Trigger/L1TCaloLayer1"/>
 <use name="hls"/>
 <use name="hls4mlEmulatorExtras"/>
+<use name="PhysicsTools/TensorFlow"/>
 <use name="CICADA"/>
 <flags EDM_PLUGIN="1"/>

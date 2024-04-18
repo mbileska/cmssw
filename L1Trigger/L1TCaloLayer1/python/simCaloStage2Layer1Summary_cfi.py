@@ -48,5 +48,6 @@ simCaloStage2Layer1Summary = cms.EDProducer('L1TCaloSummaryCICADAv2',
     verbose = cms.bool(False),
     # See UCTLayer1.hh for firmware version
     firmwareVersion = cms.int32(1),
-    CICADAModelVersion = cms.string("CICADAModel_v2p1")
+    CICADAModelVersion = cms.string("CICADAModel_v2p1"),
+    modelLocation = cms.string("/src/L1Trigger/L1TCaloLayer1/data/")
 )

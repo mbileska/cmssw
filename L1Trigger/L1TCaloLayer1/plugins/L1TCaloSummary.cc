@@ -57,6 +57,8 @@
 #include "L1Trigger/L1TCaloLayer1/src/UCTLogging.hh"
 #include <bitset>
 
+#include "PhysicsTools/TensorFlow/interface/TensorFlow.h"
+
 //Anomaly detection includes
 #include "ap_fixed.h"
 #include "hls4ml/emulator.h"
@@ -77,7 +79,7 @@ template <class INPUT, class OUTPUT>
 class L1TCaloSummary : public edm::stream::EDProducer<> {
 public:
   explicit L1TCaloSummary(const edm::ParameterSet&);
-  ~L1TCaloSummary() override = default;
+  ~L1TCaloSummary() override;
 
   static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
@@ -114,6 +116,10 @@ private:
 
   hls4mlEmulator::ModelLoader loader;
   std::shared_ptr<hls4mlEmulator::Model> model;
+
+  tensorflow::Options options;
+  tensorflow::MetaGraphDef* metaGraph;
+  tensorflow::Session* session;
 };
 
 //
@@ -165,6 +171,20 @@ L1TCaloSummary<INPUT, OUTPUT>::L1TCaloSummary(const edm::ParameterSet& iConfig)
   //anomaly trigger loading
   model = loader.load_model();
   produces<float>("CICADAScore");
+
+  std::string fullPathToModel(std::getenv("CMSSW_BASE"));
+  fullPathToModel.append(iConfig.getParameter<std::string>("modelLocation"));
+  metaGraph = tensorflow::loadMetaGraphDef(fullPathToModel);
+  session = tensorflow::createSession(metaGraph, fullPathToModel, options);
+}
+
+template <class INPUT, class OUTPUT>
+L1TCaloSummary<INPUT, OUTPUT>::~L1TCaloSummary()
+{
+  delete metaGraph;
+  metaGraph = nullptr;
+  tensorflow::closeSession(session);
+  session=nullptr;
 }
 
 //
@@ -248,6 +268,7 @@ void L1TCaloSummary<INPUT, OUTPUT>::produce(edm::Event& iEvent, const edm::Event
 
   std::list<UCTObject*> boostedJetObjs = summaryCard.getBoostedJetObjs();
   for (std::list<UCTObject*>::const_iterator i = boostedJetObjs.begin(); i != boostedJetObjs.end(); i++) {
+    tensorflow::Tensor input(tensorflow::DT_FLOAT, { 1, 9 });
     const UCTObject* object = *i;
     pt = ((double)object->et()) * caloScaleFactor * boostedJetPtFactor;
     eta = g.getUCTTowerEta(object->iEta());
@@ -262,6 +283,7 @@ void L1TCaloSummary<INPUT, OUTPUT>::produce(edm::Event& iEvent, const edm::Event
     for (uint32_t iEta = 0; iEta < 3; iEta++) {
       bool activeStrip = false;
       for (uint32_t iPhi = 0; iPhi < 3; iPhi++) {
+	input.matrix<float>()(0, 3 * iEta + iPhi) = object->boostedJetRegionET()[3 * iEta + iPhi];
         if (object->boostedJetRegionET()[3 * iEta + iPhi] > 30 &&
             object->boostedJetRegionET()[3 * iEta + iPhi] > object->et() * 0.0625)
           activeStrip = true;
@@ -269,6 +291,10 @@ void L1TCaloSummary<INPUT, OUTPUT>::produce(edm::Event& iEvent, const edm::Event
       if (activeStrip)
         activeRegionEtaPattern |= (0x1 << iEta);
     }
+    std::vector<tensorflow::Tensor> outputs;
+    tensorflow::run(session, { { "serving_default_inputs_:0", input } }, { "StatefulPartitionedCall:0" }, &outputs);
+    std::cout << "output: "<< outputs[0].matrix<float>()(0, 0) << std::endl;
+
     bitset<3> activeRegionPhiPattern = 0;
     for (uint32_t iPhi = 0; iPhi < 3; iPhi++) {
       bool activeStrip = false;
