@@ -361,7 +361,7 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
       else
         temp = ieta - nHfEta / 2 + l1t::CaloTools::kHFBegin + 1;
       hfEta[ieta][iphi] = l1t::CaloTools::towerEta(temp);
-      hfPhi[ieta][iphi] = -M_PI + (iphi * 2 * M_PI / nHfPhi) + (M_PI / nHfPhi);
+      hfPhi[ieta][iphi] = l1t::CaloTools::towerPhi(temp, iphi);
     }
   }
 
@@ -377,11 +377,7 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
     } else if (hit.id().ieta() >= (l1t::CaloTools::kHFBegin + 1)) {
       ieta = nHfEta / 2 + (hit.id().ieta() - (l1t::CaloTools::kHFBegin + 1));
     }
-    int iphi = 0;
-    if (hit.id().iphi() <= nHfPhi / 2)
-      iphi = hit.id().iphi() + (nHfPhi / 2 - 1);
-    else if (hit.id().iphi() > nHfPhi / 2)
-      iphi = hit.id().iphi() - (nHfPhi / 2 + 1);
+    int iphi = hit.id().iphi();
     if (abs(hit.id().ieta()) <= 33 && abs(hit.id().ieta()) >= 29)
       et = et - all_nvtx_to_PU_sub_funcs["hf"]["er29to33"].Eval(EstimatedNvtx);
     if (abs(hit.id().ieta()) <= 37 && abs(hit.id().ieta()) >= 34)
@@ -522,7 +518,7 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
     for (int i = 2 * nJets; i < 3 * nJets; i++) {
       jet[i] = gctobj::getRegion(tempST_hf, TTseedThresholdHF);
       l1tp2::Phase2L1CaloJet tempJet;
-      int hfjeteta = jet[i].etaCenter;
+      int hfjeteta = jet[i].etaCenter / 2; // 24 -> 12 towers
       int hfjetphi = jet[i].phiCenter;
       tempJet.setJetIEta(hfjeteta + k * nHfEta / 2);
       tempJet.setJetIPhi(hfjetphi);
@@ -533,7 +529,7 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
       tempJet.setJetEt(get_jet_pt_calibration(jet[i].energy, jeteta));
       tempJet.setTauEt(get_tau_pt_calibration(jet[i].tauEt, jeteta));
       tempJet.setTowerEt(jet[i].energyMax);
-      int hftowereta = jet[i].etaMax;
+      int hftowereta = jet[i].etaMax / 2; // 24 -> 12 towers
       int hftowerphi = jet[i].phiMax;
       tempJet.setTowerIEta(hftowereta + k * nHfEta / 2);
       tempJet.setTowerIPhi(hftowerphi);
