@@ -388,6 +388,7 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
       et = 0;
     if (et > 1.)
       hfTowers[ieta][iphi] = et;  // suppress <= 1 GeV towers
+    if(et > 5.) std::cout<<et<<std::endl;
   }
 
   float temporary_hf[nHfEta / 2][nHfPhi];
@@ -514,7 +515,7 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
 
     gctobj::GCTsupertower_t tempST_hf[nSTEta][nSTPhi];
     gctobj::makeST_hf(temporary_hf, tempST_hf);
-    float TTseedThresholdHF = 5.;
+    float TTseedThresholdHF = 3.;
     for (int i = 2 * nJets; i < 3 * nJets; i++) {
       jet[i] = gctobj::getRegion(tempST_hf, TTseedThresholdHF);
       l1tp2::Phase2L1CaloJet tempJet;

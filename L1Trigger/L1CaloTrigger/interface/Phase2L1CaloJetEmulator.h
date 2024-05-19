@@ -252,12 +252,35 @@ namespace gctobj {
   inline void makeST_hf(const float hfTowers[nHfEta / 2][nHfPhi], GCTsupertower_t supertower_return[nSTEta][nSTPhi]) {
     // make 12 x 72 --> 24 x 72 to match the tower sizes with barrel and endcap
     float hfTowers_split[nHfEta][nHfPhi];
+//    std::cout<<"hf towers: "<<std::endl;
+//    for (int j = 0; j < nHfPhi; j ++) {
+//      for (int i = 0; i < nHfEta / 2; i ++) {
+//	std::cout<<hfTowers[i][j]<<"  ";
+//      }
+//      std::cout<<"\n";
+//    }
+//    std::cout<<"hf towers split: "<<std::endl;
     for (int i = 0; i < nHfEta; i ++) {
       for (int j = 0; j < nHfPhi; j ++) {
-	if(i % 2 == 0) hfTowers_split[i][j] = hfTowers[i / 2][j]; // use the even towers
-	else hfTowers_split[i][j] = 0;
+	//if (i % 2 == 0) hfTowers_split[i][j] = hfTowers[i / 2][j]; // use the even towers
+	//else hfTowers_split[i][j] = 0;
+	//if (i < nHfEta / 2 && hfTowers[i][j] > 0) std::cout<<i<<"\t"<<j<<"\t"<<std::endl;
+	if (i % 2 == 0 && j % 2 == 1) {
+          hfTowers_split[i][j] = hfTowers[i / 2][j] / 4;
+	  hfTowers_split[i][j-1] = hfTowers[i / 2][j] / 4;
+	  hfTowers_split[i+1][j] = hfTowers[i / 2][j] / 4;
+	  hfTowers_split[i+1][j-1] = hfTowers[i / 2][j] / 4;
+	}
       }
     }
+
+//    for (int j = 0; j < nHfPhi; j ++) {
+//      for (int i = 0; i < nHfEta; i ++) {
+//	std::cout<<hfTowers_split[i][j]<<"  ";
+//      }
+//      std::cout<<"\n";
+//    }
+
     float et_sumEta[nSTEta][nSTPhi][3];
     float stripEta[nSTEta][nSTPhi][3];
     float stripPhi[nSTEta][nSTPhi][3];
