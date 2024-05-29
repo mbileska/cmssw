@@ -388,7 +388,6 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
       et = 0;
     if (et > 1.)
       hfTowers[ieta][iphi] = et;  // suppress <= 1 GeV towers
-    if(et > 5.) std::cout<<et<<std::endl;
   }
 
   float temporary_hf[nHfEta / 2][nHfPhi];
