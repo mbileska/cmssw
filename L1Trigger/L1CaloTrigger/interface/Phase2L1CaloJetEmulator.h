@@ -265,11 +265,31 @@ namespace gctobj {
 	//if (i % 2 == 0) hfTowers_split[i][j] = hfTowers[i / 2][j]; // use the even towers
 	//else hfTowers_split[i][j] = 0;
 	//if (i < nHfEta / 2 && hfTowers[i][j] > 0) std::cout<<i<<"\t"<<j<<"\t"<<std::endl;
-	if (i % 2 == 0 && j % 2 == 1) {
+	if (i % 2 == 0 && i < 20 && j % 2 == 0) {
           hfTowers_split[i][j] = hfTowers[i / 2][j] / 4;
-	  hfTowers_split[i][j-1] = hfTowers[i / 2][j] / 4;
+	  hfTowers_split[i][j+1] = hfTowers[i / 2][j] / 4;
 	  hfTowers_split[i+1][j] = hfTowers[i / 2][j] / 4;
-	  hfTowers_split[i+1][j-1] = hfTowers[i / 2][j] / 4;
+	  hfTowers_split[i+1][j+1] = hfTowers[i / 2][j] / 4;
+	}
+	if (i % 2 == 0 && i >= 20 && j % 4 == 2 && j < nHfPhi - 2) {
+          hfTowers_split[i][j] = hfTowers[i / 2][j] / 8;
+          hfTowers_split[i][j+1] = hfTowers[i / 2][j] / 8;
+          hfTowers_split[i][j+2] = hfTowers[i / 2][j] / 8;
+          hfTowers_split[i][j+3] = hfTowers[i / 2][j] / 8;
+          hfTowers_split[i+1][j] = hfTowers[i / 2][j] / 8;
+          hfTowers_split[i+1][j+1] = hfTowers[i / 2][j] / 8;
+          hfTowers_split[i+1][j+2] = hfTowers[i / 2][j] / 8;
+          hfTowers_split[i+1][j+3] = hfTowers[i / 2][j] / 8;
+	}
+	if (i % 2 == 0 && i >= 20 && j == 70) {
+	  hfTowers_split[i][j] = hfTowers[i / 2][j] / 8;
+	  hfTowers_split[i][j+1] = hfTowers[i / 2][j] / 8;
+	  hfTowers_split[i][0] = hfTowers[i / 2][j] / 8;
+	  hfTowers_split[i][1] = hfTowers[i / 2][j] / 8;
+          hfTowers_split[i+1][j] = hfTowers[i / 2][j] / 8;
+          hfTowers_split[i+1][j+1] = hfTowers[i / 2][j] / 8;
+          hfTowers_split[i+1][0] = hfTowers[i / 2][j] / 8;
+          hfTowers_split[i+1][1] = hfTowers[i / 2][j] / 8;
 	}
       }
     }

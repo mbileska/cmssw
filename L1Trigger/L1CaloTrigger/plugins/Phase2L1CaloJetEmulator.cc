@@ -353,6 +353,7 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
   float hfEta[nHfEta][nHfPhi];
   float hfPhi[nHfEta][nHfPhi];
   for (int iphi = 0; iphi < nHfPhi; iphi++) {
+    //std::cout<<iphi<<"\t"<<l1t::CaloTools::towerPhi(30, iphi)<<std::endl;
     for (int ieta = 0; ieta < nHfEta; ieta++) {
       hfTowers[ieta][iphi] = 0;
       int temp;
@@ -361,7 +362,8 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
       else
         temp = ieta - nHfEta / 2 + l1t::CaloTools::kHFBegin + 1;
       hfEta[ieta][iphi] = l1t::CaloTools::towerEta(temp);
-      hfPhi[ieta][iphi] = l1t::CaloTools::towerPhi(temp, iphi);
+      hfPhi[ieta][iphi] = l1t::CaloTools::towerPhi(temp, iphi+1);
+      //if(iphi==0) std::cout<<l1t::CaloTools::towerPhi(temp, iphi)<<std::endl;
     }
   }
 
@@ -377,7 +379,8 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
     } else if (hit.id().ieta() >= (l1t::CaloTools::kHFBegin + 1)) {
       ieta = nHfEta / 2 + (hit.id().ieta() - (l1t::CaloTools::kHFBegin + 1));
     }
-    int iphi = hit.id().iphi();
+    int iphi = hit.id().iphi() - 1; // HF phi runs between 1-72
+    //std::cout<<hit.id().ieta()<<"\t"<<ieta<<"\t"<<iphi<<std::endl;
     if (abs(hit.id().ieta()) <= 33 && abs(hit.id().ieta()) >= 29)
       et = et - all_nvtx_to_PU_sub_funcs["hf"]["er29to33"].Eval(EstimatedNvtx);
     if (abs(hit.id().ieta()) <= 37 && abs(hit.id().ieta()) >= 34)
@@ -386,8 +389,8 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
       et = et - all_nvtx_to_PU_sub_funcs["hf"]["er38to41"].Eval(EstimatedNvtx);
     if (et < 0)
       et = 0;
-    if (et > 1.)
-      hfTowers[ieta][iphi] = et;  // suppress <= 1 GeV towers
+    //if (et > 1.)
+    hfTowers[ieta][iphi] = et;  // suppress <= 1 GeV towers
   }
 
   float temporary_hf[nHfEta / 2][nHfPhi];
@@ -505,10 +508,12 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
     // HF
     for (int iphi = 0; iphi < nHfPhi; iphi++) {
       for (int ieta = 0; ieta < nHfEta / 2; ieta++) {
-        if (k == 0)
-          temporary_hf[ieta][iphi] = hfTowers[ieta][iphi];
-        else
-          temporary_hf[ieta][iphi] = hfTowers[nHfEta / 2 + ieta][iphi];
+	int ieta_temp = abs(ieta + k * nHfEta / 2 + (k - 1)*(nHfEta / 2 - 1));
+        temporary_hf[ieta][iphi] = hfTowers[ieta_temp][iphi];
+        //if (k == 0)
+        //  temporary_hf[ieta][iphi] = hfTowers[nHfEta / 2 - ieta - 1][iphi];
+        //else
+        //  temporary_hf[ieta][iphi] = hfTowers[nHfEta / 2 + ieta][iphi];
       }
     }
 
@@ -518,23 +523,23 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
     for (int i = 2 * nJets; i < 3 * nJets; i++) {
       jet[i] = gctobj::getRegion(tempST_hf, TTseedThresholdHF);
       l1tp2::Phase2L1CaloJet tempJet;
-      int hfjeteta = jet[i].etaCenter / 2; // 24 -> 12 towers
+      int hfjeteta = abs(jet[i].etaCenter / 2 + k * nHfEta / 2 + (k - 1)*(nHfEta / 2 - 1) ); // 24 -> 12 towers
       int hfjetphi = jet[i].phiCenter;
-      tempJet.setJetIEta(hfjeteta + k * nHfEta / 2);
+      tempJet.setJetIEta(hfjeteta);
       tempJet.setJetIPhi(hfjetphi);
-      float jeteta = hfEta[hfjeteta + k * nHfEta / 2][hfjetphi];
-      float jetphi = hfPhi[hfjeteta + k * nHfEta / 2][hfjetphi];
+      float jeteta = hfEta[hfjeteta][hfjetphi];
+      float jetphi = hfPhi[hfjeteta][hfjetphi];
       tempJet.setJetEta(jeteta);
       tempJet.setJetPhi(jetphi);
       tempJet.setJetEt(get_jet_pt_calibration(jet[i].energy, jeteta));
       tempJet.setTauEt(get_tau_pt_calibration(jet[i].tauEt, jeteta));
       tempJet.setTowerEt(jet[i].energyMax);
-      int hftowereta = jet[i].etaMax / 2; // 24 -> 12 towers
+      int hftowereta = abs(jet[i].etaMax / 2 + k * nHfEta / 2 + (k - 1)*(nHfEta / 2 - 1) ); // 24 -> 12 towers
       int hftowerphi = jet[i].phiMax;
-      tempJet.setTowerIEta(hftowereta + k * nHfEta / 2);
+      tempJet.setTowerIEta(hftowereta);
       tempJet.setTowerIPhi(hftowerphi);
-      float towereta = hfEta[hftowereta + k * nHfEta / 2][hftowerphi];
-      float towerphi = hfPhi[hftowereta + k * nHfEta / 2][hftowerphi];
+      float towereta = hfEta[hftowereta][hftowerphi];
+      float towerphi = hfPhi[hftowereta][hftowerphi];
       tempJet.setTowerEta(towereta);
       tempJet.setTowerPhi(towerphi);
       reco::Candidate::PolarLorentzVector tempJetp4;
