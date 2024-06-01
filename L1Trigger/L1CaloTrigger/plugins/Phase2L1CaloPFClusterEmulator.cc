@@ -177,33 +177,34 @@ void Phase2L1CaloPFClusterEmulator::produce(edm::Event& iEvent, const edm::Event
     edm::LogError("Phase2L1CaloJetEmulator") << "Failed to get HcalTrigPrimDigi for HF!";
   iEvent.getByToken(hfToken_, hfHandle);
 
-  float hfTowers[nHfEta][nHfPhi];
+  float hfTowers[2*nHfEta][nHfPhi];  // split 12 -> 24
   float hfEta[nHfEta][nHfPhi];
   float hfPhi[nHfEta][nHfPhi];
   for (int iphi = 0; iphi < nHfPhi; iphi++) {
     for (int ieta = 0; ieta < nHfEta; ieta++) {
-      hfTowers[ieta][iphi] = 0;
+      hfTowers[2*ieta][iphi] = 0;
+      hfTowers[2*ieta+1][iphi] = 0;
       int temp;
       if (ieta < nHfEta / 2)
         temp = ieta - l1t::CaloTools::kHFEnd;
       else
         temp = ieta - nHfEta / 2 + l1t::CaloTools::kHFBegin + 1;
       hfEta[ieta][iphi] = l1t::CaloTools::towerEta(temp);
-      hfPhi[ieta][iphi] = l1t::CaloTools::towerPhi(temp, iphi);
+      hfPhi[ieta][iphi] = l1t::CaloTools::towerPhi(temp, iphi+1);
     }
   }
 
-  float regionsHF[12][12][12]; // 6 regions each 3 sectors (1 sector = 20 deg in phi), 12x12 unique towers+overlap in phi ?
+  float regionsHF[nHfRegions][nHfEta][nHfPhi / 6]; // 6 regions each 3 sectors (1 sector = 20 deg in phi), 12x12->24x12 unique towers, no overlap in phi
 
-  for (int ieta = 0; ieta < 12; ieta++) {
-    for (int iphi = 0; iphi < 12; iphi++) {
-      for (int k = 0; k < 12; k++) {
+  for (int ieta = 0; ieta < nHfEta; ieta++) {
+    for (int iphi = 0; iphi < nHfPhi / 6; iphi++) {
+      for (int k = 0; k < nHfRegions; k++) {
         regionsHF[k][ieta][iphi] = 0.;
       }
     }
   }
 
-  // Assign ET to 6 12x12 regions
+  // Assign ET to 12 24x12 regions
   const auto& decoder = iSetup.getData(decoderTag_);
   for (const auto& hit : *hfHandle.product()) {
     double et = decoder.hcaletValue(hit.id(), hit.t0());
@@ -217,32 +218,50 @@ void Phase2L1CaloPFClusterEmulator::produce(edm::Event& iEvent, const edm::Event
     } else if (hit.id().ieta() >= (l1t::CaloTools::kHFBegin + 1)) {
       ieta = nHfEta / 2 + (hit.id().ieta() - (l1t::CaloTools::kHFBegin + 1));
     }
-    int iphi = hit.id().iphi();
+    int iphi = hit.id().iphi() - 1; // HF phi runs between 1-72
     //std::cout<<ieta<<"\t"<<l1t::CaloTools::towerEta(hit.id().ieta())<<"\t"<<iphi<<"\t"<<l1t::CaloTools::towerPhi(ieta, iphi)<<std::endl;
-    hfTowers[ieta][iphi] = et;
+    // split tower energy
+    hfTowers[2*ieta][iphi] = et / 2;
+    hfTowers[2*ieta+1][iphi] = et / 2;
+    if ((ieta < 2 || ieta > 21) && iphi % 4 == 2) {
+      hfTowers[2*ieta][iphi] = et / 8;
+      hfTowers[2*ieta+1][iphi] = et / 8;
+      hfTowers[2*ieta][iphi+1] = et / 8;
+      hfTowers[2*ieta+1][iphi+1] = et / 8;
+      hfTowers[2*ieta][iphi+2] = et / 8;
+      hfTowers[2*ieta+1][iphi+2] = et / 8;
+      hfTowers[2*ieta][iphi+3] = et / 8;
+      hfTowers[2*ieta+1][iphi+3] = et / 8;
+    }
+    else if ((ieta >= 2 && ieta <= 21) && iphi % 2 == 0) {
+      hfTowers[2*ieta][iphi] = et / 4;
+      hfTowers[2*ieta+1][iphi] = et / 4;
+      hfTowers[2*ieta][iphi+1] = et / 4;
+      hfTowers[2*ieta+1][iphi+1] = et / 4;
+    }
   }
 
 //  for (int iphi = 0; iphi < nHfPhi; iphi++) {
-//    for (int ieta = 0; ieta < nHfEta; ieta++) {
+//    for (int ieta = 0; ieta < 2*nHfEta; ieta++) {
 //      std::cout<<hfTowers[ieta][iphi]<<"  ";
 //    }
 //    std::cout<<"\n";
 //  }
 
-  for (int ieta = 0; ieta < 24; ieta++) {
-    for (int iphi = 0; iphi < 12; iphi++) {
-      if (ieta < 12) {
+  for (int ieta = 0; ieta < 2*nHfEta; ieta++) {
+    for (int iphi = 0; iphi < nHfPhi / 6; iphi++) {
+      if (ieta < nHfEta) {
 	regionsHF[0][ieta][0] = hfTowers[ieta][70];
 	regionsHF[0][ieta][1] = hfTowers[ieta][71];
-        for (int k = 0; k < 12; k+=2) {
-	  if (k != 0 || iphi > 1) regionsHF[k][ieta][iphi] = hfTowers[ieta][iphi + k * 6 - 2];
+        for (int k = 0; k < nHfRegions; k+=2) {
+	  if (k != 0 || iphi > 1) regionsHF[k][ieta][iphi] = hfTowers[ieta][iphi + k * (nHfRegions / 2) - 2];
         }
       }
       else {
-	regionsHF[1][ieta-12][0] = hfTowers[ieta][70];
-        regionsHF[1][ieta-12][1] = hfTowers[ieta][71];
-        for (int k = 1; k < 12; k+=2) {
-          if (k != 1 || iphi > 1) regionsHF[k][ieta-12][iphi] = hfTowers[ieta][iphi + (k - 1) * 6 - 2];
+	regionsHF[1][ieta-nHfEta][0] = hfTowers[ieta][70];
+        regionsHF[1][ieta-nHfEta][1] = hfTowers[ieta][71];
+        for (int k = 1; k < nHfRegions; k+=2) {
+          if (k != 1 || iphi > 1) regionsHF[k][ieta-nHfEta][iphi] = hfTowers[ieta][iphi + (k - 1) * (nHfRegions / 2) - 2];
         }
       }
     }
@@ -251,35 +270,35 @@ void Phase2L1CaloPFClusterEmulator::produce(edm::Event& iEvent, const edm::Event
 //  for (int k = 0; k < 12; k++) {
 //    std::cout<<"------------"<<std::endl;
 //    for (int iphi = 0; iphi < 12; iphi++) {
-//      for (int ieta = 0; ieta < 12; ieta++) {
+//      for (int ieta = 0; ieta < 24; ieta++) {
 //        std::cout<<regionsHF[k][ieta][iphi]<<"  ";
 //      }
 //      std::cout<<"\n";
 //    }
 //  }
 
-  float temporaryHF[12][12];
+  float temporaryHF[nHfEta][nHfPhi / 6];
   int etaoffsetHF = 0;
   int phioffsetHF = -2;
 
-  for (int k = 0; k < 12; k++) {
-    for (int ieta = 0; ieta < 12; ieta++) {
-      for (int iphi = 0; iphi < 12; iphi++) {
+  for (int k = 0; k < nHfRegions; k++) {
+    for (int ieta = 0; ieta < nHfEta; ieta++) {
+      for (int iphi = 0; iphi < nHfPhi / 6; iphi++) {
         temporaryHF[ieta][iphi] = regionsHF[k][ieta][iphi];
       }
     }
     if (k % 2 == 0)
       etaoffsetHF = 0;
     else
-      etaoffsetHF = 12;
+      etaoffsetHF = nHfEta;
     if (k > 1 && k % 2 == 0)
-      phioffsetHF = phioffsetHF + 12;
+      phioffsetHF = phioffsetHF + nHfPhi / 6;
 
     gctpf::PFcluster_t tempPfclustersHF;
     tempPfclustersHF = gctpf::pfclusterHF(temporaryHF, etaoffsetHF, phioffsetHF);
 
     for (int i = 0; i < nPFClusterSLR; i++) {
-      int hfeta = tempPfclustersHF.GCTpfclusters[i].eta;
+      int hfeta = tempPfclustersHF.GCTpfclusters[i].eta / 2; // turn back 24 -> 12
       int hfphi = tempPfclustersHF.GCTpfclusters[i].phi;
       float towereta = hfEta[hfeta][hfphi];
       float towerphi = hfPhi[hfeta][hfphi];

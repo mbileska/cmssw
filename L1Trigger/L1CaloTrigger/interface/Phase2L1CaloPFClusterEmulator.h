@@ -25,8 +25,7 @@ static constexpr int nTowerPhiSLR = 8;   // including overlap: 2+4+2
 static constexpr int nPFClusterSLR = 8;
 static constexpr int nHfEta = 24;
 static constexpr int nHfPhi = 72;
-//static constexpr int nHfClusterEtaSLR = 12;
-//static constexpr int nHfClusterPhiSLR = 12;
+static constexpr int nHfRegions = 12;
 
 namespace gctpf {
 
@@ -51,23 +50,23 @@ namespace gctpf {
   } GCTEtaStrip_t;
 
   typedef struct {
-    GCTint_t t[12];
+    GCTint_t t[nHfPhi / 6];
   } GCTEtaHFStrip_t;
 
   typedef struct {
     GCTint_t p[nTowerEtaSLR - 2];
   } GCTEtaStripPeak_t;
 
-//  typedef struct {
-//    GCTint_t p[12];
-//  } GCTEtaHFStripPeak_t;
+  typedef struct {
+    GCTint_t p[nHfEta];
+  } GCTEtaHFStripPeak_t;
 
   typedef struct {
     GCTEtaStrip_t s[nTowerEtaSLR];
   } Region_t;
 
   typedef struct {
-    GCTEtaHFStrip_t s[12];
+    GCTEtaHFStrip_t s[nHfEta];
   } RegionHF_t;
 
   inline GCTint_t bestOf2(const GCTint_t& t0, const GCTint_t& t1) {
@@ -87,7 +86,7 @@ namespace gctpf {
     return bestAll;
   }
 
-  inline GCTint_t getPeakHF(const GCTEtaHFStrip_t& etaStrip) {
+  inline GCTint_t getPeakOfHFStrip(const GCTEtaHFStrip_t& etaStrip) {
     GCTint_t best01 = bestOf2(etaStrip.t[0], etaStrip.t[1]);
     GCTint_t best23 = bestOf2(etaStrip.t[2], etaStrip.t[3]);
     GCTint_t best45 = bestOf2(etaStrip.t[4], etaStrip.t[5]);
@@ -126,6 +125,35 @@ namespace gctpf {
     return bestAll;
   }
 
+  inline GCTint_t getPeakBinHF(const GCTEtaHFStripPeak_t& etaStripPeak) {
+    GCTint_t best01 = bestOf2(etaStripPeak.p[0], etaStripPeak.p[1]);
+    GCTint_t best23 = bestOf2(etaStripPeak.p[2], etaStripPeak.p[3]);
+    GCTint_t best45 = bestOf2(etaStripPeak.p[4], etaStripPeak.p[5]);
+    GCTint_t best67 = bestOf2(etaStripPeak.p[6], etaStripPeak.p[7]);
+    GCTint_t best89 = bestOf2(etaStripPeak.p[8], etaStripPeak.p[9]);
+    GCTint_t best1011 = bestOf2(etaStripPeak.p[10], etaStripPeak.p[11]);
+    GCTint_t best1213 = bestOf2(etaStripPeak.p[12], etaStripPeak.p[13]);
+    GCTint_t best1415 = bestOf2(etaStripPeak.p[14], etaStripPeak.p[15]);
+    GCTint_t best1617 = bestOf2(etaStripPeak.p[16], etaStripPeak.p[17]);
+    GCTint_t best1819 = bestOf2(etaStripPeak.p[18], etaStripPeak.p[19]);
+    GCTint_t best2021 = bestOf2(etaStripPeak.p[20], etaStripPeak.p[21]);
+    GCTint_t best2223 = bestOf2(etaStripPeak.p[22], etaStripPeak.p[23]);
+    GCTint_t best0123 = bestOf2(best01, best23);
+    GCTint_t best4567 = bestOf2(best45, best67);
+    GCTint_t best891011 = bestOf2(best89, best1011);
+    GCTint_t best12131415 = bestOf2(best1213, best1415);
+    GCTint_t best16171819 = bestOf2(best1617, best1819);
+    GCTint_t best20212223 = bestOf2(best2021, best2223);
+    GCTint_t best0to7 = bestOf2(best0123, best4567);
+    GCTint_t best8to15 = bestOf2(best891011, best12131415);
+    GCTint_t best16to23 = bestOf2(best16171819, best20212223);
+    GCTint_t best0to15 = bestOf2(best0to7, best8to15);
+    GCTint_t bestAll = bestOf2(best0to15, best16to23);
+
+    return bestAll;
+  }
+
+
   inline GCTint_t getPeakPosition(const Region_t& region) {
     GCTEtaStripPeak_t etaPeak;
     for (int i = 0; i < nTowerEtaSLR - 2; i++) {
@@ -137,11 +165,11 @@ namespace gctpf {
   }
 
   inline GCTint_t getPeakPositionHF(const RegionHF_t& region) {
-    GCTEtaHFStrip_t etaPeak;
-    for (int i = 0; i < 12; i++) {
-      etaPeak.t[i] = getPeakHF(region.s[i]);
+    GCTEtaHFStripPeak_t etaPeak;
+    for (int i = 0; i < nHfPhi / 6; i++) {
+      etaPeak.p[i] = getPeakOfHFStrip(region.s[i]);
     }
-    GCTint_t max = getPeakHF(etaPeak);
+    GCTint_t max = getPeakBinHF(etaPeak);
 
     return max;
   }
@@ -161,11 +189,11 @@ namespace gctpf {
     return r;
   }
 
-  inline RegionHF_t initStructureHF(float temp[12][12]) {
+  inline RegionHF_t initStructureHF(float temp[nHfEta][nHfPhi / 6]) {
     RegionHF_t r;
 
-    for (int i = 0; i < 12; i++) {
-      for (int j = 0; j < 12; j++) {
+    for (int i = 0; i < nHfPhi / 6; i++) {
+      for (int j = 0; j < nHfEta; j++) {
         r.s[j].t[i].et = temp[j][i];
         r.s[j].t[i].eta = j;
         r.s[j].t[i].phi = i;
@@ -194,24 +222,24 @@ namespace gctpf {
     return pfcluster_et;
   }
 
-  inline float getEtHF(float temp[12][12], int eta, int phi) {
-    float tempX[12 + 2][12 + 2];
+  inline float getEtHF(float temp[nHfEta][nHfPhi / 6], int eta, int phi) {
+    float tempX[nHfEta + 2][nHfPhi / 6 + 2];
     float et_sumEta[3] = {0., 0., 0.};
 
-    for (int i = 0; i < 12 + 2; i++) {
-      for (int k = 0; k < 12 + 2; k++) {
+    for (int i = 0; i < nHfEta + 2; i++) {
+      for (int k = 0; k < nHfPhi / 6 + 2; k++) {
         tempX[i][k] = 0;
       }
     }
 
-    for (int i = 0; i < 12; i++) {
-      for (int k = 0; k < 12; k++) {
+    for (int i = 0; i < nHfEta; i++) {
+      for (int k = 0; k < nHfPhi / 6; k++) {
         tempX[i + 1][k + 1] = temp[i][k];
       }
     }
 
-    for (int i = 0; i < 12; i++) {
-      for (int j = 0; j < 12; j++) {
+    for (int i = 0; i < nHfEta; i++) {
+      for (int j = 0; j < nHfPhi / 6; j++) {
         if (i == eta && j == phi) {
           for (int k = 0; k < 3; k++) {
 	    et_sumEta[k] = tempX[i + k][j] + tempX[i + k][j + 1] + tempX[i + k][j + 2];
@@ -239,10 +267,10 @@ namespace gctpf {
     return;
   }
 
-  inline void RemoveTmpHF(float temp[12][12], int eta, int phi) {
-    for (int i = 0; i < 12; i++) {
+  inline void RemoveTmpHF(float temp[nHfEta][nHfPhi / 6], int eta, int phi) {
+    for (int i = 0; i < nHfEta; i++) {
       if (i + 1 >= eta && i <= eta + 1) {
-        for (int j = 0; j < 12; j++) {
+        for (int j = 0; j < nHfPhi / 6; j++) {
           if (j + 1 >= phi && j <= phi + 1) {
             temp[i][j] = 0;
           }
@@ -277,7 +305,7 @@ namespace gctpf {
     return pfclusterReturn;
   }
 
-  inline GCTpfcluster_t recoPfclusterHF(float temporary[12][12], int etaoffset, int phioffset) {
+  inline GCTpfcluster_t recoPfclusterHF(float temporary[nHfEta][nHfPhi / 6], int etaoffset, int phioffset) {
     GCTpfcluster_t pfclusterReturn;
 
     RegionHF_t region;
@@ -293,7 +321,7 @@ namespace gctpf {
     pfclusterReturn.et = pfcluster_et;
     pfclusterReturn.eta = regionMax.eta + etaoffset;
     pfclusterReturn.phi = regionMax.phi + phioffset;
-    if(pfclusterReturn.phi < 0) pfclusterReturn.phi += 72;
+    if(pfclusterReturn.phi < 0) pfclusterReturn.phi += nHfPhi;
 
     return pfclusterReturn;
   }
@@ -316,7 +344,7 @@ namespace gctpf {
     return GCTPfclusters;
   }
 
-  inline PFcluster_t pfclusterHF(float temporary[12][12], int etaoffset, int phioffset) {
+  inline PFcluster_t pfclusterHF(float temporary[nHfEta][nHfPhi / 6], int etaoffset, int phioffset) {
     GCTpfcluster_t pfcluster[nPFClusterSLR];
 
     for (int i = 0; i < nPFClusterSLR; i++) {
