@@ -249,58 +249,7 @@ namespace gctobj {
     }
   }
 
-  inline void makeST_hf(const float hfTowers[nHfEta / 2][nHfPhi], GCTsupertower_t supertower_return[nSTEta][nSTPhi]) {
-    // make 12 x 72 --> 24 x 72 to match the tower sizes with barrel and endcap
-    float hfTowers_split[nHfEta][nHfPhi];
-//    std::cout<<"hf towers: "<<std::endl;
-//    for (int j = 0; j < nHfPhi; j ++) {
-//      for (int i = 0; i < nHfEta / 2; i ++) {
-//	std::cout<<hfTowers[i][j]<<"  ";
-//      }
-//      std::cout<<"\n";
-//    }
-//    std::cout<<"hf towers split: "<<std::endl;
-    for (int i = 0; i < nHfEta; i ++) {
-      for (int j = 0; j < nHfPhi; j ++) {
-	//if (i % 2 == 0) hfTowers_split[i][j] = hfTowers[i / 2][j]; // use the even towers
-	//else hfTowers_split[i][j] = 0;
-	//if (i < nHfEta / 2 && hfTowers[i][j] > 0) std::cout<<i<<"\t"<<j<<"\t"<<std::endl;
-	if (i % 2 == 0 && i < 20 && j % 2 == 0) {
-          hfTowers_split[i][j] = hfTowers[i / 2][j] / 4;
-	  hfTowers_split[i][j+1] = hfTowers[i / 2][j] / 4;
-	  hfTowers_split[i+1][j] = hfTowers[i / 2][j] / 4;
-	  hfTowers_split[i+1][j+1] = hfTowers[i / 2][j] / 4;
-	}
-	if (i % 2 == 0 && i >= 20 && j % 4 == 2 && j < nHfPhi - 2) {
-          hfTowers_split[i][j] = hfTowers[i / 2][j] / 8;
-          hfTowers_split[i][j+1] = hfTowers[i / 2][j] / 8;
-          hfTowers_split[i][j+2] = hfTowers[i / 2][j] / 8;
-          hfTowers_split[i][j+3] = hfTowers[i / 2][j] / 8;
-          hfTowers_split[i+1][j] = hfTowers[i / 2][j] / 8;
-          hfTowers_split[i+1][j+1] = hfTowers[i / 2][j] / 8;
-          hfTowers_split[i+1][j+2] = hfTowers[i / 2][j] / 8;
-          hfTowers_split[i+1][j+3] = hfTowers[i / 2][j] / 8;
-	}
-	if (i % 2 == 0 && i >= 20 && j == 70) {
-	  hfTowers_split[i][j] = hfTowers[i / 2][j] / 8;
-	  hfTowers_split[i][j+1] = hfTowers[i / 2][j] / 8;
-	  hfTowers_split[i][0] = hfTowers[i / 2][j] / 8;
-	  hfTowers_split[i][1] = hfTowers[i / 2][j] / 8;
-          hfTowers_split[i+1][j] = hfTowers[i / 2][j] / 8;
-          hfTowers_split[i+1][j+1] = hfTowers[i / 2][j] / 8;
-          hfTowers_split[i+1][0] = hfTowers[i / 2][j] / 8;
-          hfTowers_split[i+1][1] = hfTowers[i / 2][j] / 8;
-	}
-      }
-    }
-
-//    for (int j = 0; j < nHfPhi; j ++) {
-//      for (int i = 0; i < nHfEta; i ++) {
-//	std::cout<<hfTowers_split[i][j]<<"  ";
-//      }
-//      std::cout<<"\n";
-//    }
-
+  inline void makeST_hf(const float hfTowers[nHfEta][nHfPhi], GCTsupertower_t supertower_return[nSTEta][nSTPhi]) {
     float et_sumEta[nSTEta][nSTPhi][3];
     float stripEta[nSTEta][nSTPhi][3];
     float stripPhi[nSTEta][nSTPhi][3];
@@ -310,14 +259,14 @@ namespace gctobj {
     for (int i = 0; i < nHfEta; i += 3) {  // 24 eta to 8 supertowers
       index_j = 0;
       for (int j = 0; j < nHfPhi; j += 3) {  // 72 phi to 24 supertowers
-        stripEta[index_i][index_j][0] = hfTowers_split[i][j] + hfTowers_split[i][j + 1] + hfTowers_split[i][j + 2];
-        stripEta[index_i][index_j][1] = hfTowers_split[i + 1][j] + hfTowers_split[i + 1][j + 1] + hfTowers_split[i + 1][j + 2];
-        stripEta[index_i][index_j][2] = hfTowers_split[i + 2][j] + hfTowers_split[i + 2][j + 1] + hfTowers_split[i + 2][j + 2];
-        stripPhi[index_i][index_j][0] = hfTowers_split[i][j] + hfTowers_split[i + 1][j] + hfTowers_split[i + 2][j];
-        stripPhi[index_i][index_j][1] = hfTowers_split[i][j + 1] + hfTowers_split[i + 1][j + 1] + hfTowers_split[i + 2][j + 1];
-        stripPhi[index_i][index_j][2] = hfTowers_split[i][j + 2] + hfTowers_split[i + 1][j + 2] + hfTowers_split[i + 2][j + 2];
+        stripEta[index_i][index_j][0] = hfTowers[i][j] + hfTowers[i][j + 1] + hfTowers[i][j + 2];
+        stripEta[index_i][index_j][1] = hfTowers[i + 1][j] + hfTowers[i + 1][j + 1] + hfTowers[i + 1][j + 2];
+        stripEta[index_i][index_j][2] = hfTowers[i + 2][j] + hfTowers[i + 2][j + 1] + hfTowers[i + 2][j + 2];
+        stripPhi[index_i][index_j][0] = hfTowers[i][j] + hfTowers[i + 1][j] + hfTowers[i + 2][j];
+        stripPhi[index_i][index_j][1] = hfTowers[i][j + 1] + hfTowers[i + 1][j + 1] + hfTowers[i + 2][j + 1];
+        stripPhi[index_i][index_j][2] = hfTowers[i][j + 2] + hfTowers[i + 1][j + 2] + hfTowers[i + 2][j + 2];
         for (int k = 0; k < 3; k++) {
-          et_sumEta[index_i][index_j][k] = hfTowers_split[i + k][j] + hfTowers_split[i + k][j + 1] + hfTowers_split[i + k][j + 2];
+          et_sumEta[index_i][index_j][k] = hfTowers[i + k][j] + hfTowers[i + k][j + 1] + hfTowers[i + k][j + 2];
         }
         index_j++;
       }
@@ -343,7 +292,7 @@ namespace gctobj {
         temp.towerEta = peakEta;
         int peakPhi = getPeakBinOf3(stripPhi[i][j][0], stripPhi[i][j][1], stripPhi[i][j][2]);
         temp.towerPhi = peakPhi;
-        float peakEt = hfTowers_split[i * 3 + peakEta][j * 3 + peakPhi];
+        float peakEt = hfTowers[i * 3 + peakEta][j * 3 + peakPhi];
         temp.towerEt = peakEt;
         int cEta = getEtCenterOf3(stripEta[i][j][0], stripEta[i][j][1], stripEta[i][j][2]);
         temp.centerEta = cEta;

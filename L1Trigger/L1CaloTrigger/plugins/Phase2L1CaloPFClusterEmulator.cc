@@ -223,7 +223,7 @@ void Phase2L1CaloPFClusterEmulator::produce(edm::Event& iEvent, const edm::Event
     // split tower energy
     hfTowers[2*ieta][iphi] = et / 2;
     hfTowers[2*ieta+1][iphi] = et / 2;
-    if ((ieta < 2 || ieta > 21) && iphi % 4 == 2) {
+    if ((ieta < 2 || ieta >= nHfEta - 2) && iphi % 4 == 2) {
       hfTowers[2*ieta][iphi] = et / 8;
       hfTowers[2*ieta+1][iphi] = et / 8;
       hfTowers[2*ieta][iphi+1] = et / 8;
@@ -233,7 +233,7 @@ void Phase2L1CaloPFClusterEmulator::produce(edm::Event& iEvent, const edm::Event
       hfTowers[2*ieta][iphi+3] = et / 8;
       hfTowers[2*ieta+1][iphi+3] = et / 8;
     }
-    else if ((ieta >= 2 && ieta <= 21) && iphi % 2 == 0) {
+    else if ((ieta >= 2 && ieta < nHfEta - 2) && iphi % 2 == 0) {
       hfTowers[2*ieta][iphi] = et / 4;
       hfTowers[2*ieta+1][iphi] = et / 4;
       hfTowers[2*ieta][iphi+1] = et / 4;

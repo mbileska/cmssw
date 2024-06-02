@@ -349,13 +349,14 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
   float temporary_hgcal[nHgcalEta / 2][nHgcalPhi];
 
   // Assign ETs to each eta-half of the forward region (12x72)
-  float hfTowers[nHfEta][nHfPhi];
+  float hfTowers[2*nHfEta][nHfPhi];  // split 12 -> 24
   float hfEta[nHfEta][nHfPhi];
   float hfPhi[nHfEta][nHfPhi];
   for (int iphi = 0; iphi < nHfPhi; iphi++) {
     //std::cout<<iphi<<"\t"<<l1t::CaloTools::towerPhi(30, iphi)<<std::endl;
     for (int ieta = 0; ieta < nHfEta; ieta++) {
-      hfTowers[ieta][iphi] = 0;
+      hfTowers[2*ieta][iphi] = 0;
+      hfTowers[2*ieta+1][iphi] = 0;
       int temp;
       if (ieta < nHfEta / 2)
         temp = ieta - l1t::CaloTools::kHFEnd;
@@ -390,10 +391,29 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
     if (et < 0)
       et = 0;
     //if (et > 1.)
-    hfTowers[ieta][iphi] = et;  // suppress <= 1 GeV towers
+    //  hfTowers[ieta][iphi] = et;  // suppress <= 1 GeV towers
+    //  split tower energy
+    hfTowers[2*ieta][iphi] = et / 2;
+    hfTowers[2*ieta+1][iphi] = et / 2;
+    if ((ieta < 2 || ieta >= nHfEta - 2) && iphi % 4 == 2) {
+      hfTowers[2*ieta][iphi] = et / 8;
+      hfTowers[2*ieta+1][iphi] = et / 8;
+      hfTowers[2*ieta][iphi+1] = et / 8;
+      hfTowers[2*ieta+1][iphi+1] = et / 8;
+      hfTowers[2*ieta][iphi+2] = et / 8;
+      hfTowers[2*ieta+1][iphi+2] = et / 8;
+      hfTowers[2*ieta][iphi+3] = et / 8;
+      hfTowers[2*ieta+1][iphi+3] = et / 8;
+    }
+    else if ((ieta >= 2 && ieta < nHfEta - 2) && iphi % 2 == 0) {
+      hfTowers[2*ieta][iphi] = et / 4;
+      hfTowers[2*ieta+1][iphi] = et / 4;
+      hfTowers[2*ieta][iphi+1] = et / 4;
+      hfTowers[2*ieta+1][iphi+1] = et / 4;
+    }
   }
 
-  float temporary_hf[nHfEta / 2][nHfPhi];
+  float temporary_hf[nHfEta][nHfPhi];
 
   // Begin creating jets
   // First create 3x3 super towers: 6x24 in barrel, endcap; 4x24 in forward
@@ -507,13 +527,11 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
 
     // HF
     for (int iphi = 0; iphi < nHfPhi; iphi++) {
-      for (int ieta = 0; ieta < nHfEta / 2; ieta++) {
-	int ieta_temp = abs(ieta + k * nHfEta / 2 + (k - 1)*(nHfEta / 2 - 1));
-        temporary_hf[ieta][iphi] = hfTowers[ieta_temp][iphi];
-        //if (k == 0)
-        //  temporary_hf[ieta][iphi] = hfTowers[nHfEta / 2 - ieta - 1][iphi];
-        //else
-        //  temporary_hf[ieta][iphi] = hfTowers[nHfEta / 2 + ieta][iphi];
+      for (int ieta = 0; ieta < nHfEta; ieta++) {
+        if (k == 0)
+          temporary_hf[ieta][iphi] = hfTowers[ieta][iphi];
+        else
+          temporary_hf[ieta][iphi] = hfTowers[nHfEta + ieta][iphi];
       }
     }
 
@@ -523,23 +541,23 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
     for (int i = 2 * nJets; i < 3 * nJets; i++) {
       jet[i] = gctobj::getRegion(tempST_hf, TTseedThresholdHF);
       l1tp2::Phase2L1CaloJet tempJet;
-      int hfjeteta = abs(jet[i].etaCenter / 2 + k * nHfEta / 2 + (k - 1)*(nHfEta / 2 - 1) ); // 24 -> 12 towers
+      int hfjeteta = jet[i].etaCenter / 2; // 24 -> 12 towers
       int hfjetphi = jet[i].phiCenter;
-      tempJet.setJetIEta(hfjeteta);
+      tempJet.setJetIEta(hfjeteta + k * nHfEta / 2);
       tempJet.setJetIPhi(hfjetphi);
-      float jeteta = hfEta[hfjeteta][hfjetphi];
-      float jetphi = hfPhi[hfjeteta][hfjetphi];
+      float jeteta = hfEta[hfjeteta + k * nHfEta / 2][hfjetphi];
+      float jetphi = hfPhi[hfjeteta + k * nHfEta / 2][hfjetphi];
       tempJet.setJetEta(jeteta);
       tempJet.setJetPhi(jetphi);
       tempJet.setJetEt(get_jet_pt_calibration(jet[i].energy, jeteta));
       tempJet.setTauEt(get_tau_pt_calibration(jet[i].tauEt, jeteta));
       tempJet.setTowerEt(jet[i].energyMax);
-      int hftowereta = abs(jet[i].etaMax / 2 + k * nHfEta / 2 + (k - 1)*(nHfEta / 2 - 1) ); // 24 -> 12 towers
+      int hftowereta = jet[i].etaMax / 2; // 24 -> 12 towers
       int hftowerphi = jet[i].phiMax;
-      tempJet.setTowerIEta(hftowereta);
+      tempJet.setTowerIEta(hftowereta + k * nHfEta / 2);
       tempJet.setTowerIPhi(hftowerphi);
-      float towereta = hfEta[hftowereta][hftowerphi];
-      float towerphi = hfPhi[hftowereta][hftowerphi];
+      float towereta = hfEta[hftowereta + k * nHfEta / 2][hftowerphi];
+      float towerphi = hfPhi[hftowereta + k * nHfEta / 2][hftowerphi];
       tempJet.setTowerEta(towereta);
       tempJet.setTowerPhi(towerphi);
       reco::Candidate::PolarLorentzVector tempJetp4;
