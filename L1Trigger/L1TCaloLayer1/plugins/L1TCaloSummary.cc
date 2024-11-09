@@ -61,6 +61,9 @@
 #include <string>
 #include <sstream>
 
+#include "PhysicsTools/TensorFlow/interface/TensorFlow.h"
+
+
 //Anomaly detection includes
 #include "ap_fixed.h"
 #include "hls4ml/emulator.h"
@@ -77,7 +80,7 @@ template <class INPUT, class OUTPUT>
 class L1TCaloSummary : public edm::stream::EDProducer<> {
 public:
   explicit L1TCaloSummary(const edm::ParameterSet&);
-  ~L1TCaloSummary() override = default;
+  ~L1TCaloSummary() override;
 
   static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
@@ -115,6 +118,10 @@ private:
 
   bool overwriteWithTestPatterns;
   std::vector<edm::ParameterSet> testPatterns;
+
+  tensorflow::Options options;
+  tensorflow::MetaGraphDef* metaGraph;
+  tensorflow::Session* session; 
 };
 
 //
@@ -168,12 +175,44 @@ L1TCaloSummary<INPUT, OUTPUT>::L1TCaloSummary(const edm::ParameterSet& iConfig)
   //anomaly trigger loading
   model = loader.load_model();
   produces<l1t::CICADABxCollection>("CICADAScore");
+
+  std::string fullPathToModel("/afs/hep.wisc.edu/user/mbileska/100try/CMSSW_14_1_0_pre5/src/L1Trigger/L1TCaloLayer1/data/model/");
+  metaGraph = tensorflow::loadMetaGraphDef(fullPathToModel);
+  session = tensorflow::createSession(metaGraph, fullPathToModel, options);
+}
+
+
+// Destructor
+template <class INPUT, class OUTPUT>
+L1TCaloSummary<INPUT, OUTPUT>::~L1TCaloSummary()
+{
+  delete metaGraph;
+  metaGraph = nullptr;
+  tensorflow::closeSession(session);
+  session=nullptr;
 }
 
 //
 // member functions
 //
+std::vector<float> eta_low_bound = {-2.5 , -2.172 , -1.392 , -1.044, -0.696, -0.348, 0.001, 0.348, 0.696, 1.044, 1.392 , 1.74, 2.172, 2.5};
+std::array<float, 18> central_phi = {{0.000, 0.349, 0.698, 1.047, 1.396, 1.744, 2.093, 2.442, 2.791, -3.14159, -2.791, -2.442, -2.093, -1.744, -1.396, -1.047, -0.698, -0.349}};
 
+float Rct_to_eta(float ieta) {
+    if (ieta < 0 || ieta >= eta_low_bound.size() - 1) {
+        return -999; 
+    }
+    float eta_lower = eta_low_bound[ieta];
+    float eta_upper = eta_low_bound[ieta + 1];
+    return (eta_lower + eta_upper) / 2.0;
+}
+
+float Rct_to_phi(float iphi) {
+    if (iphi < 0 || iphi >= central_phi.size()) {
+        return -999;  
+    }
+    return central_phi[iphi];  
+}
 // ------------ method called to produce the data  ------------
 template <class INPUT, class OUTPUT>
 void L1TCaloSummary<INPUT, OUTPUT>::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
@@ -202,6 +241,9 @@ void L1TCaloSummary<INPUT, OUTPUT>::produce(edm::Event& iEvent, const edm::Event
   //This is done as a flat vector input, but future versions may involve 2D input
   //This will have to be handled later
   INPUT modelInput[252];
+  tensorflow::Tensor input(tensorflow::DT_FLOAT, tensorflow::TensorShape({1, 18, 14, 1}));
+  auto inputTensorMapped = input.tensor<float, 4>();
+
   for (const L1CaloRegion& i : *regionCollection) {
     UCTRegionIndex r = g.getUCTRegionIndexFromL1CaloRegion(i.gctEta(), i.gctPhi());
     UCTTowerIndex t = g.getUCTTowerIndexFromL1CaloRegion(r, i.raw());
@@ -221,7 +263,14 @@ void L1TCaloSummary<INPUT, OUTPUT>::produce(edm::Event& iEvent, const edm::Event
     //iEta taken from this ranges from 4-17, (I assume reserving lower and higher for forward regions)
     //So our first index, index 0, is technically iEta=4, and so-on.
     //CICADA reads this as a flat vector
+
+
+    //IMPORTANT CHANGE
     modelInput[14 * i.gctPhi() + (i.gctEta() - 4)] = i.et();
+    inputTensorMapped(0, i.gctPhi(), i.gctEta() - 4, 0) = i.et();
+
+
+
   }
   // Check if we're using test patterns. If so, we overwrite the inputs with a test pattern
   if (overwriteWithTestPatterns) {
@@ -271,56 +320,99 @@ void L1TCaloSummary<INPUT, OUTPUT>::produce(edm::Event& iEvent, const edm::Event
   double pt = 0;
   double eta = -999.;
   double phi = -999.;
-  double mass = 0;
+  double mass = 0.0;
 
-  std::list<UCTObject*> boostedJetObjs = summaryCard.getBoostedJetObjs();
-  for (std::list<UCTObject*>::const_iterator i = boostedJetObjs.begin(); i != boostedJetObjs.end(); i++) {
-    const UCTObject* object = *i;
-    pt = ((double)object->et()) * caloScaleFactor * boostedJetPtFactor;
-    eta = g.getUCTTowerEta(object->iEta());
-    phi = g.getUCTTowerPhi(object->iPhi());
-    bitset<3> activeRegionEtaPattern = 0;
-    for (uint32_t iEta = 0; iEta < 3; iEta++) {
-      bool activeStrip = false;
-      for (uint32_t iPhi = 0; iPhi < 3; iPhi++) {
-        if (object->boostedJetRegionET()[3 * iEta + iPhi] > 30 &&
-            object->boostedJetRegionET()[3 * iEta + iPhi] > object->et() * 0.0625)
-          activeStrip = true;
+  auto input_tensor_name = metaGraph->signature_def().at("serving_default").inputs().at("INPUT").name();
+  auto phi_output_name = metaGraph->signature_def().at("serving_default").outputs().at("phi_output").name();
+  auto eta_output_name = metaGraph->signature_def().at("serving_default").outputs().at("eta_output").name();
+  auto reconstructed_output_name = metaGraph->signature_def().at("serving_default").outputs().at("reconstructed_output").name();
+
+// edm::LogError("L1TCaloSummary") << "Input Tensor Name: " << input_tensor_name;
+// edm::LogError("L1TCaloSummary") << "Phi Output Name: " << phi_output_name;
+// edm::LogError("L1TCaloSummary") << "Eta Output Name: " << eta_output_name;
+
+
+  std::vector<tensorflow::Tensor> outputs;
+
+  // tensorflow::run(session, {{"serving_default_INPUT", input}}, {"StatefulPartitionedCall:0"}, &outputs);
+  tensorflow::run(session, 
+                {{"serving_default_INPUT", input}},  
+                {"StatefulPartitionedCall:0","StatefulPartitionedCall:1"},  
+                &outputs);
+// if (outputs.size() == 2) {
+//      edm::LogError("L1TCaloSummary") << "Error: Expected 2 outputs, but got " << outputs.size() << std::endl;
+//     edm::LogError("L1TCaloSummary") << "output0: " << outputs[0];
+//     edm::LogError("L1TCaloSummary") << "outputMappedEta: " << outputs[1];
+//     return;
+// }
+  auto outputMappedEta = outputs[0].flat<float>();  // Now use flat<float> correctly for a 1D tensor
+  auto outputMappedPhi = outputs[1].flat<float>();  // Now use flat<float> correctly for a 1D tensor
+
+//   edm::LogError("L1TCaloSummary") << "outputMappedEta: " << outputMappedEta;
+// edm::LogError("L1TCaloSummary") << "outputMappedEta(0): " << outputMappedEta(0);
+// edm::LogError("L1TCaloSummary") << "outputMappedPhi: " << outputMappedPhi;
+// edm::LogError("L1TCaloSummary") << "outputMappedPhi(0): " << outputMappedPhi(0);
+
+
+  float predictedPhi = outputMappedPhi(0);  // First value in the result (phi)
+  float predictedEta = outputMappedEta(0);  // Second value in the result (eta)
+// edm::LogError("L1TCaloSummary") << "outputMappedPHI: " << predictedPhi;
+// edm::LogError("L1TCaloSummary") << "outputMappedETA: " << predictedEta;
+
+
+  std::array<double, 2> lowerBound = {{6.508498, 6.5006247}};
+  std::array<double, 2> upperBound = {{7.4892583, 7.476416}};
+
+
+  double threshold = 0.2;
+
+  bool zeroEnergy = (predictedPhi <= lowerBound[0] + threshold && predictedPhi >= upperBound[0] - threshold &&
+                    predictedEta <= lowerBound[1] + threshold && predictedEta >= upperBound[1] - threshold); 
+
+  if(zeroEnergy){
+    predictedEta=-99;
+    predictedPhi=-99;
+  }
+                    
+  if (!zeroEnergy) {
+      for (int dPhi = -1; dPhi <= 1; ++dPhi) {
+          for (int dEta = -1; dEta <= 1; ++dEta) {
+              int phiIndex = predictedPhi + dPhi;
+              int etaIndex = predictedEta + dEta;
+                     
+              if (phiIndex >= 0 && phiIndex < 18 && etaIndex >= 0 && etaIndex < 14) {
+                  // flattened index in modelInputB
+                  int flatIndex = phiIndex * 14 + etaIndex;
+                  
+                  // Accumulate the energy
+                  pt += static_cast<double>(modelInput[flatIndex]);
+              }
+          }
       }
-      if (activeStrip)
-        activeRegionEtaPattern |= (0x1 << iEta);
-    }
-    bitset<3> activeRegionPhiPattern = 0;
-    for (uint32_t iPhi = 0; iPhi < 3; iPhi++) {
-      bool activeStrip = false;
-      for (uint32_t iEta = 0; iEta < 3; iEta++) {
-        if (object->boostedJetRegionET()[3 * iEta + iPhi] > 30 &&
-            object->boostedJetRegionET()[3 * iEta + iPhi] > object->et() * 0.0625)
-          activeStrip = true;
+  }
+  uint32_t iPredictedEta = static_cast<int>(round(predictedEta));
+  uint32_t iPredictedPhi = static_cast<int>(round(predictedPhi));
+
+  for (const L1CaloRegion& i : *regionCollection) {
+      if ((i.gctEta() - 4 == iPredictedEta) && (i.gctPhi() == iPredictedPhi)) {
+  	  //std::cout<<"HERE!!!!!! "<<i.gctEta()<<"\t"<<i.gctPhi()<<std::endl;
+  
+          UCTRegionIndex r = g.getUCTRegionIndexFromL1CaloRegion(i.gctEta(), i.gctPhi());
+          UCTTowerIndex t = g.getUCTTowerIndexFromL1CaloRegion(r, i.raw());
+          
+          uint32_t absCaloEta = std::abs(t.first);
+          uint32_t absCaloPhi = std::abs(t.second);
+          bool negativeEta = (t.first < 0);
+  
+          eta = g.getUCTTowerEta(absCaloEta);
+          if (negativeEta)
+              eta = -eta;
+          phi = g.getUCTTowerPhi(absCaloPhi);
+  
+          bJetCands->push_back(L1JetParticle(math::PtEtaPhiMLorentzVector(pt, eta, phi, mass), L1JetParticle::kCentral));
+  
+          break;
       }
-      if (activeStrip)
-        activeRegionPhiPattern |= (0x1 << iPhi);
-    }
-    string regionEta = activeRegionEtaPattern.to_string<char, std::string::traits_type, std::string::allocator_type>();
-    string regionPhi = activeRegionPhiPattern.to_string<char, std::string::traits_type, std::string::allocator_type>();
-
-    bool centralHighest = object->boostedJetRegionET()[4] >= object->boostedJetRegionET()[0] &&
-                          object->boostedJetRegionET()[4] >= object->boostedJetRegionET()[1] &&
-                          object->boostedJetRegionET()[4] >= object->boostedJetRegionET()[2] &&
-                          object->boostedJetRegionET()[4] >= object->boostedJetRegionET()[3] &&
-                          object->boostedJetRegionET()[4] >= object->boostedJetRegionET()[5] &&
-                          object->boostedJetRegionET()[4] >= object->boostedJetRegionET()[6] &&
-                          object->boostedJetRegionET()[4] >= object->boostedJetRegionET()[7] &&
-                          object->boostedJetRegionET()[4] >= object->boostedJetRegionET()[8];
-
-    if (abs(eta) < 2.5 && ((regionEta == "101" && (regionPhi == "110" || regionPhi == "101" || regionPhi == "010")) ||
-                           ((regionEta == "110" || regionEta == "101" || regionEta == "010") && regionPhi == "101") ||
-                           (regionEta == "111" && (regionPhi == "110" || regionPhi == "010")) ||
-                           ((regionEta == "110" || regionEta == "010") && regionPhi == "111") ||
-                           ((regionEta == "010" || regionPhi == "010" || regionEta == "110" || regionPhi == "110" ||
-                             regionEta == "011" || regionPhi == "011") &&
-                            centralHighest)))
-      bJetCands->push_back(L1JetParticle(math::PtEtaPhiMLorentzVector(pt, eta, phi, mass), L1JetParticle::kCentral));
   }
 
   iEvent.put(std::move(bJetCands), "Boosted");
