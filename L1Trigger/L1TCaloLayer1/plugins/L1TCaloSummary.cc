@@ -175,8 +175,11 @@ L1TCaloSummary<INPUT, OUTPUT>::L1TCaloSummary(const edm::ParameterSet& iConfig)
   //anomaly trigger loading
   model = loader.load_model();
   produces<l1t::CICADABxCollection>("CICADAScore");
-
-  std::string fullPathToModel("/afs/hep.wisc.edu/user/mbileska/100try/CMSSW_14_1_0_pre5/src/L1Trigger/L1TCaloLayer1/data/model/");
+  
+  std::string fullPathToModel("");
+  fullPathToModel.append(iConfig.getParameter<std::string>("modelLocation"));  
+//std::string fullPathToModel("/afs/hep.wisc.edu/user/mbileska/100try/CMSSW_14_1_0_pre5/src/L1Trigger/L1TCaloLayer1/data/model/");
+//std::string fullPathToModel("/afs/hep.wisc.edu/user/mbileska/100try/CMSSW_14_1_0_pre5/src/L1Trigger/Crab/model");
   metaGraph = tensorflow::loadMetaGraphDef(fullPathToModel);
   session = tensorflow::createSession(metaGraph, fullPathToModel, options);
 }
@@ -325,7 +328,7 @@ void L1TCaloSummary<INPUT, OUTPUT>::produce(edm::Event& iEvent, const edm::Event
   auto input_tensor_name = metaGraph->signature_def().at("serving_default").inputs().at("INPUT").name();
   auto phi_output_name = metaGraph->signature_def().at("serving_default").outputs().at("phi_output").name();
   auto eta_output_name = metaGraph->signature_def().at("serving_default").outputs().at("eta_output").name();
-  auto reconstructed_output_name = metaGraph->signature_def().at("serving_default").outputs().at("reconstructed_output").name();
+  //auto reconstructed_output_name = metaGraph->signature_def().at("serving_default").outputs().at("reconstructed_output").name();
 
 // edm::LogError("L1TCaloSummary") << "Input Tensor Name: " << input_tensor_name;
 // edm::LogError("L1TCaloSummary") << "Phi Output Name: " << phi_output_name;
