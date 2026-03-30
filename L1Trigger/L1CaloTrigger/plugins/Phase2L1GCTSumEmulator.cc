@@ -1,5 +1,6 @@
 /* 
  * Description: Phase 2 GCT SumCard emulator
+ * Author: Mila Bileska
  */
 
 // system include files
