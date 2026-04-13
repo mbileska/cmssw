@@ -17,27 +17,45 @@
 
 namespace p2gctsum {
 
+inline ap_uint<48> pack_gamma_output(const GCTvar& object) {
+  ap_uint<48> out = 0;
+  out = ((ap_uint<48>)object.isBarrel << 47) | ((ap_uint<48>)object.Phi << 19) | ((ap_uint<48>)object.Eta << 12) |
+        (ap_uint<48>)object.ET;
+  return out;
+}
+
+inline ap_uint<48> pack_had_output(const GCTvar& object) {
+  ap_uint<48> out = 0;
+  out = ((ap_uint<48>)object.isBarrel << 47) | ((ap_uint<48>)object.PtClusterSeed << 27) |
+        ((ap_uint<48>)object.Phi << 18) | ((ap_uint<48>)object.Eta << 12) | (ap_uint<48>)object.ET;
+  return out;
+}
+
 inline void processInputLinks(ap_uint<576> link_in[N_INPUT_LINKS],
                               GCTvar EGs[N_GCT_OBJECTS],
                               GCTvar EGIs[N_GCT_OBJECTS],
                               GCTvar Jets[N_GCT_OBJECTS],
                               GCTvar Taus[N_GCT_OBJECTS],
                               GCTsum Sums[N_GCT_SUMS]) {
-  ap_uint<9> offset[4] = {0, 0, 120, 240};
+  ap_uint<9> gammaOffset[4] = {0, 0, 120, 240};
+  ap_uint<9> hadOffset[4] = {0, 0, 8, 16};
 
   for (int i = 0; i < N_GCT_CONNECTED; i++) {
     int link_base = 3 * i;
     bool isBarrel = (i > 0);
-    ap_uint<9> current_offset = offset[i];
+    ap_uint<9> currentGammaOffset = gammaOffset[i];
+    ap_uint<9> currentHadOffset = hadOffset[i];
 
     ap_uint<576> link_A = link_in[link_base + 0];
     for (int j = 0; j < 12; j++) {
       ap_uint<48> raw_48b = link_A.range(48 * j + 47, 48 * j);
       GCTvar tempObj;
-      if (isBarrel)
-        tempObj.getGCTvarBarrelGammas(raw_48b, current_offset);
-      else
-        tempObj.getGCTvarEndcapGammas(raw_48b, current_offset);
+      if (isBarrel) {
+        tempObj.getGCTvarBarrelGammas(raw_48b, currentGammaOffset);
+      } else {
+        tempObj.getGCTvarEndcapGammas(raw_48b, 0);
+        tempObj.Eta = (ap_uint<10>)tempObj.Eta + 85;
+      }
 
       if (j < 6)
         EGs[i * 6 + j] = tempObj;
@@ -48,7 +66,9 @@ inline void processInputLinks(ap_uint<576> link_in[N_INPUT_LINKS],
     for (int j = 0; j < 12; j++) {
       ap_uint<48> raw_48b = link_B.range(48 * j + 47, 48 * j);
       GCTvar tempObj;
-      tempObj.getGCTvarJetsTaus(raw_48b, current_offset, isBarrel);
+      tempObj.getGCTvarJetsTaus(raw_48b, currentHadOffset, isBarrel);
+      if (!isBarrel)
+        tempObj.Eta = (ap_uint<10>)tempObj.Eta + 6;
 
       if (j < 6)
         Jets[i * 6 + j] = tempObj;
@@ -60,43 +80,83 @@ inline void processInputLinks(ap_uint<576> link_in[N_INPUT_LINKS],
     ap_uint<48> raw_sum = link_C.range(47, 0);
     Sums[i].getGCTsum(raw_sum);
   }
- }
+}
 
-inline void stitchPair(GCTvar& endcapObj, GCTvar& barrelObj) {
-  if (endcapObj.ET == 0 || barrelObj.ET == 0)
-    return;
-  if (!match_dphi(endcapObj.Phi, barrelObj.Phi))
-    return;
+inline bool is_boundary_barrel_gamma(const GCTvar& o) {
+  return (o.ET != 0) && (o.isBarrel == 1) && (o.Eta == BARREL_GAMMA_BOUNDARY_ETA);
+}
 
-  ap_uint<12> stitchedET = saturatingAdd12(endcapObj.ET, barrelObj.ET);
+inline bool is_boundary_endcap_gamma(const GCTvar& o) {
+  return (o.ET != 0) && (o.isBarrel == 0) && (o.Eta == ENDCAP_GAMMA_BOUNDARY_ETA);
+}
 
-   if (endcapObj.ET > barrelObj.ET) {
-     endcapObj.ET = stitchedET;
-   } else {
-     barrelObj.ET = stitchedET;
-   }
+inline bool is_boundary_barrel_had(const GCTvar& o) {
+  return (o.ET != 0) && (o.isBarrel == 1) && (o.Eta == BARREL_HAD_BOUNDARY_ETA);
+}
+
+inline bool is_boundary_endcap_had(const GCTvar& o) {
+  return (o.ET != 0) && (o.isBarrel == 0) && (o.Eta == ENDCAP_HAD_BOUNDARY_ETA);
+}
+
+inline void clear_gctvar(GCTvar& o) {
+  o.ET = 0;
+  o.Eta = 0;
+  o.Phi = 0;
+  o.PtClusterSeed = 0;
+  o.isBarrel = 0;
+}
+
+inline void stitch_pair_keep_higher_pt(GCTvar& ec, GCTvar& br) {
+  ap_uint<12> ec_et = ec.ET;
+  ap_uint<12> br_et = br.ET;
+  ap_uint<12> sum = saturatingAdd12(ec_et, br_et);
+
+  if (ec_et > br_et) {
+    ec.ET = sum;
+    clear_gctvar(br);
+  } else {
+    br.ET = sum;
+    clear_gctvar(ec);
+  }
+}
+
+inline void stitch_had_pair(GCTvar& ec, GCTvar& br) {
+  stitch_pair_keep_higher_pt(ec, br);
 }
 
 inline void updateParams_GCTOutput(GCTvar EGs[N_GCT_OBJECTS],
                                    GCTvar EGIs[N_GCT_OBJECTS],
                                    GCTvar Jets[N_GCT_OBJECTS],
                                    GCTvar Taus[N_GCT_OBJECTS]) {
-  for (int i = 0; i < 6; i++) {
-    stitchPair(EGs[i], EGs[6 + i]);
-    stitchPair(EGs[i], EGs[12 + i]);
-    stitchPair(EGs[i], EGs[18 + i]);
+  for (int b = 1; b < 4; ++b) {
+    int barrel_base = b * 6;
 
-    stitchPair(EGIs[i], EGIs[6 + i]);
-    stitchPair(EGIs[i], EGIs[12 + i]);
-    stitchPair(EGIs[i], EGIs[18 + i]);
+    for (int ie = 0; ie < 6; ++ie) {
+      for (int ib = 0; ib < 6; ++ib) {
+        int i_ec = ie;
+        int i_br = barrel_base + ib;
 
-    stitchPair(Jets[i], Jets[6 + i]);
-    stitchPair(Jets[i], Jets[12 + i]);
-    stitchPair(Jets[i], Jets[18 + i]);
+        if (is_boundary_endcap_gamma(EGs[i_ec]) && is_boundary_barrel_gamma(EGs[i_br]) &&
+            match_dphi_gamma(EGs[i_ec].Phi, EGs[i_br].Phi)) {
+          stitch_pair_keep_higher_pt(EGs[i_ec], EGs[i_br]);
+        }
 
-    stitchPair(Taus[i], Taus[6 + i]);
-    stitchPair(Taus[i], Taus[12 + i]);
-    stitchPair(Taus[i], Taus[18 + i]);
+        if (is_boundary_endcap_gamma(EGIs[i_ec]) && is_boundary_barrel_gamma(EGIs[i_br]) &&
+            match_dphi_gamma(EGIs[i_ec].Phi, EGIs[i_br].Phi)) {
+          stitch_pair_keep_higher_pt(EGIs[i_ec], EGIs[i_br]);
+        }
+
+        if (is_boundary_endcap_had(Jets[i_ec]) && is_boundary_barrel_had(Jets[i_br]) &&
+            match_dphi_had(Jets[i_ec].Phi, Jets[i_br].Phi)) {
+          stitch_had_pair(Jets[i_ec], Jets[i_br]);
+        }
+
+        if (is_boundary_endcap_had(Taus[i_ec]) && is_boundary_barrel_had(Taus[i_br]) &&
+            match_dphi_had(Taus[i_ec].Phi, Taus[i_br].Phi)) {
+          stitch_had_pair(Taus[i_ec], Taus[i_br]);
+        }
+      }
+    }
   }
 }
 
@@ -185,21 +245,21 @@ inline void processOutLinks(GCTvar EGsTop6[6],
   ap_uint<576> out_link2 = 0;
 
   for (int i = 0; i < 6; i++) {
-    out_link0.range(i * 48 + 47, i * 48) = EGsTop6[i].packGamma();
+    out_link0.range(i * 48 + 47, i * 48) = pack_gamma_output(EGsTop6[i]);
   }
 
   for (int i = 0; i < 6; i++) {
     int slot = i + 6;
-    out_link0.range(slot * 48 + 47, slot * 48) = EGIsTop6[i].packGamma();
+    out_link0.range(slot * 48 + 47, slot * 48) = pack_gamma_output(EGIsTop6[i]);
   }
 
   for (int i = 0; i < 6; i++) {
-    out_link1.range(i * 48 + 47, i * 48) = JetsTop6[i].packHadron();
+    out_link1.range(i * 48 + 47, i * 48) = pack_had_output(JetsTop6[i]);
   }
 
   for (int i = 0; i < 6; i++) {
     int slot = i + 6;
-    out_link1.range(slot * 48 + 47, slot * 48) = TausTop6[i].packHadron();
+    out_link1.range(slot * 48 + 47, slot * 48) = pack_had_output(TausTop6[i]);
   }
 
   for (int i = 0; i < 4; i++) {

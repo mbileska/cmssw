@@ -10,7 +10,10 @@
 
 namespace p2gctsum {
 
-inline bool gctvar_gt(const GCTvar& a, const GCTvar& b) { return (a.ET > b.ET); }
+struct Handle {
+  ap_uint<12> key;
+  ap_uint<5> idx;
+};
 
 void bitonicSort32(GCTvar in[32], GCTvar out[32]);
 

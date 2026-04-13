@@ -19,6 +19,8 @@ static constexpr int N_GCT_OBJECTS_PER_SOURCE = 6;
 static constexpr int N_GCT_OBJECTS = 24;
 static constexpr int N_GCT_OBJECTS_SORT = 32;
 static constexpr int N_GCT_SUMS = 4;
+static constexpr unsigned int BARREL_GAMMA_SOURCE3_OFFSET = 240;
+static constexpr unsigned int BARREL_GAMMA_SOURCE3_WRAP_START = 112;
 
 typedef ap_uint<10> loop;
 typedef ap_uint<48> xvar;
@@ -65,12 +67,18 @@ public:
     }
   }
 
-
   void getGCTvarBarrelGammas(ap_uint<48> i, ap_uint<9> phiOffset = 0) {
     this->ET = i.range(11, 0);
     this->Eta = i.range(18, 12);
     ap_uint<9> raw_phi = i.range(25, 19);
-    this->Phi = (raw_phi + phiOffset) & 0x1FF;
+    ap_uint<9> global_phi = (raw_phi + phiOffset) & 0x1FF;
+    // The measured FW path wraps the last 8 crystals of the third barrel source
+    // across the phi=0 boundary before GT packing, so keep the CMSSW SumCard
+    // object phi in that wrapped convention as well.
+    if (phiOffset == BARREL_GAMMA_SOURCE3_OFFSET && raw_phi >= BARREL_GAMMA_SOURCE3_WRAP_START) {
+      global_phi = raw_phi - BARREL_GAMMA_SOURCE3_WRAP_START;
+    }
+    this->Phi = global_phi;
     this->isBarrel = 1;
     this->PtClusterSeed = 0;
   }
@@ -93,23 +101,39 @@ public:
     this->isBarrel = (barrelFlag ? 1 : 0);
   }
 
-
-  ap_uint<48> packGamma() const {
+  ap_uint<48> pack() const {
     ap_uint<48> out = 0;
-    out.range(11, 0) = ET;
-    out.range(18, 12) = Eta.range(6, 0);
-    out.range(27, 19) = Phi;
-    out.range(47, 47) = isBarrel;
-    return out;
-  }
 
-  ap_uint<48> packHadron() const {
-    ap_uint<48> out = 0;
-    out.range(11, 0) = ET;
-    out.range(17, 12) = Eta.range(5, 0);
-    out.range(26, 18) = Phi;
-    out.range(30, 27) = PtClusterSeed;
-    out.range(47, 47) = isBarrel;
+    if (isBarrel) {
+      bool isGammaFormat = (Eta > 0x3F);
+
+      if (isGammaFormat) {
+        out = ((ap_uint<48>)isBarrel << 47) |
+              ((ap_uint<48>)(Phi & 0x7F) << 19) |
+              ((ap_uint<48>)Eta << 12) |
+              (ap_uint<48>)ET;
+      } else {
+        out = ((ap_uint<48>)isBarrel << 47) |
+              ((ap_uint<48>)PtClusterSeed << 27) |
+              ((ap_uint<48>)Phi << 18) |
+              ((ap_uint<48>)Eta << 12) |
+              (ap_uint<48>)ET;
+      }
+    } else {
+      if (PtClusterSeed == 0 && Eta > 0x3F) {
+        out = ((ap_uint<48>)isBarrel << 47) |
+              ((ap_uint<48>)Phi << 19) |
+              ((ap_uint<48>)Eta << 12) |
+              (ap_uint<48>)ET;
+      } else {
+        out = ((ap_uint<48>)isBarrel << 47) |
+              ((ap_uint<48>)PtClusterSeed << 27) |
+              ((ap_uint<48>)Phi << 18) |
+              ((ap_uint<48>)Eta << 12) |
+              (ap_uint<48>)ET;
+      }
+    }
+
     return out;
   }
 };
@@ -162,13 +186,28 @@ inline ap_uint<12> saturatingAdd12(ap_uint<12> a, ap_uint<12> b) {
   return sum.range(11, 0);
 }
 
-inline ap_uint<9> dphiAbs(ap_uint<9> a, ap_uint<9> b) {
-  ap_uint<9> diff1 = (a > b) ? (a - b) : (b - a);
-  ap_uint<9> diff2 = 360 - diff1;
-  return (diff1 < diff2) ? diff1 : diff2;
+static const ap_uint<10> BARREL_GAMMA_BOUNDARY_ETA = 84;
+static const ap_uint<10> ENDCAP_GAMMA_BOUNDARY_ETA = 85;
+static const ap_uint<10> BARREL_HAD_BOUNDARY_ETA = 5;
+static const ap_uint<10> ENDCAP_HAD_BOUNDARY_ETA = 6;
+
+inline bool match_dphi_gamma(ap_uint<9> ephi, ap_uint<9> bphi) {
+  ap_int<10> dphi = (ap_int<10>)ephi - (ap_int<10>)bphi;
+  if (dphi > 180)
+    dphi -= 360;
+  if (dphi < -180)
+    dphi += 360;
+  return (dphi >= -1 && dphi <= 1);
 }
 
-inline bool match_dphi(ap_uint<9> phiA, ap_uint<9> phiB) { return (dphiAbs(phiA, phiB) <= 1); }
+inline bool match_dphi_had(ap_uint<9> ephi, ap_uint<9> bphi) {
+  ap_int<10> dphi = (ap_int<10>)ephi - (ap_int<10>)bphi;
+  if (dphi > 12)
+    dphi -= 24;
+  if (dphi < -12)
+    dphi += 24;
+  return (dphi >= -1 && dphi <= 1);
+}
 
 void algo_top(ap_uint<576> link_in[N_INPUT_LINKS], ap_uint<576> link_out[N_OUTPUT_LINKS]);
 

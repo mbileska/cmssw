@@ -70,6 +70,7 @@ private:
   edm::EDGetTokenT<l1t::HGCalTowerBxCollection> hgcalTowerToken_;
   edm::EDGetTokenT<HcalTrigPrimDigiCollection> hfToken_;
   edm::ESGetToken<CaloTPGTranscoder, CaloTPGRecord> decoderTag_;
+  bool useHgcalTowers_;
   std::vector<edm::ParameterSet> nHits_to_nvtx_params;
   std::vector<edm::ParameterSet> nvtx_to_PU_sub_params;
   std::map<std::string, TF1> nHits_to_nvtx_funcs;
@@ -109,9 +110,12 @@ private:
 //
 Phase2L1CaloJetEmulator::Phase2L1CaloJetEmulator(const edm::ParameterSet& iConfig)
     : caloTowerToken_(consumes<l1tp2::CaloTowerCollection>(iConfig.getParameter<edm::InputTag>("gctFullTowers"))),
-      hgcalTowerToken_(consumes<l1t::HGCalTowerBxCollection>(iConfig.getParameter<edm::InputTag>("hgcalTowers"))),
+      hgcalTowerToken_(iConfig.getParameter<bool>("useHgcalTowers")
+                           ? consumes<l1t::HGCalTowerBxCollection>(iConfig.getParameter<edm::InputTag>("hgcalTowers"))
+                           : edm::EDGetTokenT<l1t::HGCalTowerBxCollection>()),
       hfToken_(consumes<HcalTrigPrimDigiCollection>(iConfig.getParameter<edm::InputTag>("hcalDigis"))),
       decoderTag_(esConsumes<CaloTPGTranscoder, CaloTPGRecord>(edm::ESInputTag("", ""))),
+      useHgcalTowers_(iConfig.getParameter<bool>("useHgcalTowers")),
       nHits_to_nvtx_params(iConfig.getParameter<std::vector<edm::ParameterSet>>("nHits_to_nvtx_params")),
       nvtx_to_PU_sub_params(iConfig.getParameter<std::vector<edm::ParameterSet>>("nvtx_to_PU_sub_params")),
       jetPtBins(iConfig.getParameter<std::vector<double>>("jetPtBins")),
@@ -248,12 +252,15 @@ void Phase2L1CaloJetEmulator::produce(edm::Event& iEvent, const edm::EventSetup&
   float temporary[nBarrelEta / 2][nBarrelPhi];
 
   // HGCal and HF info used for nvtx estimation
-  edm::Handle<l1t::HGCalTowerBxCollection> hgcalTowerCollection;
-  if (!iEvent.getByToken(hgcalTowerToken_, hgcalTowerCollection))
-    edm::LogError("Phase2L1CaloJetEmulator") << "Failed to get towers from hgcalTowerCollection!";
   l1t::HGCalTowerBxCollection hgcalTowerColl;
-  iEvent.getByToken(hgcalTowerToken_, hgcalTowerCollection);
-  hgcalTowerColl = (*hgcalTowerCollection.product());
+  if (useHgcalTowers_) {
+    edm::Handle<l1t::HGCalTowerBxCollection> hgcalTowerCollection;
+    if (!iEvent.getByToken(hgcalTowerToken_, hgcalTowerCollection)) {
+      edm::LogError("Phase2L1CaloJetEmulator") << "Failed to get towers from hgcalTowerCollection!";
+    } else {
+      hgcalTowerColl = (*hgcalTowerCollection.product());
+    }
+  }
 
   edm::Handle<HcalTrigPrimDigiCollection> hfHandle;
   if (!iEvent.getByToken(hfToken_, hfHandle))
@@ -800,6 +807,7 @@ void Phase2L1CaloJetEmulator::fillDescriptions(edm::ConfigurationDescriptions& d
   desc.add<edm::InputTag>("gctFullTowers", edm::InputTag("l1tPhase2L1CaloEGammaEmulator", "GCTFullTowers"));
   desc.add<edm::InputTag>("hgcalTowers", edm::InputTag("l1tHGCalTowerProducer", "HGCalTowerProcessor"));
   desc.add<edm::InputTag>("hcalDigis", edm::InputTag("simHcalTriggerPrimitiveDigis"));
+  desc.add<bool>("useHgcalTowers", true);
 
   edm::ParameterSetDescription nHits_params_validator;
   nHits_params_validator.add<string>("fit", "type");

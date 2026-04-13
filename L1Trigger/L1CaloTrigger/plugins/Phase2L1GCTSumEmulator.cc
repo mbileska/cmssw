@@ -112,6 +112,21 @@ void Phase2L1GCTSumEmulator::produce(edm::Event& iEvent, const edm::EventSetup& 
   p2gctsum::algo_top(link_in_pos.data(), link_out_pos.data());
   p2gctsum::algo_top(link_in_neg.data(), link_out_neg.data());
 
+  if (debug_ && iEvent.id().event() == 4) {
+    edm::LogVerbatim("Phase2L1GCTSumEmulator") << "EVENT 4 CMSSW SUM OUTPUT";
+
+    for (unsigned int row = 0; row < 9; ++row) {
+      edm::LogVerbatim("Phase2L1GCTSumEmulator")
+          << "row " << row
+          << "  pos0=0x" << std::hex << (uint64_t)link_out_pos[0].range(row * 64 + 63, row * 64).to_uint64()
+          << "  pos1=0x" << std::hex << (uint64_t)link_out_pos[1].range(row * 64 + 63, row * 64).to_uint64()
+          << "  pos2=0x" << std::hex << (uint64_t)link_out_pos[2].range(row * 64 + 63, row * 64).to_uint64()
+          << "  neg0=0x" << std::hex << (uint64_t)link_out_neg[0].range(row * 64 + 63, row * 64).to_uint64()
+          << "  neg1=0x" << std::hex << (uint64_t)link_out_neg[1].range(row * 64 + 63, row * 64).to_uint64()
+          << "  neg2=0x" << std::hex << (uint64_t)link_out_neg[2].range(row * 64 + 63, row * 64).to_uint64();
+    }
+  }
+
   link_in_gt[0] = link_out_pos[0];
   link_in_gt[1] = link_out_pos[1];
   link_in_gt[2] = link_out_pos[2];
