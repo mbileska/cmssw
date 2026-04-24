@@ -31,7 +31,7 @@ inline void processInputLinks_GT(ap_uint<576> link_in[N_INPUT_LINKS_GT],
                                  GCTvar EGIsNeg[6],
                                  GCTvar JetsNeg[6],
                                  GCTvar TausNeg[6],
-                                 GCTsum Sums[8]) {
+                                 GCTsum Sums[2]) {
   for (int j = 0; j < 12; j++) {
     ap_uint<48> raw = link_in[0].range(j * 48 + 47, j * 48);
     if (j < 6)
@@ -48,9 +48,7 @@ inline void processInputLinks_GT(ap_uint<576> link_in[N_INPUT_LINKS_GT],
       TausPos[j - 6].unpack(raw, true);
   }
 
-  for (int j = 0; j < 4; j++) {
-    Sums[j].getGCTsum(link_in[2].range(j * 48 + 47, j * 48));
-  }
+  Sums[0].unpack(link_in[2]);
 
   for (int j = 0; j < 12; j++) {
     ap_uint<48> raw = link_in[3].range(j * 48 + 47, j * 48);
@@ -68,9 +66,7 @@ inline void processInputLinks_GT(ap_uint<576> link_in[N_INPUT_LINKS_GT],
       TausNeg[j - 6].unpack(raw, true);
   }
 
-  for (int j = 0; j < 4; j++) {
-    Sums[j + 4].getGCTsum(link_in[5].range(j * 48 + 47, j * 48));
-  }
+  Sums[1].unpack(link_in[5]);
 }
 
 inline void createOutputToGT(GCTvar EGspos[6],
@@ -81,9 +77,9 @@ inline void createOutputToGT(GCTvar EGspos[6],
                              GCTvar EGIsNeg[6],
                              GCTvar JetsNeg[6],
                              GCTvar TausNeg[6],
-                             GCTsum Sums[8],
+                             GCTsum Sums[2],
                              GCTtoGT& combinedoutput) {
-  combinedoutput.processSums(Sums);
+  combinedoutput.processSums(Sums[0], Sums[1]);
   combinedoutput.convertObjects(EGspos, EGsNeg, EGIsPos, EGIsNeg, JetsPos, JetsNeg, TausPos, TausNeg);
   combinedoutput.getcombinedGTfromIP();
   combinedoutput.putGTtoLink();
@@ -94,7 +90,7 @@ inline void algo_top_GT(ap_uint<576> link_in[N_INPUT_LINKS_GT], ap_uint<576> lin
   GCTvar EGIsPos[6], EGIsNeg[6];
   GCTvar JetsPos[6], JetsNeg[6];
   GCTvar TausPos[6], TausNeg[6];
-  GCTsum Sums[8];
+  GCTsum Sums[2];
 
   GCTtoGT GCTtoGT;
 

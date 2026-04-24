@@ -18,7 +18,7 @@ static constexpr int N_GCT_CONNECTED = 4;
 static constexpr int N_GCT_OBJECTS_PER_SOURCE = 6;
 static constexpr int N_GCT_OBJECTS = 24;
 static constexpr int N_GCT_OBJECTS_SORT = 32;
-static constexpr int N_GCT_SUMS = 4;
+static constexpr int N_GCT_SUMS = 1;
 static constexpr unsigned int BARREL_GAMMA_SOURCE3_OFFSET = 240;
 static constexpr unsigned int BARREL_GAMMA_SOURCE3_WRAP_START = 112;
 
@@ -140,42 +140,37 @@ public:
 
 class GCTsum {
 public:
-  ap_uint<12> Ex;
-  ap_uint<12> Ey;
-  ap_uint<12> Ht;
-  ap_uint<12> Spare;
+  ap_int<16> Ex;
+  ap_int<16> Ey;
+  ap_uint<16> Ht;
+  ap_uint<16> SumET;
+  ap_uint<16> NObj;
 
-  GCTsum() { Ex = 0; Ey = 0; Ht = 0; Spare = 0; }
+  GCTsum() { Ex = 0; Ey = 0; Ht = 0; SumET = 0; NObj = 0; }
 
   GCTsum(const GCTsum& rhs) {
     Ex = rhs.Ex;
     Ey = rhs.Ey;
     Ht = rhs.Ht;
-    Spare = rhs.Spare;
+    SumET = rhs.SumET;
+    NObj = rhs.NObj;
   }
 
   GCTsum& operator=(const GCTsum& rhs) {
     this->Ex = rhs.Ex;
     this->Ey = rhs.Ey;
     this->Ht = rhs.Ht;
-    this->Spare = rhs.Spare;
+    this->SumET = rhs.SumET;
+    this->NObj = rhs.NObj;
     return *this;
   }
 
-  void getGCTsum(ap_uint<48> i) {
-    this->Ex = i.range(11, 0);
-    this->Ey = i.range(23, 12);
-    this->Ht = i.range(35, 24);
-    this->Spare = i.range(47, 36);
-  }
-
-  ap_uint<48> pack() const {
-    ap_uint<48> out = 0;
-    out.range(11, 0) = Ex;
-    out.range(23, 12) = Ey;
-    out.range(35, 24) = Ht;
-    out.range(47, 36) = Spare;
-    return out;
+  void unpack(ap_uint<576> i) {
+    this->Ex = (ap_int<16>)i.range(15, 0);
+    this->Ey = (ap_int<16>)i.range(63, 48);
+    this->Ht = i.range(111, 96);
+    this->SumET = i.range(159, 144);
+    this->NObj = i.range(207, 192);
   }
 };
 

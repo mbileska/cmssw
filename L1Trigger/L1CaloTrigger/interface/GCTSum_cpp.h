@@ -31,20 +31,49 @@ inline ap_uint<48> pack_had_output(const GCTvar& object) {
   return out;
 }
 
+inline ap_int<12> unpack_signed_sum_component(ap_uint<48> word, ap_uint<2> index) {
+  switch (index) {
+    case 0:
+      return (ap_int<12>)word.range(11, 0);
+    case 1:
+      return (ap_int<12>)word.range(23, 12);
+    default:
+      return (ap_int<12>)word.range(35, 24);
+  }
+}
+
+inline ap_uint<12> unpack_unsigned_sum_component(ap_uint<48> word) {
+  return word.range(11, 0);
+}
+
+inline ap_uint<48> pack_signed_sum_component(ap_int<16> value) {
+  ap_uint<48> out = 0;
+  out.range(15, 0) = (ap_uint<16>)value;
+  return out;
+}
+
+inline ap_uint<48> pack_unsigned_sum_component(ap_uint<16> value) {
+  ap_uint<48> out = 0;
+  out.range(15, 0) = value;
+  return out;
+}
+
 inline void processInputLinks(ap_uint<576> link_in[N_INPUT_LINKS],
                               GCTvar EGs[N_GCT_OBJECTS],
                               GCTvar EGIs[N_GCT_OBJECTS],
                               GCTvar Jets[N_GCT_OBJECTS],
                               GCTvar Taus[N_GCT_OBJECTS],
-                              GCTsum Sums[N_GCT_SUMS]) {
+                              GCTsum& Sums) {
   ap_uint<9> gammaOffset[4] = {0, 0, 120, 240};
   ap_uint<9> hadOffset[4] = {0, 0, 8, 16};
+  ap_uint<2> sumScenario[4] = {0, 0, 1, 2};
 
   for (int i = 0; i < N_GCT_CONNECTED; i++) {
     int link_base = 3 * i;
     bool isBarrel = (i > 0);
     ap_uint<9> currentGammaOffset = gammaOffset[i];
     ap_uint<9> currentHadOffset = hadOffset[i];
+    ap_uint<2> currentSumScenario = sumScenario[i];
 
     ap_uint<576> link_A = link_in[link_base + 0];
     for (int j = 0; j < 12; j++) {
@@ -77,8 +106,17 @@ inline void processInputLinks(ap_uint<576> link_in[N_INPUT_LINKS],
     }
 
     ap_uint<576> link_C = link_in[link_base + 2];
-    ap_uint<48> raw_sum = link_C.range(47, 0);
-    Sums[i].getGCTsum(raw_sum);
+    ap_uint<48> raw_ex = link_C.range(47, 0);
+    ap_uint<48> raw_ey = link_C.range(95, 48);
+    ap_uint<48> raw_ht = link_C.range(143, 96);
+    ap_uint<48> raw_sumet = link_C.range(191, 144);
+    ap_uint<48> raw_nobj = link_C.range(239, 192);
+
+    Sums.Ex += (ap_int<16>)unpack_signed_sum_component(raw_ex, currentSumScenario);
+    Sums.Ey += (ap_int<16>)unpack_signed_sum_component(raw_ey, currentSumScenario);
+    Sums.Ht += (ap_uint<16>)unpack_unsigned_sum_component(raw_ht);
+    Sums.SumET += (ap_uint<16>)unpack_unsigned_sum_component(raw_sumet);
+    Sums.NObj += (ap_uint<16>)unpack_unsigned_sum_component(raw_nobj);
   }
 }
 
@@ -238,7 +276,7 @@ inline void processOutLinks(GCTvar EGsTop6[6],
                             GCTvar EGIsTop6[6],
                             GCTvar JetsTop6[6],
                             GCTvar TausTop6[6],
-                            GCTsum Sums[4],
+                            const GCTsum& Sums,
                             ap_uint<576> link_out[N_OUTPUT_LINKS]) {
   ap_uint<576> out_link0 = 0;
   ap_uint<576> out_link1 = 0;
@@ -262,9 +300,11 @@ inline void processOutLinks(GCTvar EGsTop6[6],
     out_link1.range(slot * 48 + 47, slot * 48) = pack_had_output(TausTop6[i]);
   }
 
-  for (int i = 0; i < 4; i++) {
-    out_link2.range(i * 48 + 47, i * 48) = Sums[i].pack();
-  }
+  out_link2.range(47, 0) = pack_signed_sum_component(Sums.Ex);
+  out_link2.range(95, 48) = pack_signed_sum_component(Sums.Ey);
+  out_link2.range(143, 96) = pack_unsigned_sum_component(Sums.Ht);
+  out_link2.range(191, 144) = pack_unsigned_sum_component(Sums.SumET);
+  out_link2.range(239, 192) = pack_unsigned_sum_component(Sums.NObj);
 
   link_out[0] = out_link0;
   link_out[1] = out_link1;
@@ -273,7 +313,7 @@ inline void processOutLinks(GCTvar EGsTop6[6],
 
 inline void algo_top(ap_uint<576> link_in[N_INPUT_LINKS], ap_uint<576> link_out[N_OUTPUT_LINKS]) {
   GCTvar EGs[24], EGIs[24], Jets[24], Taus[24];
-  GCTsum Sums[4];
+  GCTsum Sums;
 
   GCTvar EGsTop6[6], EGIsTop6[6], JetsTop6[6], TausTop6[6];
   GCTvar EGsTop6_reg[6], EGIsTop6_reg[6], JetsTop6_reg[6], TausTop6_reg[6];

@@ -8,7 +8,8 @@
  *
  * The remaining upstream contracts are intentionally left explicit:
  * - endcap EM links are left empty
- * - partial sum words are zero-filled
+ * - the five-word sum fiber payload (EX hypotheses, EY hypotheses, HT, SumET, NObj)
+ *   is zero-filled
  * - HF hadronic objects are not injected because this SumCard interface only
  *   documents one non-barrel source per eta side in the available code
  */

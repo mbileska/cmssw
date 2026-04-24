@@ -21,6 +21,20 @@ using p2gctsum::GCTsum;
 using p2gctsum::GCTvar;
 typedef ap_uint<10> loop;
 
+inline ap_uint<64> pack_scalar16_word(ap_uint<16> value) {
+  ap_uint<64> out = 0;
+  out[0] = 1;
+  out.range(16, 1) = value;
+  return out;
+}
+
+inline ap_uint<64> pack_scalar32_word(ap_uint<32> value) {
+  ap_uint<64> out = 0;
+  out[0] = 1;
+  out.range(32, 1) = value;
+  return out;
+}
+
 class GTvar {
 public:
   ap_uint<1> isValid;
@@ -83,12 +97,14 @@ public:
   GTvar Tausneg[6];
 
   ap_uint<64> Sums[4];
+  ap_uint<17> SumETTotal;
   ap_uint<576> linkOutput[6];
   ap_uint<576> link[6];
 
   GCTtoGT() {
     for (int i = 0; i < 4; i++)
       Sums[i] = 0;
+    SumETTotal = 0;
     for (int i = 0; i < 6; i++) {
       linkOutput[i] = 0;
       link[i] = 0;
@@ -115,15 +131,19 @@ public:
     }
   }
 
-  void processSums(GCTsum sumsIn[8]) {
-    for (int i = 0; i < 4; i++) {
-      ap_uint<12> sumEx = sumsIn[i].Ex + sumsIn[i + 4].Ex;
-      ap_uint<12> sumEy = sumsIn[i].Ey + sumsIn[i + 4].Ey;
-      ap_uint<12> sumHt = sumsIn[i].Ht + sumsIn[i + 4].Ht;
+  void processSums(const GCTsum& sumsPos, const GCTsum& sumsNeg) {
+    const ap_int<17> totalEx = (ap_int<17>)sumsPos.Ex + (ap_int<17>)sumsNeg.Ex;
+    const ap_int<17> totalEy = (ap_int<17>)sumsPos.Ey + (ap_int<17>)sumsNeg.Ey;
+    const ap_int<34> ex2 = (ap_int<34>)totalEx * (ap_int<34>)totalEx;
+    const ap_int<34> ey2 = (ap_int<34>)totalEy * (ap_int<34>)totalEy;
+    const ap_uint<32> et2 = (ap_uint<32>)((ap_uint<34>)ex2 + (ap_uint<34>)ey2);
+    const ap_uint<16> nObjTotal = (ap_uint<16>)((ap_uint<17>)sumsPos.NObj + (ap_uint<17>)sumsNeg.NObj);
 
-      this->Sums[i] =
-          (ap_uint<64>)1 | ((ap_uint<64>)(sumEx << 4) << 1) | ((ap_uint<64>)(sumEy) << 17) | ((ap_uint<64>)(sumHt << 4) << 30);
-    }
+    this->Sums[0] = pack_scalar16_word(sumsPos.Ht);
+    this->Sums[1] = pack_scalar16_word(sumsNeg.Ht);
+    this->Sums[2] = pack_scalar32_word(et2);
+    this->Sums[3] = pack_scalar16_word(nObjTotal);
+    this->SumETTotal = (ap_uint<17>)sumsPos.SumET + (ap_uint<17>)sumsNeg.SumET;
   }
 
   void getcombinedGTfromIP() {
@@ -183,6 +203,26 @@ public:
     for (loop i = 0; i < 6; i++) {
       link[i] = linkOutput[i];
     }
+  }
+
+  GCTtoGT& operator=(const GCTtoGT& rhs) {
+    for (int i = 0; i < 6; i++) {
+      this->EGspos[i] = rhs.EGspos[i];
+      this->EGsneg[i] = rhs.EGsneg[i];
+      this->EGIspos[i] = rhs.EGIspos[i];
+      this->EGIsneg[i] = rhs.EGIsneg[i];
+      this->Jetspos[i] = rhs.Jetspos[i];
+      this->Jetsneg[i] = rhs.Jetsneg[i];
+      this->Tauspos[i] = rhs.Tauspos[i];
+      this->Tausneg[i] = rhs.Tausneg[i];
+      this->linkOutput[i] = rhs.linkOutput[i];
+      this->link[i] = rhs.link[i];
+    }
+    for (int i = 0; i < 4; ++i) {
+      this->Sums[i] = rhs.Sums[i];
+    }
+    this->SumETTotal = rhs.SumETTotal;
+    return *this;
   }
 };
 

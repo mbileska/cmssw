@@ -29,7 +29,8 @@ private:
 
   ap_uint<48> packEG(ap_uint<12> et, ap_uint<7> eta, ap_uint<9> phi, ap_uint<1> isBarrel) const;
   ap_uint<48> packHadron(ap_uint<12> et, ap_uint<6> eta, ap_uint<9> phi, ap_uint<4> seed, ap_uint<1> isBarrel) const;
-  ap_uint<48> packSum(ap_uint<12> ex, ap_uint<12> ey, ap_uint<12> ht, ap_uint<12> spare = 0) const;
+  ap_uint<48> packSumHypotheses(ap_int<12> v0, ap_int<12> v1, ap_int<12> v2) const;
+  ap_uint<48> packSumScalar(ap_uint<12> value) const;
 
   void fillValidationPattern(std::array<ap_uint<576>, 24>& links, unsigned long long eventNumber) const;
 
@@ -77,15 +78,19 @@ ap_uint<48> GCTSumTestVectorProducer::packHadron(ap_uint<12> et,
   return out;
 }
 
-ap_uint<48> GCTSumTestVectorProducer::packSum(ap_uint<12> ex,
-                                              ap_uint<12> ey,
-                                              ap_uint<12> ht,
-                                              ap_uint<12> spare) const {
+ap_uint<48> GCTSumTestVectorProducer::packSumHypotheses(ap_int<12> v0,
+                                                        ap_int<12> v1,
+                                                        ap_int<12> v2) const {
   ap_uint<48> out = 0;
-  out.range(11, 0) = ex;
-  out.range(23, 12) = ey;
-  out.range(35, 24) = ht;
-  out.range(47, 36) = spare;
+  out.range(11, 0) = static_cast<ap_uint<12> >(v0);
+  out.range(23, 12) = static_cast<ap_uint<12> >(v1);
+  out.range(35, 24) = static_cast<ap_uint<12> >(v2);
+  return out;
+}
+
+ap_uint<48> GCTSumTestVectorProducer::packSumScalar(ap_uint<12> value) const {
+  ap_uint<48> out = 0;
+  out.range(11, 0) = value;
   return out;
 }
 
@@ -116,7 +121,11 @@ void GCTSumTestVectorProducer::fillValidationPattern(std::array<ap_uint<576>, 24
     case 2:
       // positive-side EG plus positive-side sum
       putWord48(0, 0, packEG(40, 11, 30, 0));
-      putWord48(2, 0, packSum(5, 7, 9, 0));
+      putWord48(2, 0, packSumHypotheses(5, 105, 205));
+      putWord48(2, 1, packSumHypotheses(7, 107, 207));
+      putWord48(2, 2, packSumScalar(9));
+      putWord48(2, 3, packSumScalar(11));
+      putWord48(2, 4, packSumScalar(1));
       break;
 
     case 3:
@@ -147,7 +156,11 @@ void GCTSumTestVectorProducer::fillValidationPattern(std::array<ap_uint<576>, 24
       // sparse hadron/tau plus sum
       putWord48(1, 0, packHadron(55, 9, 60, 4, 1));           // positive jet
       putWord48(1, 6, packHadron(35, 9, 61, 2, 1));           // positive tau
-      putWord48(2, 0, packSum(4, 6, 8, 0));
+      putWord48(5, 0, packSumHypotheses(4, 104, 204));        // source 1 -> use hypothesis 1
+      putWord48(5, 1, packSumHypotheses(6, 106, 206));
+      putWord48(5, 2, packSumScalar(8));
+      putWord48(5, 3, packSumScalar(10));
+      putWord48(5, 4, packSumScalar(2));
       break;
 
     case 6:
@@ -169,9 +182,54 @@ void GCTSumTestVectorProducer::fillValidationPattern(std::array<ap_uint<576>, 24
       break;
 
     case 9:
-      // sum aggregation: positive + negative
-      putWord48(2, 0, packSum(5, 7, 9, 0));                   // positive side source 0 sum
-      putWord48(14, 0, packSum(11, 13, 17, 0));               // negative side source 0 sum
+      // sum aggregation over all four sources per side with explicit hypothesis selection
+      putWord48(2, 0, packSumHypotheses(5, 101, 201));        // pos source 0 -> use 5
+      putWord48(2, 1, packSumHypotheses(7, 103, 203));        // pos source 0 -> use 7
+      putWord48(2, 2, packSumScalar(2));
+      putWord48(2, 3, packSumScalar(10));
+      putWord48(2, 4, packSumScalar(1));
+
+      putWord48(5, 0, packSumHypotheses(11, 111, 211));       // pos source 1 -> use 11
+      putWord48(5, 1, packSumHypotheses(13, 113, 213));       // pos source 1 -> use 13
+      putWord48(5, 2, packSumScalar(3));
+      putWord48(5, 3, packSumScalar(20));
+      putWord48(5, 4, packSumScalar(2));
+
+      putWord48(8, 0, packSumHypotheses(17, 19, 217));        // pos source 2 -> use 19
+      putWord48(8, 1, packSumHypotheses(23, 29, 223));        // pos source 2 -> use 29
+      putWord48(8, 2, packSumScalar(5));
+      putWord48(8, 3, packSumScalar(30));
+      putWord48(8, 4, packSumScalar(4));
+
+      putWord48(11, 0, packSumHypotheses(31, 37, 41));        // pos source 3 -> use 41
+      putWord48(11, 1, packSumHypotheses(43, 47, 53));        // pos source 3 -> use 53
+      putWord48(11, 2, packSumScalar(7));
+      putWord48(11, 3, packSumScalar(40));
+      putWord48(11, 4, packSumScalar(8));
+
+      putWord48(14, 0, packSumHypotheses(2, 102, 202));       // neg source 0 -> use 2
+      putWord48(14, 1, packSumHypotheses(3, 103, 203));       // neg source 0 -> use 3
+      putWord48(14, 2, packSumScalar(11));
+      putWord48(14, 3, packSumScalar(50));
+      putWord48(14, 4, packSumScalar(1));
+
+      putWord48(17, 0, packSumHypotheses(5, 105, 205));       // neg source 1 -> use 5
+      putWord48(17, 1, packSumHypotheses(7, 107, 207));       // neg source 1 -> use 7
+      putWord48(17, 2, packSumScalar(13));
+      putWord48(17, 3, packSumScalar(60));
+      putWord48(17, 4, packSumScalar(2));
+
+      putWord48(20, 0, packSumHypotheses(17, 23, 223));       // neg source 2 -> use 23
+      putWord48(20, 1, packSumHypotheses(19, 31, 231));       // neg source 2 -> use 31
+      putWord48(20, 2, packSumScalar(17));
+      putWord48(20, 3, packSumScalar(70));
+      putWord48(20, 4, packSumScalar(4));
+
+      putWord48(23, 0, packSumHypotheses(29, 37, 43));        // neg source 3 -> use 43
+      putWord48(23, 1, packSumHypotheses(31, 41, 47));        // neg source 3 -> use 47
+      putWord48(23, 2, packSumScalar(19));
+      putWord48(23, 3, packSumScalar(80));
+      putWord48(23, 4, packSumScalar(8));
       break;
   }
 }
