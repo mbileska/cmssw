@@ -19,8 +19,6 @@ static constexpr int N_GCT_OBJECTS_PER_SOURCE = 6;
 static constexpr int N_GCT_OBJECTS = 24;
 static constexpr int N_GCT_OBJECTS_SORT = 32;
 static constexpr int N_GCT_SUMS = 1;
-static constexpr unsigned int BARREL_GAMMA_SOURCE3_OFFSET = 240;
-static constexpr unsigned int BARREL_GAMMA_SOURCE3_WRAP_START = 112;
 
 typedef ap_uint<10> loop;
 typedef ap_uint<48> xvar;
@@ -71,21 +69,14 @@ public:
     this->ET = i.range(11, 0);
     this->Eta = i.range(18, 12);
     ap_uint<9> raw_phi = i.range(25, 19);
-    ap_uint<9> global_phi = (raw_phi + phiOffset) & 0x1FF;
-    // The measured FW path wraps the last 8 crystals of the third barrel source
-    // across the phi=0 boundary before GT packing, so keep the CMSSW SumCard
-    // object phi in that wrapped convention as well.
-    if (phiOffset == BARREL_GAMMA_SOURCE3_OFFSET && raw_phi >= BARREL_GAMMA_SOURCE3_WRAP_START) {
-      global_phi = raw_phi - BARREL_GAMMA_SOURCE3_WRAP_START;
-    }
-    this->Phi = global_phi;
+    this->Phi = (raw_phi + phiOffset) & 0x1FF;
     this->isBarrel = 1;
     this->PtClusterSeed = 0;
   }
 
   void getGCTvarEndcapGammas(ap_uint<48> i, ap_uint<9> phiOffset = 0) {
     this->ET = i.range(11, 0);
-    this->Eta = i.range(18, 12);
+    this->Eta = (ap_uint<10>)i.range(18, 12) + 85;
     ap_uint<9> raw_phi = i.range(27, 19);
     this->Phi = (raw_phi + phiOffset) & 0x1FF;
     this->isBarrel = 0;
@@ -94,7 +85,9 @@ public:
 
   void getGCTvarJetsTaus(ap_uint<48> i, ap_uint<9> phiOffset, bool barrelFlag) {
     this->ET = i.range(11, 0);
-    this->Eta = i.range(17, 12);
+    ap_uint<6> raw_eta = i.range(17, 12);
+    ap_uint<10> eta = barrelFlag ? (ap_uint<10>)raw_eta : (ap_uint<10>)(raw_eta + 6);
+    this->Eta = eta;
     ap_uint<9> raw_phi = i.range(26, 18);
     this->Phi = (raw_phi + phiOffset) & 0x1FF;
     this->PtClusterSeed = i.range(30, 27);
@@ -173,13 +166,6 @@ public:
     this->NObj = i.range(207, 192);
   }
 };
-
-inline ap_uint<12> saturatingAdd12(ap_uint<12> a, ap_uint<12> b) {
-  ap_uint<13> sum = (ap_uint<13>)a + (ap_uint<13>)b;
-  if (sum > 0xFFF)
-    return 0xFFF;
-  return sum.range(11, 0);
-}
 
 static const ap_uint<10> BARREL_GAMMA_BOUNDARY_ETA = 84;
 static const ap_uint<10> ENDCAP_GAMMA_BOUNDARY_ETA = 85;

@@ -83,7 +83,6 @@ inline void processInputLinks(ap_uint<576> link_in[N_INPUT_LINKS],
         tempObj.getGCTvarBarrelGammas(raw_48b, currentGammaOffset);
       } else {
         tempObj.getGCTvarEndcapGammas(raw_48b, 0);
-        tempObj.Eta = (ap_uint<10>)tempObj.Eta + 85;
       }
 
       if (j < 6)
@@ -96,8 +95,6 @@ inline void processInputLinks(ap_uint<576> link_in[N_INPUT_LINKS],
       ap_uint<48> raw_48b = link_B.range(48 * j + 47, 48 * j);
       GCTvar tempObj;
       tempObj.getGCTvarJetsTaus(raw_48b, currentHadOffset, isBarrel);
-      if (!isBarrel)
-        tempObj.Eta = (ap_uint<10>)tempObj.Eta + 6;
 
       if (j < 6)
         Jets[i * 6 + j] = tempObj;
@@ -120,22 +117,6 @@ inline void processInputLinks(ap_uint<576> link_in[N_INPUT_LINKS],
   }
 }
 
-inline bool is_boundary_barrel_gamma(const GCTvar& o) {
-  return (o.ET != 0) && (o.isBarrel == 1) && (o.Eta == BARREL_GAMMA_BOUNDARY_ETA);
-}
-
-inline bool is_boundary_endcap_gamma(const GCTvar& o) {
-  return (o.ET != 0) && (o.isBarrel == 0) && (o.Eta == ENDCAP_GAMMA_BOUNDARY_ETA);
-}
-
-inline bool is_boundary_barrel_had(const GCTvar& o) {
-  return (o.ET != 0) && (o.isBarrel == 1) && (o.Eta == BARREL_HAD_BOUNDARY_ETA);
-}
-
-inline bool is_boundary_endcap_had(const GCTvar& o) {
-  return (o.ET != 0) && (o.isBarrel == 0) && (o.Eta == ENDCAP_HAD_BOUNDARY_ETA);
-}
-
 inline void clear_gctvar(GCTvar& o) {
   o.ET = 0;
   o.Eta = 0;
@@ -144,58 +125,260 @@ inline void clear_gctvar(GCTvar& o) {
   o.isBarrel = 0;
 }
 
-inline void stitch_pair_keep_higher_pt(GCTvar& ec, GCTvar& br) {
-  ap_uint<12> ec_et = ec.ET;
-  ap_uint<12> br_et = br.ET;
-  ap_uint<12> sum = saturatingAdd12(ec_et, br_et);
+inline ap_uint<12> saturating_add(ap_uint<12> a, ap_uint<12> b) {
+  ap_uint<13> s = (ap_uint<13>)a + (ap_uint<13>)b;
+  return (s > 0xFFF) ? (ap_uint<12>)0xFFF : (ap_uint<12>)s;
+}
+
+static const int GAMMA_PHI_BINS = 360;
+static const int GAMMA_PMUS_PER_REGION = 9;
+static const int GAMMA_CRYSTALS_PER_PMU = 5;
+static const int GAMMA_REGION_WIDTH = GAMMA_PMUS_PER_REGION * GAMMA_CRYSTALS_PER_PMU;
+static const int GAMMA_REGION_OVERLAP = GAMMA_CRYSTALS_PER_PMU;
+static const int HAD_PHI_BINS = 24;
+static const int HAD_BINS_PER_REGION = 3;
+static const int HAD_REGION_OVERLAP = 1;
+
+inline bool is_active_boundary_flag(ap_uint<1> boundary_flag, ap_uint<12> et, ap_uint<1> cleared) {
+  return (cleared == 0) && (et != 0) && (boundary_flag == 1);
+}
+
+inline void stitch_state_pair_local(ap_uint<12>& ec_et,
+                                    ap_uint<1>& ec_cleared,
+                                    ap_uint<12>& br_et,
+                                    ap_uint<1>& br_cleared) {
+  ap_uint<12> sum = saturating_add(ec_et, br_et);
 
   if (ec_et > br_et) {
-    ec.ET = sum;
-    clear_gctvar(br);
+    ec_et = sum;
+    br_et = 0;
+    br_cleared = 1;
   } else {
-    br.ET = sum;
-    clear_gctvar(ec);
+    br_et = sum;
+    ec_et = 0;
+    ec_cleared = 1;
   }
 }
 
-inline void stitch_had_pair(GCTvar& ec, GCTvar& br) {
-  stitch_pair_keep_higher_pt(ec, br);
+inline ap_uint<9> normalize_gamma_phi(ap_uint<9> phi) {
+  return (phi >= GAMMA_PHI_BINS) ? (ap_uint<9>)(phi - GAMMA_PHI_BINS) : phi;
+}
+
+inline ap_uint<5> normalize_had_phi(ap_uint<9> phi) {
+  ap_uint<9> p = phi;
+  if (p >= 384)
+    p -= 384;
+  if (p >= 192)
+    p -= 192;
+  if (p >= 96)
+    p -= 96;
+  if (p >= 48)
+    p -= 48;
+  if (p >= HAD_PHI_BINS)
+    p -= HAD_PHI_BINS;
+  return (ap_uint<5>)p;
+}
+
+inline ap_uint<3> gamma_owner_region(ap_uint<9> phi) {
+  ap_uint<9> p = normalize_gamma_phi(phi);
+  if (p < (1 * GAMMA_REGION_WIDTH))
+    return 0;
+  if (p < (2 * GAMMA_REGION_WIDTH))
+    return 1;
+  if (p < (3 * GAMMA_REGION_WIDTH))
+    return 2;
+  if (p < (4 * GAMMA_REGION_WIDTH))
+    return 3;
+  if (p < (5 * GAMMA_REGION_WIDTH))
+    return 4;
+  if (p < (6 * GAMMA_REGION_WIDTH))
+    return 5;
+  if (p < (7 * GAMMA_REGION_WIDTH))
+    return 6;
+  return 7;
+}
+
+inline ap_uint<3> had_owner_region(ap_uint<9> phi) {
+  ap_uint<5> p = normalize_had_phi(phi);
+  if (p < (1 * HAD_BINS_PER_REGION))
+    return 0;
+  if (p < (2 * HAD_BINS_PER_REGION))
+    return 1;
+  if (p < (3 * HAD_BINS_PER_REGION))
+    return 2;
+  if (p < (4 * HAD_BINS_PER_REGION))
+    return 3;
+  if (p < (5 * HAD_BINS_PER_REGION))
+    return 4;
+  if (p < (6 * HAD_BINS_PER_REGION))
+    return 5;
+  if (p < (7 * HAD_BINS_PER_REGION))
+    return 6;
+  return 7;
+}
+
+inline bool gamma_phi_in_region_overlap(ap_uint<9> phi, ap_uint<3> region) {
+  int start = (int(region) * GAMMA_REGION_WIDTH) - GAMMA_REGION_OVERLAP;
+  int end = ((int(region) + 1) * GAMMA_REGION_WIDTH) - 1 + GAMMA_REGION_OVERLAP;
+  ap_uint<9> p = normalize_gamma_phi(phi);
+
+  if (start < 0) {
+    return (p >= (start + GAMMA_PHI_BINS)) || (p <= end);
+  }
+  if (end >= GAMMA_PHI_BINS) {
+    return (p >= start) || (p <= (end - GAMMA_PHI_BINS));
+  }
+  return (p >= start) && (p <= end);
+}
+
+inline bool had_phi_in_region_overlap(ap_uint<9> phi, ap_uint<3> region) {
+  int start = (int(region) * HAD_BINS_PER_REGION) - HAD_REGION_OVERLAP;
+  int end = ((int(region) + 1) * HAD_BINS_PER_REGION) - 1 + HAD_REGION_OVERLAP;
+  ap_uint<5> p = normalize_had_phi(phi);
+
+  if (start < 0) {
+    return (p >= (start + HAD_PHI_BINS)) || (p <= end);
+  }
+  if (end >= HAD_PHI_BINS) {
+    return (p >= start) || (p <= (end - HAD_PHI_BINS));
+  }
+  return (p >= start) && (p <= end);
+}
+
+template <bool IS_GAMMA>
+inline void stitch_candidate_pair(const GCTvar& ec,
+                                  ap_uint<1> ec_boundary,
+                                  ap_uint<3> ec_owner_region,
+                                  ap_uint<12>& ec_et,
+                                  ap_uint<1>& ec_cleared,
+                                  const GCTvar& br,
+                                  ap_uint<1> br_boundary,
+                                  ap_uint<12>& br_et,
+                                  ap_uint<1>& br_cleared) {
+  bool in_local_window =
+      IS_GAMMA ? gamma_phi_in_region_overlap(br.Phi, ec_owner_region) : had_phi_in_region_overlap(br.Phi, ec_owner_region);
+
+  if (in_local_window && is_active_boundary_flag(ec_boundary, ec_et, ec_cleared) &&
+      is_active_boundary_flag(br_boundary, br_et, br_cleared) &&
+      (IS_GAMMA ? match_dphi_gamma(ec.Phi, br.Phi) : match_dphi_had(ec.Phi, br.Phi))) {
+    stitch_state_pair_local(ec_et, ec_cleared, br_et, br_cleared);
+  }
+}
+
+template <bool IS_GAMMA>
+inline void stitch_boundary_group(GCTvar ec[2], GCTvar br[6], ap_uint<10> endcap_eta, ap_uint<10> barrel_eta) {
+  ap_uint<12> ec_et[2];
+  ap_uint<12> br_et[6];
+  ap_uint<1> ec_cleared[2];
+  ap_uint<1> br_cleared[6];
+  ap_uint<1> ec_boundary[2];
+  ap_uint<1> br_boundary[6];
+
+  for (int i = 0; i < 2; ++i) {
+    ec_et[i] = ec[i].ET;
+    ec_cleared[i] = 0;
+    ec_boundary[i] = (ec[i].isBarrel == 0) && (ec[i].Eta == endcap_eta);
+  }
+
+  for (int i = 0; i < 6; ++i) {
+    br_et[i] = br[i].ET;
+    br_cleared[i] = 0;
+    br_boundary[i] = (br[i].isBarrel == 1) && (br[i].Eta == barrel_eta);
+  }
+
+  ap_uint<3> ec0_owner_region = IS_GAMMA ? gamma_owner_region(ec[0].Phi) : had_owner_region(ec[0].Phi);
+  ap_uint<3> ec1_owner_region = IS_GAMMA ? gamma_owner_region(ec[1].Phi) : had_owner_region(ec[1].Phi);
+
+  stitch_candidate_pair<IS_GAMMA>(ec[0], ec_boundary[0], ec0_owner_region, ec_et[0], ec_cleared[0], br[0],
+                                  br_boundary[0], br_et[0], br_cleared[0]);
+  stitch_candidate_pair<IS_GAMMA>(ec[0], ec_boundary[0], ec0_owner_region, ec_et[0], ec_cleared[0], br[1],
+                                  br_boundary[1], br_et[1], br_cleared[1]);
+  stitch_candidate_pair<IS_GAMMA>(ec[0], ec_boundary[0], ec0_owner_region, ec_et[0], ec_cleared[0], br[2],
+                                  br_boundary[2], br_et[2], br_cleared[2]);
+  stitch_candidate_pair<IS_GAMMA>(ec[0], ec_boundary[0], ec0_owner_region, ec_et[0], ec_cleared[0], br[3],
+                                  br_boundary[3], br_et[3], br_cleared[3]);
+  stitch_candidate_pair<IS_GAMMA>(ec[0], ec_boundary[0], ec0_owner_region, ec_et[0], ec_cleared[0], br[4],
+                                  br_boundary[4], br_et[4], br_cleared[4]);
+  stitch_candidate_pair<IS_GAMMA>(ec[0], ec_boundary[0], ec0_owner_region, ec_et[0], ec_cleared[0], br[5],
+                                  br_boundary[5], br_et[5], br_cleared[5]);
+
+  stitch_candidate_pair<IS_GAMMA>(ec[1], ec_boundary[1], ec1_owner_region, ec_et[1], ec_cleared[1], br[0],
+                                  br_boundary[0], br_et[0], br_cleared[0]);
+  stitch_candidate_pair<IS_GAMMA>(ec[1], ec_boundary[1], ec1_owner_region, ec_et[1], ec_cleared[1], br[1],
+                                  br_boundary[1], br_et[1], br_cleared[1]);
+  stitch_candidate_pair<IS_GAMMA>(ec[1], ec_boundary[1], ec1_owner_region, ec_et[1], ec_cleared[1], br[2],
+                                  br_boundary[2], br_et[2], br_cleared[2]);
+  stitch_candidate_pair<IS_GAMMA>(ec[1], ec_boundary[1], ec1_owner_region, ec_et[1], ec_cleared[1], br[3],
+                                  br_boundary[3], br_et[3], br_cleared[3]);
+  stitch_candidate_pair<IS_GAMMA>(ec[1], ec_boundary[1], ec1_owner_region, ec_et[1], ec_cleared[1], br[4],
+                                  br_boundary[4], br_et[4], br_cleared[4]);
+  stitch_candidate_pair<IS_GAMMA>(ec[1], ec_boundary[1], ec1_owner_region, ec_et[1], ec_cleared[1], br[5],
+                                  br_boundary[5], br_et[5], br_cleared[5]);
+
+  for (int i = 0; i < 2; ++i) {
+    if (ec_cleared[i] == 1) {
+      clear_gctvar(ec[i]);
+    } else {
+      ec[i].ET = ec_et[i];
+    }
+  }
+
+  for (int i = 0; i < 6; ++i) {
+    if (br_cleared[i] == 1) {
+      clear_gctvar(br[i]);
+    } else {
+      br[i].ET = br_et[i];
+    }
+  }
+}
+
+template <bool IS_GAMMA>
+inline void stitch_boundary_collection(GCTvar objects[N_GCT_OBJECTS], ap_uint<10> endcap_eta, ap_uint<10> barrel_eta) {
+  for (int barrel_group = 0; barrel_group < 3; ++barrel_group) {
+    for (int ec_group = 0; ec_group < 3; ++ec_group) {
+      GCTvar ec[2];
+      GCTvar br[6];
+
+      int ie_base = ec_group * 2;
+      int barrel_base = (barrel_group + 1) * 6;
+
+      for (int i = 0; i < 2; ++i) {
+        ec[i] = objects[ie_base + i];
+      }
+
+      for (int i = 0; i < 6; ++i) {
+        br[i] = objects[barrel_base + i];
+      }
+
+      stitch_boundary_group<IS_GAMMA>(ec, br, endcap_eta, barrel_eta);
+
+      for (int i = 0; i < 2; ++i) {
+        objects[ie_base + i] = ec[i];
+      }
+
+      for (int i = 0; i < 6; ++i) {
+        objects[barrel_base + i] = br[i];
+      }
+    }
+  }
+}
+
+inline void stitch_gamma_collection(GCTvar objects[N_GCT_OBJECTS]) {
+  stitch_boundary_collection<true>(objects, ENDCAP_GAMMA_BOUNDARY_ETA, BARREL_GAMMA_BOUNDARY_ETA);
+}
+
+inline void stitch_had_collection(GCTvar objects[N_GCT_OBJECTS]) {
+  stitch_boundary_collection<false>(objects, ENDCAP_HAD_BOUNDARY_ETA, BARREL_HAD_BOUNDARY_ETA);
 }
 
 inline void updateParams_GCTOutput(GCTvar EGs[N_GCT_OBJECTS],
                                    GCTvar EGIs[N_GCT_OBJECTS],
                                    GCTvar Jets[N_GCT_OBJECTS],
                                    GCTvar Taus[N_GCT_OBJECTS]) {
-  for (int b = 1; b < 4; ++b) {
-    int barrel_base = b * 6;
-
-    for (int ie = 0; ie < 6; ++ie) {
-      for (int ib = 0; ib < 6; ++ib) {
-        int i_ec = ie;
-        int i_br = barrel_base + ib;
-
-        if (is_boundary_endcap_gamma(EGs[i_ec]) && is_boundary_barrel_gamma(EGs[i_br]) &&
-            match_dphi_gamma(EGs[i_ec].Phi, EGs[i_br].Phi)) {
-          stitch_pair_keep_higher_pt(EGs[i_ec], EGs[i_br]);
-        }
-
-        if (is_boundary_endcap_gamma(EGIs[i_ec]) && is_boundary_barrel_gamma(EGIs[i_br]) &&
-            match_dphi_gamma(EGIs[i_ec].Phi, EGIs[i_br].Phi)) {
-          stitch_pair_keep_higher_pt(EGIs[i_ec], EGIs[i_br]);
-        }
-
-        if (is_boundary_endcap_had(Jets[i_ec]) && is_boundary_barrel_had(Jets[i_br]) &&
-            match_dphi_had(Jets[i_ec].Phi, Jets[i_br].Phi)) {
-          stitch_had_pair(Jets[i_ec], Jets[i_br]);
-        }
-
-        if (is_boundary_endcap_had(Taus[i_ec]) && is_boundary_barrel_had(Taus[i_br]) &&
-            match_dphi_had(Taus[i_ec].Phi, Taus[i_br].Phi)) {
-          stitch_had_pair(Taus[i_ec], Taus[i_br]);
-        }
-      }
-    }
-  }
+  stitch_gamma_collection(EGs);
+  stitch_gamma_collection(EGIs);
+  stitch_had_collection(Jets);
+  stitch_had_collection(Taus);
 }
 
 inline void sortGCTVars(GCTvar EGsVars[32],
