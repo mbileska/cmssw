@@ -69,6 +69,13 @@ Phase2L1GCTSumEmulator::Phase2L1GCTSumEmulator(const edm::ParameterSet& iConfig)
   produces<std::vector<uint64_t> >("LinkOut3");
   produces<std::vector<uint64_t> >("LinkOut4");
   produces<std::vector<uint64_t> >("LinkOut5");
+
+  produces<std::vector<uint64_t> >("SumLinkOut0");
+  produces<std::vector<uint64_t> >("SumLinkOut1");
+  produces<std::vector<uint64_t> >("SumLinkOut2");
+  produces<std::vector<uint64_t> >("SumLinkOut3");
+  produces<std::vector<uint64_t> >("SumLinkOut4");
+  produces<std::vector<uint64_t> >("SumLinkOut5");
 }
 
 void Phase2L1GCTSumEmulator::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
@@ -109,10 +116,22 @@ void Phase2L1GCTSumEmulator::produce(edm::Event& iEvent, const edm::EventSetup& 
     link_in_neg[i] = packed;
   }
 
-  p2gctsum::algo_top(link_in_pos.data(), link_out_pos.data());
-  p2gctsum::algo_top(link_in_neg.data(), link_out_neg.data());
+	  p2gctsum::algo_top(link_in_pos.data(), link_out_pos.data());
+	  p2gctsum::algo_top(link_in_neg.data(), link_out_neg.data());
 
-  if (debug_ && iEvent.id().event() == 4) {
+  for (unsigned int i = 0; i < 6; ++i) {
+    ap_uint<576> sumLink = (i < 3) ? link_out_pos[i] : link_out_neg[i - 3];
+    std::unique_ptr<std::vector<uint64_t> > outWords = std::make_unique<std::vector<uint64_t> >();
+    outWords->reserve(9);
+
+    for (unsigned int word = 0; word < 9; ++word) {
+      outWords->push_back((uint64_t)sumLink.range((word * 64) + 63, word * 64));
+    }
+
+    iEvent.put(std::move(outWords), std::string("SumLinkOut") + std::to_string(i));
+  }
+
+	  if (debug_ && iEvent.id().event() == 4) {
     edm::LogVerbatim("Phase2L1GCTSumEmulator") << "EVENT 4 CMSSW SUM OUTPUT";
 
     for (unsigned int row = 0; row < 9; ++row) {
