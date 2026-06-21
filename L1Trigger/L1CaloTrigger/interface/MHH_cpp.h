@@ -603,4 +603,3 @@ void mhh_algo_top(
 }  // namespace p2mhh
 
 #endif
-

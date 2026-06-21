@@ -327,4 +327,3 @@ void bitonicSort32(MHHObject in[MHH_SORT_SIZE], MHHObject out[MHH_SORT_SIZE]) {
 }  // namespace p2mhh
 
 #endif
-
