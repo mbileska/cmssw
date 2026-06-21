@@ -1,5 +1,5 @@
 /*
- * Description: File-backed input producer for Phase 2 GCT SumCard emulator
+ * Description: File-backed input producer for the Phase-2 MHH emulator
  */
 
 #include <algorithm>
@@ -26,8 +26,7 @@
 namespace {
 
 constexpr unsigned int kWordsPerEvent = 9;
-constexpr unsigned int kLinksPerSide = 12;
-constexpr unsigned int kInputLinks = 24;
+constexpr unsigned int kInputLinks = 16;
 
 using LinkWords = std::array<uint64_t, kWordsPerEvent>;
 using EventWords = std::array<LinkWords, kInputLinks>;
@@ -79,15 +78,15 @@ uint64_t parseHexWord64(const std::string& token) {
   return std::stoull(token, nullptr, 16);
 }
 
-std::vector<EventWords> readEvents(const std::string& path, unsigned int posOffset, unsigned int negOffset) {
+std::vector<EventWords> readEvents(const std::string& path, unsigned int payloadOffset) {
   std::ifstream input(path.c_str());
   if (!input.is_open()) {
-    throw cms::Exception("GCTSumFileInputProducer") << "Could not open input vector file: " << path;
+    throw cms::Exception("MHHFileInputProducer") << "Could not open input vector file: " << path;
   }
 
   std::vector<std::array<uint64_t, kInputLinks> > rows;
   std::string line;
-  const unsigned int minColumns = std::max(posOffset + kLinksPerSide, negOffset + kLinksPerSide);
+  const unsigned int minColumns = payloadOffset + kInputLinks;
 
   while (std::getline(input, line)) {
     if (!isDataLine(line)) {
@@ -105,24 +104,24 @@ std::vector<EventWords> readEvents(const std::string& path, unsigned int posOffs
     }
 
     if (tokens.size() < minColumns) {
-      throw cms::Exception("GCTSumFileInputProducer")
-          << "Vector row in " << path << " has " << tokens.size() << " payload columns, expected at least " << minColumns;
+      throw cms::Exception("MHHFileInputProducer")
+          << "Vector row in " << path << " has " << tokens.size() << " payload columns, expected at least "
+          << minColumns;
     }
 
     std::array<uint64_t, kInputLinks> row{};
-    for (unsigned int i = 0; i < kLinksPerSide; ++i) {
-      row[i] = parseHexWord64(tokens[posOffset + i]);
-      row[kLinksPerSide + i] = parseHexWord64(tokens[negOffset + i]);
+    for (unsigned int i = 0; i < kInputLinks; ++i) {
+      row[i] = parseHexWord64(tokens[payloadOffset + i]);
     }
     rows.push_back(row);
   }
 
   if (rows.empty()) {
-    throw cms::Exception("GCTSumFileInputProducer") << "No data rows were found in input vector file: " << path;
+    throw cms::Exception("MHHFileInputProducer") << "No data rows were found in input vector file: " << path;
   }
 
   if ((rows.size() % kWordsPerEvent) != 0) {
-    throw cms::Exception("GCTSumFileInputProducer")
+    throw cms::Exception("MHHFileInputProducer")
         << "Input vector rows (" << rows.size() << ") are not a multiple of " << kWordsPerEvent;
   }
 
@@ -146,10 +145,10 @@ std::vector<EventWords> readEvents(const std::string& path, unsigned int posOffs
 
 }  // namespace
 
-class GCTSumFileInputProducer : public edm::stream::EDProducer<> {
+class MHHFileInputProducer : public edm::stream::EDProducer<> {
 public:
-  explicit GCTSumFileInputProducer(const edm::ParameterSet&);
-  ~GCTSumFileInputProducer() override = default;
+  explicit MHHFileInputProducer(const edm::ParameterSet&);
+  ~MHHFileInputProducer() override = default;
 
   static void fillDescriptions(edm::ConfigurationDescriptions&);
 
@@ -162,10 +161,9 @@ private:
   bool debug_;
 };
 
-GCTSumFileInputProducer::GCTSumFileInputProducer(const edm::ParameterSet& iConfig)
+MHHFileInputProducer::MHHFileInputProducer(const edm::ParameterSet& iConfig)
     : events_(readEvents(iConfig.getParameter<std::string>("inputFile"),
-                         iConfig.getParameter<unsigned int>("posOffset"),
-                         iConfig.getParameter<unsigned int>("negOffset"))),
+                         iConfig.getParameter<unsigned int>("payloadOffset"))),
       eventOffset_(iConfig.getParameter<unsigned int>("eventOffset")),
       wrapAround_(iConfig.getParameter<bool>("wrapAround")),
       debug_(iConfig.getParameter<bool>("debug")) {
@@ -174,47 +172,47 @@ GCTSumFileInputProducer::GCTSumFileInputProducer(const edm::ParameterSet& iConfi
   }
 }
 
-void GCTSumFileInputProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
+void MHHFileInputProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
   (void)iSetup;
 
   if (events_.empty()) {
-    throw cms::Exception("GCTSumFileInputProducer") << "No events were loaded from the configured input file";
+    throw cms::Exception("MHHFileInputProducer") << "No events were loaded from the configured input file";
   }
 
   const unsigned long long eventNumber = iEvent.id().event();
   if (eventNumber == 0) {
-    throw cms::Exception("GCTSumFileInputProducer") << "Expected event numbering to start at 1";
+    throw cms::Exception("MHHFileInputProducer") << "Expected event numbering to start at 1";
   }
 
   std::size_t eventIndex = eventOffset_ + static_cast<std::size_t>(eventNumber - 1ULL);
   if (wrapAround_) {
     eventIndex %= events_.size();
   } else if (eventIndex >= events_.size()) {
-    throw cms::Exception("GCTSumFileInputProducer")
+    throw cms::Exception("MHHFileInputProducer")
         << "Requested event index " << eventIndex << " but only " << events_.size()
         << " events are available in the input file. Set maxEvents accordingly or enable wrapAround.";
   }
 
   if (debug_) {
-    edm::LogVerbatim("GCTSumFileInputProducer")
-        << "Producing GCT Sum file event " << eventIndex << " for edm event " << eventNumber;
+    edm::LogVerbatim("MHHFileInputProducer")
+        << "Producing MHH file event " << eventIndex << " for edm event " << eventNumber;
   }
 
   for (unsigned int link = 0; link < kInputLinks; ++link) {
-    auto out = std::make_unique<std::vector<uint64_t> >(events_[eventIndex][link].begin(), events_[eventIndex][link].end());
+    auto out = std::make_unique<std::vector<uint64_t> >(events_[eventIndex][link].begin(),
+                                                        events_[eventIndex][link].end());
     iEvent.put(std::move(out), std::string("LinkIn") + std::to_string(link));
   }
 }
 
-void GCTSumFileInputProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+void MHHFileInputProducer::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   edm::ParameterSetDescription desc;
   desc.add<std::string>("inputFile", "");
-  desc.add<unsigned int>("posOffset", 0);
-  desc.add<unsigned int>("negOffset", 12);
+  desc.add<unsigned int>("payloadOffset", 0);
   desc.add<unsigned int>("eventOffset", 0);
   desc.add<bool>("wrapAround", false);
   desc.add<bool>("debug", false);
-  descriptions.add("gctSumFileInputProducer", desc);
+  descriptions.add("mhhFileInputProducer", desc);
 }
 
-DEFINE_FWK_MODULE(GCTSumFileInputProducer);
+DEFINE_FWK_MODULE(MHHFileInputProducer);
