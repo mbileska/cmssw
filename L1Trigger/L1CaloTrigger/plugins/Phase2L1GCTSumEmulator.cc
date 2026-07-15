@@ -3,27 +3,23 @@
  * Author: Mila Bileska
  */
 
-// system include files
 #include <ap_int.h>
-#include <array>
-#include <cmath>
-#include <cstdlib>
-#include <iostream>
-#include <fstream>
-#include <memory>
-#include <vector>
-#include <cstdint>
 
-// user include files
-#include "FWCore/Framework/interface/stream/EDProducer.h"
+#include <array>
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <vector>
+
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/EventSetup.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
+#include "FWCore/Framework/interface/stream/EDProducer.h"
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "FWCore/ParameterSet/interface/ConfigurationDescriptions.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/ParameterSet/interface/ParameterSetDescription.h"
-
-#include "FWCore/MessageLogger/interface/MessageLogger.h"
+#include "FWCore/Utilities/interface/Exception.h"
 
 #include "L1Trigger/L1CaloTrigger/interface/GCTSum_h.h"
 #include "L1Trigger/L1CaloTrigger/interface/GCTSum_cpp.h"
@@ -32,9 +28,13 @@
 #include "L1Trigger/L1CaloTrigger/interface/bitonicSort32_GCT_h.h"
 #include "L1Trigger/L1CaloTrigger/interface/bitonicSort32_GCT_cpp.h"
 
-////////////////////////////////////////////////////////////////////////////////
-
-// Declare the Phase2L1GCTSumEmulator class and its methods
+namespace {
+  constexpr unsigned int kWordsPerLink = 9;
+  constexpr unsigned int kSideInputLinks = 12;
+  constexpr unsigned int kSideOutputLinks = 3;
+  constexpr unsigned int kInputLinks = 2 * kSideInputLinks;
+  constexpr unsigned int kOutputLinks = 2 * kSideOutputLinks;
+}  // namespace
 
 class Phase2L1GCTSumEmulator : public edm::stream::EDProducer<> {
 public:
@@ -46,104 +46,89 @@ public:
 private:
   void produce(edm::Event&, const edm::EventSetup&) override;
 
-  std::array<edm::EDGetTokenT<std::vector<uint64_t> >, 24> inputLinkTokens_;
+  std::array<edm::EDGetTokenT<std::vector<uint64_t>>, kInputLinks> inputLinkTokens_;
   bool debug_;
 };
 
-//////////////////////////////////////////////////////////////////
-
 Phase2L1GCTSumEmulator::Phase2L1GCTSumEmulator(const edm::ParameterSet& iConfig)
     : debug_(iConfig.getParameter<bool>("debug")) {
-  const std::vector<edm::InputTag> inputLinks = iConfig.getParameter<std::vector<edm::InputTag> >("inputLinks");
-  if (inputLinks.size() != 24) {
-    throw cms::Exception("Phase2L1GCTSumEmulator") << "Expected exactly 24 input links (12 positive eta + 12 negative eta)";
+  const auto inputLinks = iConfig.getParameter<std::vector<edm::InputTag>>("inputLinks");
+  if (inputLinks.size() != inputLinkTokens_.size()) {
+    throw cms::Exception("Phase2L1GCTSumEmulator")
+        << "Expected exactly " << inputLinkTokens_.size() << " input links (12 positive eta + 12 negative eta)";
   }
 
-  for (unsigned int i = 0; i < 24; ++i) {
-    inputLinkTokens_[i] = consumes<std::vector<uint64_t> >(inputLinks[i]);
+  for (unsigned int i = 0; i < inputLinkTokens_.size(); ++i) {
+    inputLinkTokens_[i] = consumes<std::vector<uint64_t>>(inputLinks[i]);
   }
 
-  produces<std::vector<uint64_t> >("LinkOut0");
-  produces<std::vector<uint64_t> >("LinkOut1");
-  produces<std::vector<uint64_t> >("LinkOut2");
-  produces<std::vector<uint64_t> >("LinkOut3");
-  produces<std::vector<uint64_t> >("LinkOut4");
-  produces<std::vector<uint64_t> >("LinkOut5");
-
-  produces<std::vector<uint64_t> >("SumLinkOut0");
-  produces<std::vector<uint64_t> >("SumLinkOut1");
-  produces<std::vector<uint64_t> >("SumLinkOut2");
-  produces<std::vector<uint64_t> >("SumLinkOut3");
-  produces<std::vector<uint64_t> >("SumLinkOut4");
-  produces<std::vector<uint64_t> >("SumLinkOut5");
+  for (unsigned int i = 0; i < kOutputLinks; ++i) {
+    produces<std::vector<uint64_t>>(std::string("LinkOut") + std::to_string(i));
+    produces<std::vector<uint64_t>>(std::string("SumLinkOut") + std::to_string(i));
+  }
 }
 
 void Phase2L1GCTSumEmulator::produce(edm::Event& iEvent, const edm::EventSetup& iSetup) {
-  using namespace edm;
-
   (void)iSetup;
 
-  std::array<ap_uint<576>, 12> link_in_pos;
-  std::array<ap_uint<576>, 12> link_in_neg;
-  std::array<ap_uint<576>, 3> link_out_pos;
-  std::array<ap_uint<576>, 3> link_out_neg;
-  std::array<ap_uint<576>, 6> link_in_gt;
-  std::array<ap_uint<576>, 6> link_out_gt;
+  std::array<ap_uint<576>, kSideInputLinks> link_in_pos{};
+  std::array<ap_uint<576>, kSideInputLinks> link_in_neg{};
+  std::array<ap_uint<576>, kSideOutputLinks> link_out_pos{};
+  std::array<ap_uint<576>, kSideOutputLinks> link_out_neg{};
+  std::array<ap_uint<576>, kOutputLinks> link_in_gt{};
+  std::array<ap_uint<576>, kOutputLinks> link_out_gt{};
 
-  for (unsigned int i = 0; i < 12; ++i) {
-    edm::Handle<std::vector<uint64_t> > handle;
+  for (unsigned int i = 0; i < kSideInputLinks; ++i) {
+    edm::Handle<std::vector<uint64_t>> handle;
     iEvent.getByToken(inputLinkTokens_[i], handle);
+    if (!handle.isValid()) {
+      throw cms::Exception("Phase2L1GCTSumEmulator") << "GCTSum positive-eta input link " << i << " is missing";
+    }
+    if (handle->size() != kWordsPerLink) {
+      throw cms::Exception("Phase2L1GCTSumEmulator")
+          << "GCTSum positive-eta input link " << i << " has " << handle->size() << " words; expected "
+          << kWordsPerLink;
+    }
 
     ap_uint<576> packed = 0;
-    if (handle.isValid()) {
-      for (unsigned int word = 0; word < handle->size() && word < 9; ++word) {
-        packed.range((word * 64) + 63, word * 64) = (*handle)[word];
-      }
+    for (unsigned int word = 0; word < kWordsPerLink; ++word) {
+      packed.range((word * 64) + 63, word * 64) = (*handle)[word];
     }
     link_in_pos[i] = packed;
   }
 
-  for (unsigned int i = 0; i < 12; ++i) {
-    edm::Handle<std::vector<uint64_t> > handle;
-    iEvent.getByToken(inputLinkTokens_[12 + i], handle);
+  for (unsigned int i = 0; i < kSideInputLinks; ++i) {
+    edm::Handle<std::vector<uint64_t>> handle;
+    iEvent.getByToken(inputLinkTokens_[kSideInputLinks + i], handle);
+    if (!handle.isValid()) {
+      throw cms::Exception("Phase2L1GCTSumEmulator") << "GCTSum negative-eta input link " << i << " is missing";
+    }
+    if (handle->size() != kWordsPerLink) {
+      throw cms::Exception("Phase2L1GCTSumEmulator")
+          << "GCTSum negative-eta input link " << i << " has " << handle->size() << " words; expected "
+          << kWordsPerLink;
+    }
 
     ap_uint<576> packed = 0;
-    if (handle.isValid()) {
-      for (unsigned int word = 0; word < handle->size() && word < 9; ++word) {
-        packed.range((word * 64) + 63, word * 64) = (*handle)[word];
-      }
+    for (unsigned int word = 0; word < kWordsPerLink; ++word) {
+      packed.range((word * 64) + 63, word * 64) = (*handle)[word];
     }
     link_in_neg[i] = packed;
   }
 
-	  p2gctsum::algo_top(link_in_pos.data(), link_out_pos.data());
-	  p2gctsum::algo_top(link_in_neg.data(), link_out_neg.data());
+  p2gctsum::algo_top(link_in_pos.data(), link_out_pos.data());
+  p2gctsum::algo_top(link_in_neg.data(), link_out_neg.data());
 
-  for (unsigned int i = 0; i < 6; ++i) {
-    ap_uint<576> sumLink = (i < 3) ? link_out_pos[i] : link_out_neg[i - 3];
-    std::unique_ptr<std::vector<uint64_t> > outWords = std::make_unique<std::vector<uint64_t> >();
-    outWords->reserve(9);
+  for (unsigned int i = 0; i < kOutputLinks; ++i) {
+    const ap_uint<576> sumLink = (i < kSideOutputLinks) ? link_out_pos[i] : link_out_neg[i - kSideOutputLinks];
+    auto outWords = std::make_unique<std::vector<uint64_t>>();
+    outWords->reserve(kWordsPerLink);
 
-    for (unsigned int word = 0; word < 9; ++word) {
-      outWords->push_back((uint64_t)sumLink.range((word * 64) + 63, word * 64));
+    for (unsigned int word = 0; word < kWordsPerLink; ++word) {
+      outWords->push_back(sumLink.range((word * 64) + 63, word * 64).to_uint64());
     }
 
     iEvent.put(std::move(outWords), std::string("SumLinkOut") + std::to_string(i));
-  }
-
-	  if (debug_ && iEvent.id().event() == 4) {
-    edm::LogVerbatim("Phase2L1GCTSumEmulator") << "EVENT 4 CMSSW SUM OUTPUT";
-
-    for (unsigned int row = 0; row < 9; ++row) {
-      edm::LogVerbatim("Phase2L1GCTSumEmulator")
-          << "row " << row
-          << "  pos0=0x" << std::hex << (uint64_t)link_out_pos[0].range(row * 64 + 63, row * 64).to_uint64()
-          << "  pos1=0x" << std::hex << (uint64_t)link_out_pos[1].range(row * 64 + 63, row * 64).to_uint64()
-          << "  pos2=0x" << std::hex << (uint64_t)link_out_pos[2].range(row * 64 + 63, row * 64).to_uint64()
-          << "  neg0=0x" << std::hex << (uint64_t)link_out_neg[0].range(row * 64 + 63, row * 64).to_uint64()
-          << "  neg1=0x" << std::hex << (uint64_t)link_out_neg[1].range(row * 64 + 63, row * 64).to_uint64()
-          << "  neg2=0x" << std::hex << (uint64_t)link_out_neg[2].range(row * 64 + 63, row * 64).to_uint64();
-    }
   }
 
   link_in_gt[0] = link_out_pos[0];
@@ -155,16 +140,17 @@ void Phase2L1GCTSumEmulator::produce(edm::Event& iEvent, const edm::EventSetup& 
 
   p2gctsumGT::algo_top_GT(link_in_gt.data(), link_out_gt.data());
 
-  for (unsigned int i = 0; i < 6; ++i) {
-    std::unique_ptr<std::vector<uint64_t> > outWords = std::make_unique<std::vector<uint64_t> >();
-    outWords->reserve(9);
+  for (unsigned int i = 0; i < kOutputLinks; ++i) {
+    auto outWords = std::make_unique<std::vector<uint64_t>>();
+    outWords->reserve(kWordsPerLink);
 
-    for (unsigned int word = 0; word < 9; ++word) {
-      outWords->push_back((uint64_t)link_out_gt[i].range((word * 64) + 63, word * 64));
+    for (unsigned int word = 0; word < kWordsPerLink; ++word) {
+      outWords->push_back(link_out_gt[i].range((word * 64) + 63, word * 64).to_uint64());
     }
 
     if (debug_) {
-      edm::LogVerbatim("Phase2L1GCTSumEmulator") << "Output Link " << i << " has " << outWords->size() << " 64b words";
+      edm::LogVerbatim("Phase2L1GCTSumEmulator") << "Output link " << i << " contains " << outWords->size()
+                                                  << " words";
     }
 
     iEvent.put(std::move(outWords), std::string("LinkOut") + std::to_string(i));
@@ -173,9 +159,9 @@ void Phase2L1GCTSumEmulator::produce(edm::Event& iEvent, const edm::EventSetup& 
 
 void Phase2L1GCTSumEmulator::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   edm::ParameterSetDescription desc;
-  desc.add<std::vector<edm::InputTag> >("inputLinks", std::vector<edm::InputTag>());
+  desc.add<std::vector<edm::InputTag>>("inputLinks", std::vector<edm::InputTag>());
   desc.add<bool>("debug", false);
-  descriptions.add("phase2L1GCTSumEmulator", desc);
+  descriptions.add("l1tPhase2L1GCTSumEmulator", desc);
 }
 
 DEFINE_FWK_MODULE(Phase2L1GCTSumEmulator);

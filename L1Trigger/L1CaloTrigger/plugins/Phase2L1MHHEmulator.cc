@@ -93,7 +93,7 @@ void Phase2L1MHHEmulator::fillDescriptions(edm::ConfigurationDescriptions& descr
   edm::ParameterSetDescription description;
   description.add<std::vector<edm::InputTag>>("inputLinks", std::vector<edm::InputTag>());
   description.add<bool>("debug", false);
-  descriptions.add("phase2L1MHHEmulator", description);
+  descriptions.add("l1tPhase2L1MHHEmulator", description);
 }
 
 DEFINE_FWK_MODULE(Phase2L1MHHEmulator);
