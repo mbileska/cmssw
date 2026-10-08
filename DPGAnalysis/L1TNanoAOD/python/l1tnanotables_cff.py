@@ -66,13 +66,19 @@ l1EmulCaloClusterTable = cms.EDProducer("SimpleTriggerL1CaloClusterFlatTableProd
                                         )
 )
 
+# AXO emulated score
+l1EmulAXOTable = cms.EDProducer("AXOL1TLScoreTableProducer",
+    src  = cms.InputTag("simGtStage2Digis", "AXOScore"),
+    name = cms.string("L1AXO"),
+)
+
 
 
 l1CaloTPsNanoTask = cms.Task(l1CaloTPTable)
 l1CaloLayer1NanoTask = cms.Task(l1CaloTowerTable)
 l1EmulCaloTPsNanoTask = cms.Task(l1EmulCaloTPTable)
 l1EmulCaloLayer1NanoTask = cms.Task(l1EmulCaloTowerTable,l1EmulCaloClusterTable)
-
+l1EmulAXONanoTask = cms.Task(l1EmulAXOTable)
 
 #Now L1 emulated objects 
 #Cloning the L1 object tables producers used for central NANO (unpacked objects)

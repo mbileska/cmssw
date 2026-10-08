@@ -1,0 +1,90 @@
+=== ggXToYY_m18 ===
+
+=== GluGluHToBB ===
+/GluGluHToBB_M-125_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer23BPixDRPremix-130X_mcRun3_2023_realistic_postBPix_v2-v2/GEN-SIM-RAW
+/GluGluHToBB_M-125_TuneCP5_13p6TeV_powheg-pythia8/Run3Winter23Digi-GTv3Digi_126X_mcRun3_2023_forPU65_v3-v2/GEN-SIM-RAW
+
+=== HTo2LL4b_1000_450_10000 ===
+/HTo2LongLivedTo4b_MH-1000_MFF-450_CTau-10000mm_TuneCP5_13p6TeV-pythia8/Run3Summer23BPixDRPremix-130X_mcRun3_2023_realistic_postBPix_v2-v2/GEN-SIM-RAW
+/HTo2LongLivedTo4b_MH-1000_MFF-450_CTau-10000mm_TuneCP5_13p6TeV_pythia8/Run3Summer23BPixDRPremix-130X_mcRun3_2023_realistic_postBPix_v2-v2/GEN-SIM-RAW
+
+=== HTo2LL4b_125_50_3000 ===
+/HTo2LongLivedTo4b_MH-125_MFF-50_CTau-3000mm_TuneCP5_13p6TeV-pythia8/Run3Summer23BPixDRPremix-130X_mcRun3_2023_realistic_postBPix_v2-v2/GEN-SIM-RAW
+/HTo2LongLivedTo4b_MH-125_MFF-50_CTau-3000mm_TuneCP5_13p6TeV_pythia8/Run3Summer23BPixDRPremix-130X_mcRun3_2023_realistic_postBPix_v2-v2/GEN-SIM-RAW
+
+=== GluGluHToGG_125 ===
+/GluGluHToGG_M-125_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer23BPixDRPremix-130X_mcRun3_2023_realistic_postBPix_v6-v2/GEN-SIM-RAW
+
+=== VBFHToInvisible ===
+/VBFHToInvisible_M-125_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer23BPixDRPremix-130X_mcRun3_2023_realistic_postBPix_v6-v2/GEN-SIM-RAW
+/VBFHToInvisible_M-125_TuneCP5_13p6TeV_powheg-pythia8/Run3Winter23Digi-GTv3Digi_126X_mcRun3_2023_forPU65_v3-v2/GEN-SIM-RAW
+
+=== HTo2LL4b_1000_450_100000 ===
+/HTo2LongLivedTo4b_MH-1000_MFF-450_CTau-100000mm_TuneCP5_13p6TeV-pythia8/Run3Summer23BPixDRPremix-130X_mcRun3_2023_realistic_postBPix_v2-v2/GEN-SIM-RAW
+/HTo2LongLivedTo4b_MH-1000_MFF-450_CTau-100000mm_TuneCP5_13p6TeV_pythia8/Run3Summer23BPixDRPremix-130X_mcRun3_2023_realistic_postBPix_v2-v2/GEN-SIM-RAW
+
+=== ggXToJpsiJpsi ===
+
+=== VBFHToTauTau ===
+/VBFHToTauTau_M125_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer23BPixDRPremix-130X_mcRun3_2023_realistic_postBPix_v2-v2/GEN-SIM-RAW
+/VBFHToTauTau_M125_TuneCP5_13p6TeV_powheg-pythia8/Run3Winter23Digi-GTv3Digi_126X_mcRun3_2023_forPU65_v3-v2/GEN-SIM-RAW
+
+=== HTo2LL4b_125_25_1500 ===
+/HTo2LongLivedTo4b_MH-125_MFF-25_CTau-1500mm_TuneCP5_13p6TeV-pythia8/Run3Summer23BPixDRPremix-130X_mcRun3_2023_realistic_postBPix_v2-v2/GEN-SIM-RAW
+/HTo2LongLivedTo4b_MH-125_MFF-25_CTau-1500mm_TuneCP5_13p6TeV_pythia8/Run3Summer23BPixDRPremix-130X_mcRun3_2023_realistic_postBPix_v2-v2/GEN-SIM-RAW
+
+=== SMS_Higgsino ===
+/SMS-Higgsino_mN2-170_mC1-160_mN1-150_HT-60_TuneCP5_13p6TeV_pythia8/Run3Summer23BPixDRPremix-130X_mcRun3_2023_realistic_postBPix_v2-v2/GEN-SIM-RAW
+/SMS-Higgsino_mN2-170_mC1-160_mN1-150_HT60_TuneCP5_13p6TeV-pythia8/Run3Summer23BPixDRPremix-130X_mcRun3_2023_realistic_postBPix_v2-v2/GEN-SIM-RAW
+
+=== GluGluHHto2B2W ===
+
+=== WToTauTo3Mu ===
+/WToTauTo3Mu_TuneCP5_13p6TeV_pythia8/Run3Summer23BPixDRPremix-130X_mcRun3_2023_realistic_postBPix_v2-v2/GEN-SIM-RAW
+
+=== ggXToYY_m26 ===
+
+=== GluGluHToTauTau ===
+/GluGluHToTauTau_M-125_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer23BPixDRPremix-130X_mcRun3_2023_realistic_postBPix_v2-v2/GEN-SIM-RAW
+/GluGluHToTauTau_M-125_TuneCP5_13p6TeV_powheg-pythia8/Run3Winter23Digi-GTv3Digi_126X_mcRun3_2023_forPU65_v3-v2/GEN-SIM-RAW
+
+=== ttHto2C ===
+/ttHto2C_M-125_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer23BPixDRPremix-130X_mcRun3_2023_realistic_postBPix_v2-v2/GEN-SIM-RAW
+/ttHto2C_M-125_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer23DRPremix-130X_mcRun3_2023_realistic_v14-v2/GEN-SIM-RAW
+
+=== ttHto2B ===
+/ttHto2B_M-125_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer23BPixDRPremix-130X_mcRun3_2023_realistic_postBPix_v2-v2/GEN-SIM-RAW
+/ttHto2B_M-125_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer23DRPremix-130X_mcRun3_2023_realistic_v14-v2/GEN-SIM-RAW
+
+=== VBFHToCC ===
+/VBFHToCC_M-125_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer23BPixDRPremix-130X_mcRun3_2023_realistic_postBPix_v6-v2/GEN-SIM-RAW
+
+=== HTo2LL4b_125_12_900 ===
+/HTo2LongLivedTo4b_MH-125_MFF-12_CTau-900mm_TuneCP5_13p6TeV-pythia8/Run3Summer23BPixDRPremix-130X_mcRun3_2023_realistic_postBPix_v2-v2/GEN-SIM-RAW
+/HTo2LongLivedTo4b_MH-125_MFF-12_CTau-900mm_TuneCP5_13p6TeV_pythia8/Run3Summer23BPixDRPremix-130X_mcRun3_2023_realistic_postBPix_v2-v2/GEN-SIM-RAW
+
+=== SUSYGGtoBBH_1200 ===
+/SUSYGluGluToBBHToBB_NarrowWidth_M-1200_TuneCP5_13p6TeV-pythia8/Run3Summer23BPixDRPremix-130X_mcRun3_2023_realistic_postBPix_v2-v2/GEN-SIM-RAW
+/SUSYGluGluToBBHToBB_NarrowWidth_M-1200_TuneCP5_13p6TeV_pythia8/Run3Summer23BPixDRPremix-130X_mcRun3_2023_realistic_postBPix_v2-v2/GEN-SIM-RAW
+
+=== HHHTo6B ===
+/HHHTo6B_c3_0_d4_0_TuneCP5_13p6TeV_amcatnlo-pythia8/Run3Summer23BPixDRPremix-130X_mcRun3_2023_realistic_postBPix_v2-v2/GEN-SIM-RAW
+/HHHTo6B_c3_0_d4_0_TuneCP5_13p6TeV_amcatnlo-pythia8/Run3Summer23DRPremix-130X_mcRun3_2023_realistic_v14-v2/GEN-SIM-RAW
+
+=== SUSYGGtoBBH_600 ===
+/SUSYGluGluToBBHToBB_NarrowWidth_M-600_TuneCP5_13p6TeV-pythia8/Run3Summer23BPixDRPremix-130X_mcRun3_2023_realistic_postBPix_v2-v2/GEN-SIM-RAW
+/SUSYGluGluToBBHToBB_NarrowWidth_M-600_TuneCP5_13p6TeV_pythia8/Run3Summer23BPixDRPremix-130X_mcRun3_2023_realistic_postBPix_v2-v2/GEN-SIM-RAW
+
+=== SUSYGGtoBBH_120 ===
+/SUSYGluGluToBBHToBB_NarrowWidth_M-1200_TuneCP5_13p6TeV-pythia8/Run3Summer23BPixDRPremix-130X_mcRun3_2023_realistic_postBPix_v2-v2/GEN-SIM-RAW
+/SUSYGluGluToBBHToBB_NarrowWidth_M-1200_TuneCP5_13p6TeV_pythia8/Run3Summer23BPixDRPremix-130X_mcRun3_2023_realistic_postBPix_v2-v2/GEN-SIM-RAW
+/SUSYGluGluToBBHToBB_NarrowWidth_M-120_TuneCP5_13p6TeV-pythia8/Run3Summer23BPixDRPremix-130X_mcRun3_2023_realistic_postBPix_v2-v2/GEN-SIM-RAW
+/SUSYGluGluToBBHToBB_NarrowWidth_M-120_TuneCP5_13p6TeV_pythia8/Run3Summer23BPixDRPremix-130X_mcRun3_2023_realistic_postBPix_v2-v2/GEN-SIM-RAW
+
+=== SUSYGGtoBBH_350 ===
+/SUSYGluGluToBBHToBB_NarrowWidth_M-350_TuneCP5_13p6TeV-pythia8/Run3Summer23BPixDRPremix-130X_mcRun3_2023_realistic_postBPix_v2-v2/GEN-SIM-RAW
+/SUSYGluGluToBBHToBB_NarrowWidth_M-350_TuneCP5_13p6TeV_pythia8/Run3Summer23BPixDRPremix-130X_mcRun3_2023_realistic_postBPix_v2-v2/GEN-SIM-RAW
+
+=== GluGluHToGG_90 ===
+/GluGluHToGG_M-90_TuneCP5_13p6TeV_powheg-pythia8/Run3Summer23BPixDRPremix-130X_mcRun3_2023_realistic_postBPix_v6-v2/GEN-SIM-RAW
+

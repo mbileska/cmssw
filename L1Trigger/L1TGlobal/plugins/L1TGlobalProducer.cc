@@ -75,7 +75,7 @@ void L1TGlobalProducer::fillDescriptions(edm::ConfigurationDescriptions& descrip
   desc.add<bool>("useMuonShowers", false);
 
   //switch for saving AXO score
-  desc.add<bool>("produceAXOL1TLScore", false);
+  desc.add<bool>("produceAXOL1TLScore", true);
 
   // disables resetting the prescale counters each lumisection (needed for offline)
   //  originally, the L1T firmware applied the reset of prescale counters at the end of every LS;
@@ -426,6 +426,8 @@ void L1TGlobalProducer::beginRun(edm::Run const& iRun, const edm::EventSetup& ev
 */
 
   // initialise Trigger Conditions
+  m_uGtBrd->enableAXOScoreSaving(m_produceAXOL1TLScore);
+  
   m_uGtBrd->initTriggerConditions(evSetup, m_l1GtMenu.get(), m_nrL1Mu, m_nrL1MuShower, m_nrL1EG, m_nrL1Tau, m_nrL1Jet);
 }
 
@@ -530,7 +532,8 @@ void L1TGlobalProducer::produce(edm::Event& iEvent, const edm::EventSetup& evSet
 
   std::unique_ptr<AXOL1TLScoreBxCollection> uGtAXOScoreRecord(nullptr);
   if (m_produceAXOL1TLScore) {
-    uGtAXOScoreRecord = std::make_unique<AXOL1TLScoreBxCollection>();
+    // uGtAXOScoreRecord = std::make_unique<AXOL1TLScoreBxCollection>();
+    uGtAXOScoreRecord = std::make_unique<AXOL1TLScoreBxCollection>(0, minEmulBxInEvent, maxEmulBxInEvent);
   }
 
   // fill the boards not depending on the BxInEvent in the L1 GT DAQ record
@@ -604,7 +607,7 @@ void L1TGlobalProducer::produce(edm::Event& iEvent, const edm::EventSetup& evSet
     m_uGtBrd->receiveMuonShowerObjectData(iEvent, m_muShowerInputToken, receiveMuShower, m_nrL1MuShower);
 
   //tell board to save axo scores when running GTL
-  m_uGtBrd->enableAXOScoreSaving(m_produceAXOL1TLScore);
+  // m_uGtBrd->enableAXOScoreSaving(m_produceAXOL1TLScore);
 
   m_uGtBrd->receiveExternalData(iEvent, m_extInputToken, receiveExt);
 

@@ -1,0 +1,58 @@
+=== ggXToYY_m18 ===
+
+=== GluGluHToBB ===
+/GluGluHToBB_M-125_TuneCP5_13p6TeV_powheg-pythia8/Run3Winter24Digi-133X_mcRun3_2024_realistic_v8-v2/GEN-SIM-RAW
+
+=== HTo2LL4b_1000_450_10000 ===
+
+=== HTo2LL4b_125_50_3000 ===
+
+=== GluGluHToGG_125 ===
+/GluGluHToGG_M-125_TuneCP5_13p6TeV_powheg-pythia8/Run3Winter24Digi-133X_mcRun3_2024_realistic_v9-v2/GEN-SIM-RAW
+
+=== VBFHToInvisible ===
+
+=== HTo2LL4b_1000_450_100000 ===
+
+=== ggXToJpsiJpsi ===
+
+=== VBFHToTauTau ===
+/VBFHToTauTau_M125_TuneCP5_13p6TeV_powheg-pythia8/Run3Winter24Digi-133X_mcRun3_2024_realistic_v8-v2/GEN-SIM-RAW
+
+=== HTo2LL4b_125_25_1500 ===
+
+=== SMS_Higgsino ===
+
+=== GluGluHHto2B2W ===
+
+=== WToTauTo3Mu ===
+
+=== ggXToYY_m26 ===
+
+=== GluGluHToTauTau ===
+/GluGluHToTauTau_M-125_TuneCP5_13p6TeV_powheg-pythia8/Run3Winter24Digi-133X_mcRun3_2024_realistic_v8-v2/GEN-SIM-RAW
+
+=== ttHto2C ===
+/ttHto2C_M-125_TuneCP5_13p6TeV_powheg-pythia8/Run3Winter24Digi-133X_mcRun3_2024_realistic_v8-v2/GEN-SIM-RAW
+
+=== ttHto2B ===
+/ttHto2B_M-125_TuneCP5_13p6TeV_powheg-pythia8/Run3Winter24Digi-133X_mcRun3_2024_realistic_v8-v2/GEN-SIM-RAW
+
+=== VBFHToCC ===
+/VBFHToCC_M-125_TuneCP5_13p6TeV_powheg-pythia8/Run3Winter24Digi-133X_mcRun3_2024_realistic_v9-v3/GEN-SIM-RAW
+
+=== HTo2LL4b_125_12_900 ===
+/HTo2LongLivedTo4b_MH-125_MFF-12_CTau-900mm_TuneCP5_13p6TeV_pythia8/Run3Winter24Digi-133X_mcRun3_2024_realistic_v8-v2/GEN-SIM-RAW
+
+=== SUSYGGtoBBH_1200 ===
+
+=== HHHTo6B ===
+
+=== SUSYGGtoBBH_600 ===
+
+=== SUSYGGtoBBH_120 ===
+
+=== SUSYGGtoBBH_350 ===
+
+=== GluGluHToGG_90 ===
+

@@ -645,7 +645,7 @@ void l1t::GlobalBoard::initTriggerConditions(const edm::EventSetup& evSetup,
           theCondition = std::make_unique<AXOL1TLCondition>(itCond.second, this);
           theCondition->setVerbosity(m_verbosity);
 
-          if (m_saveAXOScore and not m_axoScoreConditionName.empty()) {
+          if (m_saveAXOScore && m_axoScoreConditionName.empty()) {
             m_axoScoreConditionName = itCond.first;
           }
 
@@ -1175,7 +1175,7 @@ void l1t::GlobalBoard::reset() {
   //reset AXO score
   m_storedAXOScore = -999.f;
   m_uGtAXOScore.reset();
-  m_axoScoreConditionName = "";
+  // m_axoScoreConditionName = "";
 
   m_gtlDecisionWord.reset();
   m_gtlAlgorithmOR.reset();

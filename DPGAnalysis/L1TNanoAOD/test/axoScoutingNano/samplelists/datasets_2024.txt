@@ -1,0 +1,8 @@
+/GluGluHToBB_M-125_TuneCP5_13p6TeV_powheg-pythia8/Run3Winter24Digi-133X_mcRun3_2024_realistic_v8-v2/GEN-SIM-RAW
+/GluGluHToGG_M-125_TuneCP5_13p6TeV_powheg-pythia8/Run3Winter24Digi-133X_mcRun3_2024_realistic_v9-v2/GEN-SIM-RAW
+/GluGluHToTauTau_M-125_TuneCP5_13p6TeV_powheg-pythia8/Run3Winter24Digi-133X_mcRun3_2024_realistic_v8-v2/GEN-SIM-RAW
+/VBFHToTauTau_M125_TuneCP5_13p6TeV_powheg-pythia8/Run3Winter24Digi-133X_mcRun3_2024_realistic_v8-v2/GEN-SIM-RAW
+/VBFHToCC_M-125_TuneCP5_13p6TeV_powheg-pythia8/Run3Winter24Digi-133X_mcRun3_2024_realistic_v9-v3/GEN-SIM-RAW
+/ttHto2B_M-125_TuneCP5_13p6TeV_powheg-pythia8/Run3Winter24Digi-133X_mcRun3_2024_realistic_v8-v2/GEN-SIM-RAW
+/ttHto2C_M-125_TuneCP5_13p6TeV_powheg-pythia8/Run3Winter24Digi-133X_mcRun3_2024_realistic_v8-v2/GEN-SIM-RAW
+/HTo2LongLivedTo4b_MH-125_MFF-12_CTau-900mm_TuneCP5_13p6TeV_pythia8/Run3Winter24Digi-133X_mcRun3_2024_realistic_v8-v2/GEN-SIM-RAW

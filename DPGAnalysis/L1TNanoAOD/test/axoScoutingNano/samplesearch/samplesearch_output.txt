@@ -1,0 +1,65 @@
+Searching for ggXToYY_m18: /ggXToYYTo2Mu2E_m18*/Run3Winter25Digi*/GEN-SIM-RAW
+  NOT FOUND
+Searching for GluGluHToBB: /GluGluHToBB_M-125*/Run3Winter25Digi*/GEN-SIM-RAW
+  NOT FOUND
+Searching for HTo2LL4b_1000_450_10000: /HTo2LongLivedTo4b_MH-1000_MFF-450_CTau-10000mm*/Run3Winter25Digi*/GEN-SIM-RAW
+  NOT FOUND
+Searching for HTo2LL4b_125_50_3000: /HTo2LongLivedTo4b_MH-125_MFF-50_CTau-3000mm*/Run3Winter25Digi*/GEN-SIM-RAW
+  NOT FOUND
+Searching for GluGluHToGG_125: /GluGluHToGG_M-125*/Run3Winter25Digi*/GEN-SIM-RAW
+  NOT FOUND
+Searching for VBFHToInvisible: /VBFHToInvisible*/Run3Winter25Digi*/GEN-SIM-RAW
+  NOT FOUND
+Searching for HTo2LL4b_1000_450_100000: /HTo2LongLivedTo4b_MH-1000_MFF-450_CTau-100000mm*/Run3Winter25Digi*/GEN-SIM-RAW
+  NOT FOUND
+Searching for ggXToJpsiJpsi: /ggXToJpsiJpsiTo2Mu2E_m7*/Run3Winter25Digi*/GEN-SIM-RAW
+  NOT FOUND
+Searching for VBFHToTauTau: /VBFHToTauTau*/Run3Winter25Digi*/GEN-SIM-RAW
+  NOT FOUND
+Searching for HTo2LL4b_125_25_1500: /HTo2LongLivedTo4b_MH-125_MFF-25_CTau-1500mm*/Run3Winter25Digi*/GEN-SIM-RAW
+  NOT FOUND
+Searching for SMS_Higgsino: /SMS-Higgsino*/Run3Winter25Digi*/GEN-SIM-RAW
+  NOT FOUND
+Searching for VBFHto2B: /VBFHto2B*/Run3Winter25Digi*/GEN-SIM-RAW
+  Found: /VBFHto2B_Par-MH-125_TuneCP5_13p6TeV_powheg-pythia8/Run3Winter25Digi-142X_mcRun3_2025_realistic_v7-v2/GEN-SIM-RAW
+  Files: 355
+Searching for GluGluHHto2B2W: /GluGluHHto2B2WtoLNu2Q*/Run3Winter25Digi*/GEN-SIM-RAW
+  NOT FOUND
+Searching for WToTauTo3Mu: /WToTauTo3Mu*/Run3Winter25Digi*/GEN-SIM-RAW
+  NOT FOUND
+Searching for WJets: /WJetsToLNu_TuneCP5_13p6TeV_madgraphMLM-pythia8/Run3Winter25Digi-142X_mcRun3_2025_realistic_v7*/GEN-SIM-RAW
+  Found: /WJetsToLNu_TuneCP5_13p6TeV_madgraphMLM-pythia8/Run3Winter25Digi-142X_mcRun3_2025_realistic_v7-v2/GEN-SIM-RAW
+  Files: 20265
+Searching for ggXToYY_m26: /ggXToYYTo2Mu2E_m26*/Run3Winter25Digi*/GEN-SIM-RAW
+  NOT FOUND
+Searching for GluGluHToTauTau: /GluGluHToTauTau*/Run3Winter25Digi*/GEN-SIM-RAW
+  NOT FOUND
+Searching for ttHto2C: /ttHto2C*/Run3Winter25Digi*/GEN-SIM-RAW
+  NOT FOUND
+Searching for ttHto2B: /ttHto2B*/Run3Winter25Digi*/GEN-SIM-RAW
+  NOT FOUND
+Searching for VBFHToCC: /VBFHToCC*/Run3Winter25Digi*/GEN-SIM-RAW
+  NOT FOUND
+Searching for HTo2LL4b_125_12_900: /HTo2LongLivedTo4b_MH-125_MFF-12_CTau-900mm*/Run3Winter25Digi*/GEN-SIM-RAW
+  NOT FOUND
+Searching for DY: /DYto2L-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/Run3Winter25Digi-142X_mcRun3_2025_realistic_v7*/GEN-SIM-RAW
+  Found: /DYto2L-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/Run3Winter25Digi-142X_mcRun3_2025_realistic_v7-v2/GEN-SIM-RAW
+  Files: 50289
+Searching for SUSYGGtoBBH_1200: /SUSYGluGluToBBHToBB_NarrowWidth_M-1200*/Run3Winter25Digi*/GEN-SIM-RAW
+  NOT FOUND
+Searching for HHHTo6B: /HHHTo6B*/Run3Winter25Digi*/GEN-SIM-RAW
+  NOT FOUND
+Searching for SUSYGGtoBBH_600: /SUSYGluGluToBBHToBB_NarrowWidth_M-600*/Run3Winter25Digi*/GEN-SIM-RAW
+  NOT FOUND
+Searching for SUSYGGtoBBH_120: /SUSYGluGluToBBHToBB_NarrowWidth_M-120*/Run3Winter25Digi*/GEN-SIM-RAW
+  NOT FOUND
+Searching for HHHto4B2Tau: /HHHto4B2Tau*/Run3Winter25Digi*/GEN-SIM-RAW
+  Found: /HHHto4B2Tau_Par-c3-0-d4-0_TuneCP5_13p6TeV_amcatnlo-pythia8/Run3Winter25Digi-142X_mcRun3_2025_realistic_v7-v2/GEN-SIM-RAW
+  Files: 3776
+Searching for SUSYGGtoBBH_350: /SUSYGluGluToBBHToBB_NarrowWidth_M-350*/Run3Winter25Digi*/GEN-SIM-RAW
+  NOT FOUND
+Searching for TT: /TT_TuneCP5_13p6TeV_powheg-pythia8/Run3Winter25Digi-142X_mcRun3_2025_realistic_v7*/GEN-SIM-RAW
+  Found: /TT_TuneCP5_13p6TeV_powheg-pythia8/Run3Winter25Digi-142X_mcRun3_2025_realistic_v7-v2/GEN-SIM-RAW
+  Files: 5440
+Searching for GluGluHToGG_90: /GluGluHToGG_M-90*/Run3Winter25Digi*/GEN-SIM-RAW
+  NOT FOUND

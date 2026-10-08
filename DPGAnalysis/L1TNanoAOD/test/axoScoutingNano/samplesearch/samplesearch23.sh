@@ -1,0 +1,33 @@
+declare -A missing
+missing["GluGluHToBB"]="/GluGluHToBB_M-125*/*2023*/GEN-SIM-RAW"
+missing["GluGluHToGG_125"]="/GluGluHToGG_M-125*/*2023*/GEN-SIM-RAW"
+missing["GluGluHToGG_90"]="/GluGluHToGG_M-90*/*2023*/GEN-SIM-RAW"
+missing["GluGluHToTauTau"]="/GluGluHToTauTau*/*2023*/GEN-SIM-RAW"
+missing["GluGluHHto2B2W"]="/GluGluHHto2B2WtoLNu2Q*/*2023*/GEN-SIM-RAW"
+missing["HHHTo6B"]="/HHHTo6B*/*2023*/GEN-SIM-RAW"
+missing["HTo2LL4b_1000_450_100000"]="/HTo2LongLivedTo4b_MH-1000_MFF-450_CTau-100000mm*/*2023*/GEN-SIM-RAW"
+missing["HTo2LL4b_1000_450_10000"]="/HTo2LongLivedTo4b_MH-1000_MFF-450_CTau-10000mm*/*2023*/GEN-SIM-RAW"
+missing["HTo2LL4b_125_12_900"]="/HTo2LongLivedTo4b_MH-125_MFF-12_CTau-900mm*/*2023*/GEN-SIM-RAW"
+missing["HTo2LL4b_125_25_1500"]="/HTo2LongLivedTo4b_MH-125_MFF-25_CTau-1500mm*/*2023*/GEN-SIM-RAW"
+missing["HTo2LL4b_125_50_3000"]="/HTo2LongLivedTo4b_MH-125_MFF-50_CTau-3000mm*/*2023*/GEN-SIM-RAW"
+missing["SMS_Higgsino"]="/SMS-Higgsino*/*2023*/GEN-SIM-RAW"
+missing["SUSYGGtoBBH_120"]="/SUSYGluGluToBBHToBB_NarrowWidth_M-120*/*2023*/GEN-SIM-RAW"
+missing["SUSYGGtoBBH_1200"]="/SUSYGluGluToBBHToBB_NarrowWidth_M-1200*/*2023*/GEN-SIM-RAW"
+missing["SUSYGGtoBBH_350"]="/SUSYGluGluToBBHToBB_NarrowWidth_M-350*/*2023*/GEN-SIM-RAW"
+missing["SUSYGGtoBBH_600"]="/SUSYGluGluToBBHToBB_NarrowWidth_M-600*/*2023*/GEN-SIM-RAW"
+missing["VBFHToCC"]="/VBFHToCC*/*2023*/GEN-SIM-RAW"
+missing["VBFHToInvisible"]="/VBFHToInvisible*/*2023*/GEN-SIM-RAW"
+missing["VBFHToTauTau"]="/VBFHToTauTau*/*2023*/GEN-SIM-RAW"
+missing["WToTauTo3Mu"]="/WToTauTo3Mu*/*2023*/GEN-SIM-RAW"
+missing["ggXToJpsiJpsi"]="/ggXToJpsiJpsiTo2Mu2E_m7*/*2023*/GEN-SIM-RAW"
+missing["ggXToYY_m18"]="/ggXToYYTo2Mu2E_m18*/*2023*/GEN-SIM-RAW"
+missing["ggXToYY_m26"]="/ggXToYYTo2Mu2E_m26*/*2023*/GEN-SIM-RAW"
+missing["ttHto2B"]="/ttHto2B*/*2023*/GEN-SIM-RAW"
+missing["ttHto2C"]="/ttHto2C*/*2023*/GEN-SIM-RAW"
+
+for name in "${!missing[@]}"; do
+    query="${missing[$name]}"
+    echo "=== $name ==="
+    dasgoclient --query="dataset=$query" 2>/dev/null
+    echo ""
+done
