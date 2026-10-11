@@ -260,21 +260,28 @@ if the dataset is only on tape).
 voms-proxy-init --voms cms --valid 192:00
 DATASET=$(head -1 samplelists/backgrounds_2025_wjets.txt)
 
-# Do not assume the first DAS file has a disk replica. Probe a bounded set and
-# keep the first file that the global redirector can actually locate.
+# Check dataset placement once; never make one DAS site query per file.
+SITES=$(dasgoclient --query="site dataset=${DATASET}" | sort -u)
+printf '%s\n' "${SITES}"
+DISK_SITE=$(printf '%s\n' "${SITES}" | grep -E '(^T2_|^T3_|_Disk$)' | head -1 || true)
+if [ -z "${DISK_SITE}" ]; then
+  echo "This dataset is tape-only. Stage a file or block as described in Section 4."
+  false
+fi
+
+# Ask DAS for files at that disk site, then keep the first one the redirector
+# can locate. Five 15-second probes bound this check to about 75 seconds.
 LFN=
 while IFS= read -r candidate; do
   echo "checking ${candidate}"
-  if timeout 45 xrdfs root://cms-xrd-global.cern.ch stat "${candidate}" >/dev/null 2>&1; then
+  if timeout 15 xrdfs root://cms-xrd-global.cern.ch stat "${candidate}" >/dev/null 2>&1; then
     LFN=${candidate}
     break
   fi
-done < <(dasgoclient --limit=50 --query="file dataset=${DATASET}")
+done < <(dasgoclient --limit=5 --query="file dataset=${DATASET} site=${DISK_SITE}")
 
 if [ -z "${LFN}" ]; then
-  echo "No readable disk replica found among the first 50 files. Dataset sites:"
-  dasgoclient --query="site dataset=${DATASET}" | sort -u
-  echo "Stage a file or block as described in Section 4, then retry."
+  echo "No readable replica found at ${DISK_SITE}; try another listed disk site or stage one file."
   false
 fi
 
