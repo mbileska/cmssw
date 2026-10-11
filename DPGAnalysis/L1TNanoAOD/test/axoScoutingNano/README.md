@@ -124,7 +124,7 @@ because of approvals, so start them early.
    ```bash
    voms-proxy-init --voms cms --valid 192:00   # asks for the PEM pass phrase
    voms-proxy-info --all                       # should show the /cms VO attribute
-   source /cvmfs/cms.cern.ch/common/crab-setup.sh
+   source /cvmfs/cms.cern.ch/common/crab-setup.sh prod
    crab checkusername                          # should print your CERN username
    ```
 5. **Somewhere to write output.** CRAB copies the output to a logical `/store/user/<username>/`
@@ -357,7 +357,7 @@ finish processing before the rule lifetime ends.
 directory, with your proxy and CRAB set up:
 
 ```bash
-source /cvmfs/cms.cern.ch/common/crab-setup.sh
+source /cvmfs/cms.cern.ch/common/crab-setup.sh prod
 voms-proxy-init --voms cms --valid 192:00
 python3 -c 'from CRABAPI.RawCommand import crabCommand; from CRABClient.UserUtilities import config; print("CRAB API OK")'
 ```
@@ -584,7 +584,7 @@ Those made before this README existed used the 2025 conditions for every input y
 | `ProductNotFound` for `Run3ScoutingMuon` (or other scouting collections) | Same cause: `run3_scouting_2025` is missing from the `cms.Process(...)` line. |
 | `No "GEMMaskedStripsRcd" record found` | `customiseAXOScoutingNano` wasn't applied. Make the config with `makeConfig.sh`. |
 | `GLIBC_2.xx not found` on the grid | The build architecture does not match the worker runtime. Rebuild with this release's supported `el9_amd64_gcc14` architecture. |
-| `ModuleNotFoundError: No module named 'CRABAPI'` | Load the Python-capable CRAB environment with `source /cvmfs/cms.cern.ch/common/crab-setup.sh`, then rerun the command in the same shell. |
+| `ModuleNotFoundError: No module named 'CRABAPI'` | Load the Python-capable production CRAB environment with `source /cvmfs/cms.cern.ch/common/crab-setup.sh prod`, then rerun the command in the same shell. Giving `prod` explicitly also prevents unrelated interactive-shell positional parameters from being interpreted as the CRAB type. |
 | HTTP 403 from `crab checkwrite` | Your certificate DN is not authorized at that storage site. For this campaign use `T2_US_Wisconsin`; `T3_US_FNALLPC` is a separate authorization. |
 | `L1AXO_score` always `-999` | The L1TGlobal fixes aren't compiled in. Check that `git cms-merge-topic` checked out `L1Trigger/L1TGlobal`, then run `scram b`. |
 | Proxy or `checkwrite` errors | Renew the proxy (`voms-proxy-init --voms cms --valid 192:00`); check the certificate expiry date at <https://ca.cern.ch/ca/>. |

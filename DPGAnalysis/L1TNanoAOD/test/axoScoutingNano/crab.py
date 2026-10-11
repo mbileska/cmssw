@@ -15,7 +15,7 @@ try:
 except ImportError as exc:
     raise SystemExit(
         "CRAB Python modules are not available. In this shell run:\n"
-        "  source /cvmfs/cms.cern.ch/common/crab-setup.sh\n"
+        "  source /cvmfs/cms.cern.ch/common/crab-setup.sh prod\n"
         "Then verify with:\n"
         "  python3 -c 'from CRABAPI.RawCommand import crabCommand; "
         "from CRABClient.UserUtilities import config; print(\"CRAB API OK\")'"
