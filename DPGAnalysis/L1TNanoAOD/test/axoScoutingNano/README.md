@@ -376,6 +376,7 @@ Main options:
 | `--num-cores 4 --max-memory 8000` | Matches `--nThreads 4`. L1+HLT needs this much memory. |
 | `--no-publication` | Always use this |
 | `--input-blocks "b1,b2,..."` | Process only these blocks (use with data you staged by block) |
+| `--partial-dataset` | Process only the portion currently available on disk and skip tape recall. Useful for pilots; record that the input was partial. |
 | `--max-units N` | Process only N files *in total* |
 | `--fnal` | Input files on FNAL EOS (`cmseos.fnal.gov`): run at US sites and read over xrootd |
 | `--cern` | Input files on CERN EOS: run at `T2_CH_CERN` |
@@ -407,7 +408,7 @@ python3 crab.py -p axoNano_2025_wjets_s1_cfg.py -i samplelists/backgrounds_2025_
   -t AnomalyNano_WJets_trial_v1 -o /store/user/mbileska/anomalyNano/2025/WJets/ \
   --site T2_US_Wisconsin --work-area crab_2025_wjets_trial \
   -s FileBased -n 1 --max-units 10 --num-cores 4 --max-memory 8000 \
-  --no-publication --dryrun
+  --partial-dataset --no-publication --dryrun
 ```
 
 Repeat with the matching QCD, Z/DY, and ttbar config/list. Remove `--dryrun` only after inspecting
@@ -578,6 +579,7 @@ Those made before this README existed used the 2025 conditions for every input y
 | Symptom | Cause and fix |
 |---|---|
 | `SUBMITREFUSED` mentioning tape or dataset size | The dataset is on tape. Stage it with Rucio (Section 4) and submit with `--input-blocks`. |
+| A small pilot is refused because part of a large dataset is on tape | Submit the pilot with `--partial-dataset`; this sets CRAB `Data.partialDataset = True`, uses only complete disk replicas, and does not initiate tape recall. |
 | `Working area ... already exists` | Two datasets with the same primary name in one `--work-area`. Use a separate work area per year. |
 | Job log full of `Algorithm L1_... cannot be matched to a L1 algo name` | Expected. These HLT paths are seeded by L1 bits not in the 2025 menu; `TryToContinue` skips them. |
 | `RuntimeError: customiseAXOScoutingNano: the process must be built with the run3_scouting_2025 modifier` | The config wasn't made with `makeConfig.sh`. Make it with the script. |

@@ -139,6 +139,9 @@ def createConfig(args, dataset):
     if args.input_blocks:
         config.Data.inputBlocks = args.input_blocks.split(',')
 
+    if args.partial_dataset:
+        config.Data.partialDataset = True
+
     config.Site.storageSite = args.site
 
     options = parseOptions(args)
@@ -406,6 +409,10 @@ def main():
     parser.add_argument('--input-blocks',
                         default='',
                         help='Comma-separated list of full block names to process (e.g., block1#hash1,block2#hash2). Default: %(default)s'
+                        )
+    parser.add_argument('--partial-dataset',
+                        action='store_true', default=False,
+                        help='Process only files with a complete disk replica and skip tape recall. Default: %(default)s'
                         )
     args = parser.parse_args()
 
