@@ -127,13 +127,15 @@ because of approvals, so start them early.
    source /cvmfs/cms.cern.ch/common/crab-setup.sh
    crab checkusername                          # should print your CERN username
    ```
-5. **Somewhere to write output.** CRAB copies the output to `/store/user/<username>/` at a grid site
-   (the "storage site"). Ask your supervisor which site to use. The existing samples are at
-   `T2_US_UCSD`, which needs your certificate DN registered by the UCSD site admins. Check that it
-   works:
+5. **Somewhere to write output.** CRAB copies the output to a logical `/store/user/<username>/`
+   path at a grid site (the "storage site"). For this campaign use `T2_US_Wisconsin`. Its logical
+   `/store/user/mbileska/` namespace is mounted interactively as `/hdfs/store/user/mbileska/`.
+   Check the grid write path before submitting:
    ```bash
-   crab checkwrite --site=T2_US_UCSD     # or the site you were given
+   crab checkwrite --site=T2_US_Wisconsin
    ```
+   Do not use `T3_US_FNALLPC` for this output: write permission at one storage site does not imply
+   permission at another site.
 6. **Rucio account** (only for staging data from tape, Section 4). Your Rucio account is your
    CERN username:
    ```bash
@@ -150,13 +152,11 @@ You need a valid proxy (`voms-proxy-init ...`) in every new session that uses CR
 
 ## 1. Set up the release
 
-The branch is based on `CMSSW_16_1_0_pre4` (architecture `el8_amd64_gcc13`), so use exactly that
-release. Build on an EL8 machine (`lxplus8.cern.ch`). On EL9 lxplus, open an EL8 container first
-with `cmssw-el8`. A build made on EL9 for this EL8 release fails on the grid with GLIBC errors.
+The branch is based on `CMSSW_16_1_0_pre4` and has been built with `el9_amd64_gcc14`. Use exactly
+that release and architecture on an EL9 worker-compatible machine.
 
 ```bash
-ssh <username>@lxplus8.cern.ch          # or: ssh lxplus.cern.ch, then: cmssw-el8
-export SCRAM_ARCH=el8_amd64_gcc13
+export SCRAM_ARCH=el9_amd64_gcc14
 cmsrel CMSSW_16_1_0_pre4
 cd CMSSW_16_1_0_pre4/src
 cmsenv
@@ -320,7 +320,7 @@ automatic tape recall refuses large datasets. Request the copy at a site where y
 ```bash
 source /cvmfs/cms.cern.ch/rucio/setup-py3.sh
 export RUCIO_ACCOUNT=$USER
-SITE=T2_US_UCSD                          # where you have quota
+SITE=T2_US_Wisconsin                     # where mbileska has quota
 LIFETIME=2592000                         # 30 days; the disk copy is deleted afterwards
 
 # Small dataset: stage all of it
@@ -359,6 +359,7 @@ directory, with your proxy and CRAB set up:
 ```bash
 source /cvmfs/cms.cern.ch/common/crab-setup.sh
 voms-proxy-init --voms cms --valid 192:00
+python3 -c 'from CRABAPI.RawCommand import crabCommand; from CRABClient.UserUtilities import config; print("CRAB API OK")'
 ```
 
 Main options:
@@ -369,7 +370,7 @@ Main options:
 | `-i <file>` | Input list: one DAS dataset per line, or a list of files with `--set-input-files` |
 | `-t <tag>` | Output dataset tag (for `--set-input-files`, also the CRAB task name) |
 | `-o /store/user/<username>/...` | Output directory at the storage site |
-| `--site <site>` | Storage site (Section 0, step 5). The default `T3_US_FNALLPC` is probably not yours. |
+| `--site <site>` | Storage site (Section 0, step 5). Default: `T2_US_Wisconsin`. |
 | `--work-area <dir>` | Local directory for the CRAB task folders. **Use a separate one per year** (see below). |
 | `-s FileBased -n N` | File-based splitting with N input files per job (`-n` is honored). Start with `-n 1` for the closure pilot. |
 | `--num-cores 4 --max-memory 8000` | Matches `--nThreads 4`. L1+HLT needs this much memory. |
@@ -395,14 +396,16 @@ The output ends up at
 
 ### Example workflows
 
-Replace `<username>` and `T2_US_UCSD` with your own. Add `--dryrun` the first time.
+The examples below write to logical paths below `/store/user/mbileska/anomalyNano/`, which appear
+on the Wisconsin login nodes below `/hdfs/store/user/mbileska/anomalyNano/`. Add `--dryrun` the
+first time.
 
 **2025 exclusive background closure pilot**
 ```bash
 ./makeConfig.sh 2025 --background wjets --sample-id 1
 python3 crab.py -p axoNano_2025_wjets_s1_cfg.py -i samplelists/backgrounds_2025_wjets.txt \
-  -t AnomalyNano_WJets_trial_v1 -o /store/user/<username>/anomalyNano/2025/WJets/ \
-  --site T2_US_UCSD --work-area crab_2025_wjets_trial \
+  -t AnomalyNano_WJets_trial_v1 -o /store/user/mbileska/anomalyNano/2025/WJets/ \
+  --site T2_US_Wisconsin --work-area crab_2025_wjets_trial \
   -s FileBased -n 1 --max-units 10 --num-cores 4 --max-memory 8000 \
   --no-publication --dryrun
 ```
@@ -421,8 +424,8 @@ dasgoclient --query="block dataset=${DATASET}" | grep -v -F -f samplelists/QCD_2
 # ... add Rucio rules for these blocks (Section 4) and wait until they are OK ...
 ./makeConfig.sh 2025 --background qcd --sample-id 0
 python3 crab.py -p axoNano_2025_qcd_s0_cfg.py -i samplelists/backgrounds_2025_qcd.txt \
-  -t AXOnano_QCD_2025_v2 -o /store/user/<username>/axoNano/QCD_2025/ \
-  --site T2_US_UCSD --work-area crab_QCD_2025_v2 \
+  -t AXOnano_QCD_2025_v2 -o /store/user/mbileska/anomalyNano/2025/QCD/ \
+  --site T2_US_Wisconsin --work-area crab_QCD_2025_v2 \
   --input-blocks "$(paste -sd, samplelists/QCD_2025_blocks_v2.txt)" \
   -s FileBased -n 1 --num-cores 4 --max-memory 8000 --no-publication
 ```
@@ -432,8 +435,8 @@ Commit the new block list to the branch so the next person knows those blocks ar
 ```bash
 ./makeConfig.sh 2024
 python3 crab.py -p axoNano_2024_cfg.py -i samplelists/datasets_2024.txt \
-  -t AXOnano_2024_v1 -o /store/user/<username>/axoNano/2024/ \
-  --site T2_US_UCSD --work-area crab_2024 \
+  -t AXOnano_2024_v1 -o /store/user/mbileska/anomalyNano/2024/ \
+  --site T2_US_Wisconsin --work-area crab_2024 \
   -s FileBased --num-cores 4 --max-memory 8000 --no-publication
 ```
 
@@ -441,8 +444,8 @@ python3 crab.py -p axoNano_2024_cfg.py -i samplelists/datasets_2024.txt \
 ```bash
 ./makeConfig.sh 2023postBPix
 python3 crab.py -p axoNano_2023postBPix_cfg.py -i samplelists/datasets_2023postBPix.txt \
-  -t AXOnano_2023postBPix_v1 -o /store/user/<username>/axoNano/2023postBPix/ \
-  --site T2_US_UCSD --work-area crab_2023postBPix \
+  -t AXOnano_2023postBPix_v1 -o /store/user/mbileska/anomalyNano/2023postBPix/ \
+  --site T2_US_Wisconsin --work-area crab_2023postBPix \
   -s FileBased --num-cores 4 --max-memory 8000 --no-publication
 ```
 
@@ -456,8 +459,8 @@ datasets of one campaign row of the table in Section 2.
 for list in samplelists/emj_private2022/*.txt; do
   name=$(basename ${list} .txt)_private2022
   python3 crab.py -p axoNano_2022preEE_cfg.py -i ${list} --set-input-files \
-    -t ${name}_v1 -o /store/user/<username>/axoNano/${name}/ \
-    --site T2_US_UCSD --work-area crab_emj \
+    -t ${name}_v1 -o /store/user/mbileska/anomalyNano/${name}/ \
+    --site T2_US_Wisconsin --work-area crab_emj \
     -s FileBased --num-cores 4 --max-memory 8000 --no-publication --fnal
 done
 ```
@@ -574,6 +577,8 @@ Those made before this README existed used the 2025 conditions for every input y
 | `RuntimeError: customiseAXOScoutingNano: the process must be built with the run3_scouting_2025 modifier` | The config wasn't made with `makeConfig.sh`. Make it with the script. |
 | `ProductNotFound` for `Run3ScoutingMuon` (or other scouting collections) | Same cause: `run3_scouting_2025` is missing from the `cms.Process(...)` line. |
 | `No "GEMMaskedStripsRcd" record found` | `customiseAXOScoutingNano` wasn't applied. Make the config with `makeConfig.sh`. |
-| `GLIBC_2.xx not found` on the grid | The area was built on EL9. Rebuild on lxplus8 or inside `cmssw-el8`. |
+| `GLIBC_2.xx not found` on the grid | The build architecture does not match the worker runtime. Rebuild with this release's supported `el9_amd64_gcc14` architecture. |
+| `ModuleNotFoundError: No module named 'CRABAPI'` | Load the Python-capable CRAB environment with `source /cvmfs/cms.cern.ch/common/crab-setup.sh`, then rerun the command in the same shell. |
+| HTTP 403 from `crab checkwrite` | Your certificate DN is not authorized at that storage site. For this campaign use `T2_US_Wisconsin`; `T3_US_FNALLPC` is a separate authorization. |
 | `L1AXO_score` always `-999` | The L1TGlobal fixes aren't compiled in. Check that `git cms-merge-topic` checked out `L1Trigger/L1TGlobal`, then run `scram b`. |
 | Proxy or `checkwrite` errors | Renew the proxy (`voms-proxy-init --voms cms --valid 192:00`); check the certificate expiry date at <https://ca.cern.ch/ca/>. |

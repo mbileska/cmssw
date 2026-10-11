@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 from __future__ import print_function
 
 import argparse
@@ -7,7 +7,19 @@ import os, sys
 import re
 import logging
 
-from CRABAPI.RawCommand import crabCommand
+try:
+    # Import CRABClient first: this initializes the CRAB Python environment
+    # before CRABAPI is used.
+    import CRABClient  # noqa: F401
+    from CRABAPI.RawCommand import crabCommand
+except ImportError as exc:
+    raise SystemExit(
+        "CRAB Python modules are not available. In this shell run:\n"
+        "  source /cvmfs/cms.cern.ch/common/crab-setup.sh\n"
+        "Then verify with:\n"
+        "  python3 -c 'from CRABAPI.RawCommand import crabCommand; "
+        "from CRABClient.UserUtilities import config; print(\"CRAB API OK\")'"
+    ) from exc
 
 
 def configLogger(name, loglevel=logging.INFO):
@@ -312,7 +324,7 @@ def main():
                         help='JSON file for lumi mask. Default: %(default)s'
                         )
     parser.add_argument('--site',
-                        default='T3_US_FNALLPC',
+                        default='T2_US_Wisconsin',
                         help='Storage site. Default: %(default)s'
                         )
     parser.add_argument('--send-external',
