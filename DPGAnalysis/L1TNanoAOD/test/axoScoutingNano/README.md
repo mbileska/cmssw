@@ -483,10 +483,16 @@ parent sample, exact tensor sizes, a complete CICADA grid, score closure, finite
 and agreement between the stored category fields and the JSON phase-space boundaries:
 
 ```bash
-python3 validateTrialNano.py /path/to/out_nano_*.root \
+find /hdfs/store/user/mbileska/anomalyNano/2025 -type f -name 'out_nano_*.root' \
+  | sort > background_files.txt
+python3 validateTrialNano.py @background_files.txt \
   --expected-categories 0-23,27-36 \
   --min-events-per-populated-category 5000 --output trial_validation.json
 ```
+
+The `@filelist.txt` form accepts one local path or xrootd URL per line and avoids the shell argument
+limit for large productions. Use the same unchanged, sorted file list for staging so the validator
+and stager see exactly the same inputs.
 
 The expected set above is the current 34-category trial. After adding and validating Z-to-nunu,
 replace it with `--expected-categories all`. Add `--require-cross-sections` before any
@@ -498,7 +504,7 @@ That estimate is meaningful when the pilot used representative files and CRAB `F
 After validation, create physically separate fine-category shards:
 
 ```bash
-python3 stageBackgrounds.py /path/to/out_nano_*.root \
+python3 stageBackgrounds.py @background_files.txt \
   --validation-report trial_validation.json --output staged_backgrounds
 ```
 

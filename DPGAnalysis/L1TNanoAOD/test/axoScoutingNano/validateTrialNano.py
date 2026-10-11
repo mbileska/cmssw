@@ -42,8 +42,12 @@ REQUIRED_BRANCHES = {
 
 def parse_args():
     here = Path(__file__).resolve().parent
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("inputs", nargs="+", help="NanoAOD ROOT files or xrootd URLs")
+    parser = argparse.ArgumentParser(description=__doc__, fromfile_prefix_chars="@")
+    parser.add_argument(
+        "inputs",
+        nargs="+",
+        help="NanoAOD ROOT files or xrootd URLs; use @filelist.txt for one input per line",
+    )
     parser.add_argument(
         "--categories",
         default=str(here / "background_categories.json"),

@@ -15,8 +15,12 @@ import uproot
 
 def parse_args():
     here = Path(__file__).resolve().parent
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("inputs", nargs="+", help="validated NanoAOD ROOT files or xrootd URLs")
+    parser = argparse.ArgumentParser(description=__doc__, fromfile_prefix_chars="@")
+    parser.add_argument(
+        "inputs",
+        nargs="+",
+        help="validated NanoAOD ROOT files or xrootd URLs; use @filelist.txt for one input per line",
+    )
     parser.add_argument("--output", required=True, help="output directory")
     parser.add_argument(
         "--validation-report",
