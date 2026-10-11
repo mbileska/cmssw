@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "normalization": "Normalize each parent sample independently as luminosity_pb_inverse * cross_section_pb * genWeight / sum_genWeight. Merge exclusive categories only after this step.",
+  "samples": [
+    {
+      "id": 0,
+      "name": "QCD_PT_flat",
+      "process": "qcd",
+      "dataset": "/QCD_Bin-PT-15to7000_Par-PT-flat2022_TuneCP5_13p6TeV_pythia8/Run3Winter25Digi-142X_mcRun3_2025_realistic_v9-v4/GEN-SIM-RAW",
+      "allowed_category_ids": [0, 1, 2, 3, 4, 5],
+      "cross_section_pb": null,
+      "weight_note": "Keep the signed generator weight; this flat-pT sample relies on its event weights."
+    },
+    {
+      "id": 1,
+      "name": "WJetsToLNu",
+      "process": "wjets",
+      "dataset": "/WJetsToLNu_TuneCP5_13p6TeV_madgraphMLM-pythia8/Run3Winter25Digi-142X_mcRun3_2025_realistic_v7-v2/GEN-SIM-RAW",
+      "allowed_category_ids": [6, 7, 8, 9, 10, 11, 12, 13, 14],
+      "cross_section_pb": null,
+      "weight_note": "One inclusive parent normalization is shared by its mutually exclusive decay/HT children."
+    },
+    {
+      "id": 2,
+      "name": "DYto2L_MLL50",
+      "process": "zjets",
+      "dataset": "/DYto2L-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/Run3Winter25Digi-142X_mcRun3_2025_realistic_v7-v2/GEN-SIM-RAW",
+      "allowed_category_ids": [15, 16, 17, 18, 19, 20, 21, 22, 23],
+      "cross_section_pb": null,
+      "weight_note": "The MLL>50 phase-space definition is part of this parent sample and must not be mixed with another DY mass slice."
+    },
+    {
+      "id": 3,
+      "name": "TTbar",
+      "process": "ttbar",
+      "dataset": "/TT_TuneCP5_13p6TeV_powheg-pythia8/Run3Winter25Digi-142X_mcRun3_2025_realistic_v7-v2/GEN-SIM-RAW",
+      "allowed_category_ids": [27, 28, 29, 30, 31, 32, 33, 34, 35, 36],
+      "cross_section_pb": null,
+      "weight_note": "One inclusive parent normalization is shared by the ten mutually exclusive W-decay pairs."
+    }
+  ],
+  "pending_samples": [
+    {
+      "name": "ZToNuNu",
+      "process": "zjets",
+      "dataset_query": "dataset=/Zto2Nu*/Run3Winter25Digi*/GEN-SIM-RAW",
+      "requirement": "Use one inclusive sample or a complete non-overlapping set of official HT slices; assign every parent a distinct sample ID and cross section."
+    }
+  ]
+}

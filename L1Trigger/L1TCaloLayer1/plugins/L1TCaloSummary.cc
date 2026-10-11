@@ -210,7 +210,8 @@ void L1TCaloSummary<INPUT, OUTPUT>::produce(edm::Event& iEvent, const edm::Event
   //Model input
   //This is done as a flat vector input, but future versions may involve 2D input
   //This will have to be handled later
-  INPUT modelInput[252];
+  // Zero-initialize so a missing region has deterministic input rather than uninitialized memory.
+  INPUT modelInput[252] = {};
   for (const L1CaloRegion& i : *regionCollection) {
     UCTRegionIndex r = g.getUCTRegionIndexFromL1CaloRegion(i.gctEta(), i.gctPhi());
     UCTTowerIndex t = g.getUCTTowerIndexFromL1CaloRegion(r, i.raw());

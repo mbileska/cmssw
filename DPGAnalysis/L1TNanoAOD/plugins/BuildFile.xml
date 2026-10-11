@@ -4,10 +4,22 @@
 <use name="FWCore/ServiceRegistry"/>
 <use name="FWCore/Utilities"/>
 <use name="CalibFormats/CaloTPG"/>
+<use name="DataFormats/Candidate"/>
+<use name="DataFormats/L1CaloTrigger"/>
 <use name="DataFormats/L1TCalorimeter"/>
+<use name="DataFormats/L1TGlobal"/>
+<use name="DataFormats/HepMCCandidate"/>
+<use name="SimDataFormats/GeneratorProducts"/>
+<use name="CondFormats/L1TObjects"/>
+<use name="CondFormats/DataRecord"/>
 <use name="PhysicsTools/NanoAOD"/>
 <use name="CommonTools/Utils"/>
 <use name="DataFormats/L1Trigger"/>
+<use name="FWCore/MessageLogger"/>
+<use name="hls"/>
+<use name="hls4mlEmulatorExtras"/>
+<use name="AXOL1TL"/>
+<use name="CICADA"/>
 <library file="*.cc" name="DPGAnalysisL1TNanoAOD_plugins">
   <flags EDM_PLUGIN="1"/>
 </library>

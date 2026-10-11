@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "rules": {
+    "exclusive": true,
+    "category_multiplicity_per_event": 1,
+    "unclassified_policy": "fail",
+    "tau_definition": "direct W/Z decay before tau decay",
+    "qcd_kinematic_variable": "generator.binningValues[0] (generated hard pT, GeV)",
+    "vector_boson_kinematic_variable": "scalar pT sum of outgoing LHE quarks and gluons (LHE HT, GeV)",
+    "boundary_convention": "lower inclusive, upper exclusive"
+  },
+  "process_ids": {
+    "qcd": 0,
+    "wjets": 1,
+    "zjets": 2,
+    "ttbar": 3
+  },
+  "training_groups": {
+    "QCD": [0, 1, 2, 3, 4, 5],
+    "WJets": [6, 7, 8, 9, 10, 11, 12, 13, 14],
+    "ZJets": [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26],
+    "TTbar": [27, 28, 29, 30, 31, 32, 33, 34, 35, 36]
+  },
+  "categories": [
+    {"id": 0, "name": "QCD_Pt15to50", "process": "qcd", "decay": "not_applicable", "kinematic_bin": [15, 50]},
+    {"id": 1, "name": "QCD_Pt50to100", "process": "qcd", "decay": "not_applicable", "kinematic_bin": [50, 100]},
+    {"id": 2, "name": "QCD_Pt100to200", "process": "qcd", "decay": "not_applicable", "kinematic_bin": [100, 200]},
+    {"id": 3, "name": "QCD_Pt200to400", "process": "qcd", "decay": "not_applicable", "kinematic_bin": [200, 400]},
+    {"id": 4, "name": "QCD_Pt400to800", "process": "qcd", "decay": "not_applicable", "kinematic_bin": [400, 800]},
+    {"id": 5, "name": "QCD_Pt800toInf", "process": "qcd", "decay": "not_applicable", "kinematic_bin": [800, null]},
+
+    {"id": 6, "name": "WToENu_HT0to100", "process": "wjets", "decay": "enu", "kinematic_bin": [0, 100]},
+    {"id": 7, "name": "WToENu_HT100to400", "process": "wjets", "decay": "enu", "kinematic_bin": [100, 400]},
+    {"id": 8, "name": "WToENu_HT400toInf", "process": "wjets", "decay": "enu", "kinematic_bin": [400, null]},
+    {"id": 9, "name": "WToMuNu_HT0to100", "process": "wjets", "decay": "munu", "kinematic_bin": [0, 100]},
+    {"id": 10, "name": "WToMuNu_HT100to400", "process": "wjets", "decay": "munu", "kinematic_bin": [100, 400]},
+    {"id": 11, "name": "WToMuNu_HT400toInf", "process": "wjets", "decay": "munu", "kinematic_bin": [400, null]},
+    {"id": 12, "name": "WToTauNu_HT0to100", "process": "wjets", "decay": "taunu", "kinematic_bin": [0, 100]},
+    {"id": 13, "name": "WToTauNu_HT100to400", "process": "wjets", "decay": "taunu", "kinematic_bin": [100, 400]},
+    {"id": 14, "name": "WToTauNu_HT400toInf", "process": "wjets", "decay": "taunu", "kinematic_bin": [400, null]},
+
+    {"id": 15, "name": "ZToEE_HT0to100", "process": "zjets", "decay": "ee", "kinematic_bin": [0, 100]},
+    {"id": 16, "name": "ZToEE_HT100to400", "process": "zjets", "decay": "ee", "kinematic_bin": [100, 400]},
+    {"id": 17, "name": "ZToEE_HT400toInf", "process": "zjets", "decay": "ee", "kinematic_bin": [400, null]},
+    {"id": 18, "name": "ZToMuMu_HT0to100", "process": "zjets", "decay": "mumu", "kinematic_bin": [0, 100]},
+    {"id": 19, "name": "ZToMuMu_HT100to400", "process": "zjets", "decay": "mumu", "kinematic_bin": [100, 400]},
+    {"id": 20, "name": "ZToMuMu_HT400toInf", "process": "zjets", "decay": "mumu", "kinematic_bin": [400, null]},
+    {"id": 21, "name": "ZToTauTau_HT0to100", "process": "zjets", "decay": "tautau", "kinematic_bin": [0, 100]},
+    {"id": 22, "name": "ZToTauTau_HT100to400", "process": "zjets", "decay": "tautau", "kinematic_bin": [100, 400]},
+    {"id": 23, "name": "ZToTauTau_HT400toInf", "process": "zjets", "decay": "tautau", "kinematic_bin": [400, null]},
+    {"id": 24, "name": "ZToNuNu_HT0to100", "process": "zjets", "decay": "nunu", "kinematic_bin": [0, 100]},
+    {"id": 25, "name": "ZToNuNu_HT100to400", "process": "zjets", "decay": "nunu", "kinematic_bin": [100, 400]},
+    {"id": 26, "name": "ZToNuNu_HT400toInf", "process": "zjets", "decay": "nunu", "kinematic_bin": [400, null]},
+
+    {"id": 27, "name": "TTbar_HH", "process": "ttbar", "decay": "HH", "kinematic_bin": null},
+    {"id": 28, "name": "TTbar_HE", "process": "ttbar", "decay": "HE", "kinematic_bin": null},
+    {"id": 29, "name": "TTbar_HM", "process": "ttbar", "decay": "HM", "kinematic_bin": null},
+    {"id": 30, "name": "TTbar_HT", "process": "ttbar", "decay": "HT", "kinematic_bin": null},
+    {"id": 31, "name": "TTbar_EE", "process": "ttbar", "decay": "EE", "kinematic_bin": null},
+    {"id": 32, "name": "TTbar_EM", "process": "ttbar", "decay": "EM", "kinematic_bin": null},
+    {"id": 33, "name": "TTbar_ET", "process": "ttbar", "decay": "ET", "kinematic_bin": null},
+    {"id": 34, "name": "TTbar_MM", "process": "ttbar", "decay": "MM", "kinematic_bin": null},
+    {"id": 35, "name": "TTbar_MT", "process": "ttbar", "decay": "MT", "kinematic_bin": null},
+    {"id": 36, "name": "TTbar_TT", "process": "ttbar", "decay": "TT", "kinematic_bin": null}
+  ]
+}

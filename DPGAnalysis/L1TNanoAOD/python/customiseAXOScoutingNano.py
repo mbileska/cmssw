@@ -11,8 +11,8 @@ def _missingScouting2025Modifier(process):
         "DPGAnalysis/L1TNanoAOD/test/axoScoutingNano/makeConfig.sh, which adds it for pre-2025 eras.")
 
 
-def customiseAXOScoutingNano(process):
-    """Add the emulated AXOL1TL score and generator weights to a re-L1 + re-HLT scouting NanoAOD job.
+def customiseAXOScoutingNano(process, backgroundProcess="none", backgroundSample=0):
+    """Add independently checked L1 anomaly scores and optional exclusive background labels.
 
     Apply it after the scouting NanoAOD customisations, to a process built with the run3_scouting_2025
     modifier. DPGAnalysis/L1TNanoAOD/test/axoScoutingNano/makeConfig.sh takes care of both.
@@ -25,11 +25,26 @@ def customiseAXOScoutingNano(process):
     process = addScoutingTrack(process)
     process = addScoutingParticle(process)
 
-    # emulate the AXOL1TL score in the uGT emulator and store it as a NanoAOD column (L1AXO_score);
-    # the parameter is not in the simGtStage2Digis cfi, so it has to be created with an explicit type
+    # Evaluate both models through their official emulator paths.  Set CICADA explicitly rather than relying
+    # on an era modifier: every input year must use the same v2p2p0 score definition.
     process.simGtStage2Digis.produceAXOL1TLScore = cms.bool(True)
+    process.simCaloStage2Layer1Summary.CICADAModelVersion = cms.string("CICADAModel_v2p2p0")
+
+    # Rebuild both input tensors and run both models a second time in an independent producer.  The module
+    # stores the two scores, their difference, and the lossless integer tensors used for the second inference.
     process.load('DPGAnalysis.L1TNanoAOD.l1tnanotables_cff')
-    process.nanoAOD_step += process.l1EmulAXOTable
+    process.nanoAOD_step += process.l1EmulAnomalyTable
+
+    if backgroundProcess != "none":
+        process.backgroundCategoryTable = cms.EDProducer(
+            "BackgroundCategoryTableProducer",
+            process=cms.string(backgroundProcess),
+            sample=cms.uint32(backgroundSample),
+            genParticles=cms.InputTag("genParticles"),
+            generator=cms.InputTag("generator"),
+            lheEvent=cms.InputTag("externalLHEProducer"),
+        )
+        process.nanoAOD_step += process.backgroundCategoryTable
 
     # generator weights; the module label ends in "Table", so the NANOAODoutput wildcard already keeps it
     process.load('PhysicsTools.NanoAOD.genWeightsTable_cfi')

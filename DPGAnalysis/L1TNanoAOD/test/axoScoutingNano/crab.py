@@ -109,7 +109,7 @@ def createConfig(args, dataset):
     else: config.Data.inputDataset = dataset
     if args.use_parent: config.Data.useParent = True
     config.Data.splitting = args.splitting
-    config.Data.unitsPerJob = 1 # args.units_per_job
+    config.Data.unitsPerJob = args.units_per_job
     if args.max_units > 0:
         config.Data.totalUnits = args.max_units
     if args.no_publication:

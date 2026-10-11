@@ -539,6 +539,10 @@ void l1t::GlobalBoard::initTriggerConditions(const edm::EventSetup& evSetup,
                                              const int nrL1EG,
                                              const int nrL1Tau,
                                              const int nrL1Jet) {
+  // The selected AXO condition belongs to this menu.  Keep it across events,
+  // but choose it again whenever the trigger conditions are rebuilt.
+  m_axoScoreConditionName.clear();
+
   const std::vector<ConditionMap>& conditionMap = m_l1GtMenu->gtConditionMap();
   const GlobalScales& gtScales = m_l1GtMenu->gtScales();
   const std::string scaleSetName = gtScales.getScalesName();
@@ -920,10 +924,10 @@ void l1t::GlobalBoard::runGTL(const edm::Event&,
     for (auto& cond : condMap) {
       cond.second->evaluateConditionStoreResult(iBxInEvent);
 
-      // for optional software-only saving of axol1tl score
-      // m_storedAXOScore < 0.0 ensures this gets set only once per condition if score not default of -999
-      if (m_saveAXOScore and m_storedAXOScore < 0 and cond.first == m_axoScoreConditionName and
-          not m_axoScoreConditionName.empty()) {
+      // Save the selected AXOL1TL score at BX 0.  Explicitly checking the BX is
+      // important when the emulator is configured to process multiple BXs.
+      if (m_saveAXOScore and iBxInEvent == 0 and m_storedAXOScore < 0 and
+          cond.first == m_axoScoreConditionName and not m_axoScoreConditionName.empty()) {
         auto const* theCondition = dynamic_cast<AXOL1TLCondition*>(cond.second.get());
         m_storedAXOScore = theCondition->getScore();
       }
@@ -1175,7 +1179,6 @@ void l1t::GlobalBoard::reset() {
   //reset AXO score
   m_storedAXOScore = -999.f;
   m_uGtAXOScore.reset();
-  // m_axoScoreConditionName = "";
 
   m_gtlDecisionWord.reset();
   m_gtlAlgorithmOR.reset();

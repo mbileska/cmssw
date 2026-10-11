@@ -1,26 +1,33 @@
-# Scouting NanoAOD with the AXOL1TL score
+# Scouting NanoAOD with checked AXOL1TL and CICADA scores
 
-This directory holds what you need to produce HLT-scouting NanoAOD samples that include the
-AXOL1TL (AXO) L1 anomaly-detection score. Starting from MC `GEN-SIM-RAW`, each job:
+This directory holds what you need to produce HLT-scouting NanoAOD samples with two independent
+evaluations of both L1 anomaly scores. Starting from MC `GEN-SIM-RAW`, each job:
 
-1. re-runs the L1 trigger emulator (`L1REPACK:FullMC`) with the 2025 L1 menu and saves the AXO score,
+1. re-runs the L1 trigger emulator (`L1REPACK:FullMC`) with the 2025 L1 menu, AXOL1TL, and
+   `CICADAModel_v2p2p0`,
 2. re-runs the HLT (`HLT:GRun` menu of this release),
-3. writes scouting NanoAOD (`NANO:@ScoutMonitor`).
+3. independently rebuilds both model tensors and evaluates both models again,
+4. writes scouting NanoAOD (`NANO:@ScoutMonitor`).
 
 Every input event is written out, whether or not it fired a scouting trigger. The main columns:
 
 | Branch | Content |
 |---|---|
-| `L1AXO_score` | Continuous AXOL1TL score at BX 0 (`-999` only if the score could not be read) |
+| `L1AXO_score`, `L1AXO_scoreRecomputed`, `L1AXO_scoreDifference` | uGT score, independent score, and independent minus uGT at BX 0 |
+| `nL1AXOInput`, `L1AXOInput_value2` | The 57 exact AXOL1TL inputs; divide `value2` by two before inference |
+| `L1CICADA_score`, `L1CICADA_scoreRecomputed`, `L1CICADA_scoreDifference` | Layer-1 score, independent v2p2p0 score, and their difference at BX 0 |
+| `nL1CICADAInput`, `L1CICADAInput_et`, `L1CICADAInput_gctEta`, `L1CICADAInput_gctPhi`, `L1CICADAInput_present` | The ordered 252-region CICADA tensor and grid-integrity flag |
+| `Background_process`, `Background_sample`, `Background_decay`, `Background_kinematicBin`, `Background_category`, `Background_kinematicValue` | Strict exclusive background label and parent-normalization provenance (background configs only) |
 | `L1_AXO_VLoose` … `L1_AXO_VVVTight` | Re-emulated L1 AXO trigger bits |
 | `DST_PFScouting_AXO*`, other `DST_*`/`HLT_*` | Re-run HLT decisions |
 | `*_pHLT` versions of the trigger bits | HLT decisions from the original MC production, kept for comparison. Paths that exist only in the original menu keep their plain name (for example `DST_PFScouting_AXONominal`); the branch description says `(process: HLT)` for original bits and `(process: reL1reHLT)` for re-run ones. |
 | `ScoutingParticle_*` (PF candidates), `ScoutingTrack_*`, `ScoutingPFJet_*`, `ScoutingMuonVtx_*`/`ScoutingMuonNoVtx_*`, `ScoutingElectron_*`, `ScoutingPhoton_*`, `ScoutingPrimaryVertex_*`, `ScoutingMET_*`, `ScoutingRho_*`, … | Scouting objects |
 | `genWeight` (and `genEventSumw` in the `Runs` tree) | Generator weights for normalisation |
 
-`nano_branches.txt` lists every branch with its type and description, from a 2025 test job. The
-re-run part is the same for every year. The original-HLT bits depend on which menu the input MC
-was made with.
+`nano_branches.txt` is the branch inventory from the earlier AXO-only 2025 test job. Regenerate it
+after the first successful closure pilot; it does not yet contain the new independent-score,
+tensor, or background-label columns. The original-HLT bits also depend on the menu used to make
+the input MC.
 
 ---
 
@@ -31,19 +38,61 @@ was made with.
 | `README.md` | This file |
 | `makeConfig.sh` | Writes the cmsRun config for one year (Section 3) |
 | `crab.py` | CRAB submission wrapper (Section 5) |
-| `nano_branches.txt` | All branches of the output NanoAOD |
+| `nano_branches.txt` | Pre-change AXO-only branch inventory; regenerate after the closure pilot |
 | `samplelists/` | Input lists for CRAB (Section 6) |
 | `samplesearch/` | Scripts used to find the input datasets in DAS, and their outputs (Section 6) |
+| `background_categories.json` | Authoritative 37-category partition and optional coarse training groups |
+| `background_samples_2025.json` | Parent-dataset IDs and normalization ledger; cross sections must be filled before physics normalization |
+| `validateTrialNano.py` | Fails on score disagreement, malformed tensors, duplicate events, invalid labels, or weights |
+| `stageBackgrounds.py` | Writes one set of Parquet shards per fine category; training groups remain a reversible mapping |
 
 The code changes this workflow needs live in two other packages of the branch:
 
 | Path (under `$CMSSW_BASE/src`) | What it does |
 |---|---|
-| `L1Trigger/L1TGlobal/src/GlobalBoard.cc` | Fixes so the AXO score is actually stored. The AXO condition name is now set (an inverted `empty()` check prevented it), and it is no longer cleared every event. |
+| `L1Trigger/L1TGlobal/src/GlobalBoard.cc` | Fixes AXO score storage: selects the condition when each menu is initialized, preserves that choice across events, and records only its BX-0 score (including in multi-BX emulation). |
 | `L1Trigger/L1TGlobal/plugins/L1TGlobalProducer.cc` | Turns on AXO score saving in `beginRun`, before the trigger conditions are built, and gives the score collection a real BX range. |
-| `DPGAnalysis/L1TNanoAOD/plugins/AXOL1TLScoreTableProducer.cc` | Writes the BX-0 score as the NanoAOD column `L1AXO_score` |
-| `DPGAnalysis/L1TNanoAOD/python/l1tnanotables_cff.py` | Defines the `l1EmulAXOTable` module |
+| `DPGAnalysis/L1TNanoAOD/plugins/L1AnomalyScoreTableProducer.cc` | Rebuilds the 57/252 inputs, reruns both models, checks closure, and writes both versions |
+| `DPGAnalysis/L1TNanoAOD/plugins/BackgroundCategoryTableProducer.cc` | Assigns exactly one fine category and records the configured parent sample ID |
+| `DPGAnalysis/L1TNanoAOD/python/l1tnanotables_cff.py` | Defines the anomaly-score and input tables |
 | `DPGAnalysis/L1TNanoAOD/python/customiseAXOScoutingNano.py` | The customisation `makeConfig.sh` adds to every config (Section 2) |
+| `L1Trigger/L1TCaloLayer1/plugins/L1TCaloSummary.cc` | Zero-initializes the official 252-cell CICADA input for deterministic behavior if a region is absent |
+
+### Exclusive trial design
+
+`background_categories.json` is the source of truth. Its 37 categories are mutually exclusive:
+
+- QCD: six generated-hard-pT intervals: `[15,50)`, `[50,100)`, `[100,200)`, `[200,400)`,
+  `[400,800)`, `[800,infinity)`.
+- W+jets: direct `e nu`, `mu nu`, or `tau nu`, crossed with LHE-HT intervals `[0,100)`,
+  `[100,400)`, `[400,infinity)` (nine categories).
+- Z/DY+jets: direct `ee`, `mumu`, `tautau`, or `nunu`, crossed with the same three LHE-HT
+  intervals (twelve categories). The listed DY parent is restricted to `MLL>50`; do not mix in
+  another mass slice under the same sample ID.
+- ttbar: the unordered direct-W pairs `HH`, `HE`, `HM`, `HT`, `EE`, `EM`, `ET`, `MM`, `MT`, `TT`
+  (ten categories). A tau is labeled at the W decay, before the tau itself decays.
+
+There is no `other` category. A malformed or unclassifiable event throws and fails the job. The
+recommended closure trial target is **5,000 retained events per fine category**. That is 185,000
+events once all 37 categories are available, or 170,000 for the current 34-category set before the
+pending Z-to-nunu parent is added. Start with a small pilot and scale each parent sample until its least-populated child
+reaches 5,000; rare high-HT and `TT` children determine how many input files are needed. Do not
+guess a fixed file count before measuring these efficiencies.
+
+The physical staging is also exclusive: `stageBackgrounds.py` writes each event to exactly one
+fine-category directory. Training may combine directories through `training_groups` (for example,
+all six QCD directories become training label `QCD`) without changing or duplicating the original
+fine label.
+
+Normalize by parent sample, not child category:
+
+```
+event weight = luminosity * parent cross section * genWeight / parent sum(genWeight)
+```
+
+`Background_sample` ties every event to `background_samples_2025.json`. If several official
+Z-to-nunu HT slices are needed, each slice gets a separate sample ID, cross section, and sum of
+weights. Merge categories only after applying those parent weights.
 
 ---
 
@@ -112,14 +161,14 @@ cmsrel CMSSW_16_1_0_pre4
 cd CMSSW_16_1_0_pre4/src
 cmsenv
 git cms-init
-git cms-merge-topic quinnanm:addaxoscore   # pulls branch addaxoscore from github.com/quinnanm/cmssw
+git cms-merge-topic mbileska:addaxoscore-review
 scram b -j 8
 cd DPGAnalysis/L1TNanoAOD/test/axoScoutingNano   # everything below runs from here
 ```
 
-`git cms-merge-topic` checks out only the packages the branch changes (`DPGAnalysis/L1TNanoAOD`
-and `L1Trigger/L1TGlobal`). Don't run `scram b clean` after making local edits unless you know what
-you changed.
+`git cms-merge-topic` checks out only the packages the branch changes (`DPGAnalysis/L1TNanoAOD`,
+`L1Trigger/L1TGlobal`, and `L1Trigger/L1TCaloLayer1`). Don't run `scram b clean` after making local
+edits unless you know what you changed.
 
 ---
 
@@ -135,20 +184,17 @@ processed string tells you the conditions it was made with.
 
 | `makeConfig.sh` year | Input campaign (dataset name contains) | `--era` | `--conditions` (global tag) | Tested |
 |---|---|---|---|---|
-| `2022preEE` | `Run3Summer22DRPremix` / `mcRun3_2022_realistic_v` | `Run3` | `150X_mcRun3_2022_realistic_v2` | yes |
-| `2022postEE` | `Run3Summer22EEDRPremix` / `mcRun3_2022_realistic_postEE` | `Run3` | `150X_mcRun3_2022_realistic_postEE_v2` | no (same setup as pre-EE, different GT) |
-| `2023preBPix` | `Run3Summer23DRPremix` / `mcRun3_2023_realistic_v` | `Run3_2023` | `150X_mcRun3_2023_realistic_v2` | no (same setup as post-BPix, different GT) |
-| `2023postBPix` | `Run3Summer23BPixDRPremix` / `mcRun3_2023_realistic_postBPix` | `Run3_2023` | `150X_mcRun3_2023_realistic_postBPix_v2` | yes |
-| `2024` | `Run3Winter24Digi` / `mcRun3_2024_realistic` | `Run3_2024` | `150X_mcRun3_2024_realistic_v3` | yes |
-| `2025` | `Run3Winter25Digi` / `mcRun3_2025_realistic` | `Run3_2025` | `150X_mcRun3_2025_realistic_v12` | yes, and used for the existing samples |
+| `2022preEE` | `Run3Summer22DRPremix` / `mcRun3_2022_realistic_v` | `Run3` | `150X_mcRun3_2022_realistic_v2` | legacy AXO path only; new closure rerun required |
+| `2022postEE` | `Run3Summer22EEDRPremix` / `mcRun3_2022_realistic_postEE` | `Run3` | `150X_mcRun3_2022_realistic_postEE_v2` | new closure rerun required |
+| `2023preBPix` | `Run3Summer23DRPremix` / `mcRun3_2023_realistic_v` | `Run3_2023` | `150X_mcRun3_2023_realistic_v2` | new closure rerun required |
+| `2023postBPix` | `Run3Summer23BPixDRPremix` / `mcRun3_2023_realistic_postBPix` | `Run3_2023` | `150X_mcRun3_2023_realistic_postBPix_v2` | legacy AXO path only; new closure rerun required |
+| `2024` | `Run3Winter24Digi` / `mcRun3_2024_realistic` | `Run3_2024` | `150X_mcRun3_2024_realistic_v3` | legacy AXO path only; new closure rerun required |
+| `2025` | `Run3Winter25Digi` / `mcRun3_2025_realistic` | `Run3_2025` | `150X_mcRun3_2025_realistic_v12` | legacy AXO path only; new closure rerun required |
 
-What "tested" means: the config was made with `makeConfig.sh` in this release, ran on a few events
-with exit code 0, and wrote every event with `L1AXO_score` filled and `genWeight` present. The 2025
-check used a central `Run3Winter25Digi` file. The existing 2025 production also shows high scores
-lining up with `L1_AXO_Tight`. The 2022, 2023 and 2024 checks used TTbar events generated with that
-year's GT, because no central `GEN-SIM-RAW` from those years was on disk at the time. In those, the
-high-score events fired the AXO L1 bits and `DST_PFScouting_AXO*` paths. Before a large production of a row, especially an untested one, run the local test
-in Section 3.2 on a real input file.
+The legacy checks established that the era/GT choices and official AXO path run. They did not test
+the new independent AXO/CICADA inference or exclusive classifier. Treat every row as unvalidated
+for this implementation until Section 3.2 passes on a real input file; never start a large
+production from the legacy status alone.
 
 Other campaigns (for example `Run3Winter23Digi`, made with special conditions) are not covered.
 Ask before processing them.
@@ -166,7 +212,7 @@ The rest is the same for every year:
 | Steps | `-s L1REPACK:FullMC,HLT:GRun,NANO:@ScoutMonitor` | Re-emulate L1 from the raw detector data, re-run HLT, write scouting NanoAOD |
 | Process name | `--process reL1reHLT` | New name, so the original `HLT` results stay readable as `*_pHLT` |
 | Modifier `run3_scouting_2025` | added to the `cms.Process(...)` line for years before 2025 | The re-run HLT writes the 2025 scouting format in every year, so the scouting NanoAOD tables must be set up for that format. Without it they look for collections that don't exist and the job stops with `ProductNotFound`. |
-| `customiseAXOScoutingNano` | added near the end of the config | AXO score on, `L1AXO` table, `genWeight` table, scouting PF candidate and track tables (not part of `@ScoutMonitor`), `TryToContinue`, GEM masking (see below) |
+| `customiseAXOScoutingNano` | added near the end of the config | Both official and independent anomaly evaluations, exact tensors, optional strict background table, `genWeight`, scouting PF candidate and track tables, `TryToContinue`, and GEM masking |
 | Threads | `--nThreads 4` | Must match `--num-cores 4` in the CRAB submission |
 
 `customiseAXOScoutingNano` also handles two things that otherwise stop the job:
@@ -185,10 +231,15 @@ The rest is the same for every year:
 ### 3.1 Config for CRAB
 
 ```bash
-./makeConfig.sh 2023postBPix        # or any year from the table in Section 2
+./makeConfig.sh 2025 --background qcd   --sample-id 0
+./makeConfig.sh 2025 --background wjets --sample-id 1
+./makeConfig.sh 2025 --background zjets --sample-id 2
+./makeConfig.sh 2025 --background ttbar --sample-id 3
 ```
 
-This writes `axoNano_2023postBPix_cfg.py`, the file you give to CRAB. It runs `cmsDriver.py` with
+These write `axoNano_2025_<process>_s<id>_cfg.py`, one explicitly typed config per parent sample.
+The sample ID must match `background_samples_2025.json`; a second Z/DY parent must not reuse ID 2.
+The script runs `cmsDriver.py` with
 the settings above, then makes two edits to the generated file:
 1. it adds `run3_scouting_2025` to the `cms.Process(...)` line (years before 2025 only),
 2. it adds the `customiseAXOScoutingNano` call.
@@ -207,18 +258,18 @@ if the dataset is only on tape).
 
 ```bash
 voms-proxy-init --voms cms --valid 192:00
-DATASET=$(head -1 samplelists/datasets_2023postBPix.txt)     # any dataset of your year
+DATASET=$(head -1 samplelists/backgrounds_2025_wjets.txt)
 LFN=$(dasgoclient --query="file dataset=${DATASET}" | head -1)
 
-./makeConfig.sh 2023postBPix 10 root://cms-xrd-global.cern.ch/${LFN}   # writes test_2023postBPix_cfg.py
-cmsRun test_2023postBPix_cfg.py > test_2023postBPix.log 2>&1; echo "exit code: $?"
-root -l -b -q test_2023postBPix.root \
-  -e 'Events->Scan("L1AXO_score:L1_AXO_VLoose:L1_AXO_Tight:DST_PFScouting_AXOVLoose:genWeight")'
+./makeConfig.sh 2025 10 root://cms-xrd-global.cern.ch/${LFN} --background wjets --sample-id 1
+cmsRun test_2025_wjets_s1_cfg.py > test_2025_wjets_s1.log 2>&1; echo "exit code: $?"
+python3 validateTrialNano.py test_2025_wjets_s1.root --output validation_wjets.json
 ```
 
 Expected:
 - exit code 0
-- `L1AXO_score` real numbers (not `-999`), with high scores tending to have `L1_AXO_Tight = 1`
+- both score differences within `1e-6`, with all 57 AXO inputs and all 252 CICADA regions present
+- every event has one valid `Background_category` and the configured `Background_sample == 1`
 - `genWeight` present
 
 The first few minutes go to loading the HLT menu, so 10 events take roughly 5–10 minutes.
@@ -291,7 +342,7 @@ Main options:
 | `-o /store/user/<username>/...` | Output directory at the storage site |
 | `--site <site>` | Storage site (Section 0, step 5). The default `T3_US_FNALLPC` is probably not yours. |
 | `--work-area <dir>` | Local directory for the CRAB task folders. **Use a separate one per year** (see below). |
-| `-s FileBased` | One input file per job. `-n` is ignored: `crab.py` always uses 1 file per job. |
+| `-s FileBased -n N` | File-based splitting with N input files per job (`-n` is honored). Start with `-n 1` for the closure pilot. |
 | `--num-cores 4 --max-memory 8000` | Matches `--nThreads 4`. L1+HLT needs this much memory. |
 | `--no-publication` | Always use this |
 | `--input-blocks "b1,b2,..."` | Process only these blocks (use with data you staged by block) |
@@ -317,14 +368,18 @@ The output ends up at
 
 Replace `<username>` and `T2_US_UCSD` with your own. Add `--dryrun` the first time.
 
-**2025 signals and backgrounds**
+**2025 exclusive background closure pilot**
 ```bash
-./makeConfig.sh 2025
-python3 crab.py -p axoNano_2025_cfg.py -i samplelists/datasets_2025.txt \
-  -t AXOnano_2025_v1 -o /store/user/<username>/axoNano/2025/ \
-  --site T2_US_UCSD --work-area crab_2025 \
-  -s FileBased --num-cores 4 --max-memory 8000 --no-publication
+./makeConfig.sh 2025 --background wjets --sample-id 1
+python3 crab.py -p axoNano_2025_wjets_s1_cfg.py -i samplelists/backgrounds_2025_wjets.txt \
+  -t AnomalyNano_WJets_trial_v1 -o /store/user/<username>/anomalyNano/2025/WJets/ \
+  --site T2_US_UCSD --work-area crab_2025_wjets_trial \
+  -s FileBased -n 1 --max-units 10 --num-cores 4 --max-memory 8000 \
+  --no-publication --dryrun
 ```
+
+Repeat with the matching QCD, Z/DY, and ttbar config/list. Remove `--dryrun` only after inspecting
+the generated CRAB configs. `crab.py` submits unless `--dryrun` is present.
 
 **2025 flat-pT QCD, staged by block with Rucio (Section 4).** The dataset is about 30M events in
 29,900 files (500 files per block), all on tape. Stage and process 10–20 blocks at a time. The 10
@@ -334,12 +389,12 @@ DATASET=$(cat samplelists/QCD_2025_dataset.txt)
 dasgoclient --query="block dataset=${DATASET}" | grep -v -F -f samplelists/QCD_2025_blocks_v1.txt \
   | head -10 > samplelists/QCD_2025_blocks_v2.txt
 # ... add Rucio rules for these blocks (Section 4) and wait until they are OK ...
-./makeConfig.sh 2025
-python3 crab.py -p axoNano_2025_cfg.py -i samplelists/QCD_2025_dataset.txt \
+./makeConfig.sh 2025 --background qcd --sample-id 0
+python3 crab.py -p axoNano_2025_qcd_s0_cfg.py -i samplelists/backgrounds_2025_qcd.txt \
   -t AXOnano_QCD_2025_v2 -o /store/user/<username>/axoNano/QCD_2025/ \
   --site T2_US_UCSD --work-area crab_QCD_2025_v2 \
   --input-blocks "$(paste -sd, samplelists/QCD_2025_blocks_v2.txt)" \
-  -s FileBased --num-cores 4 --max-memory 8000 --no-publication
+  -s FileBased -n 1 --num-cores 4 --max-memory 8000 --no-publication
 ```
 Commit the new block list to the branch so the next person knows those blocks are done.
 
@@ -388,6 +443,37 @@ python3 crab.py --status --work-area crab_2024           # all tasks; resubmits 
 python3 crab.py --status --no-resubmit --work-area crab_2024
 ```
 
+### Validate and stage completed trial output
+
+Run the validator on all outputs from one or more parents. It checks event identity within each
+parent sample, exact tensor sizes, a complete CICADA grid, score closure, finite generator weights,
+and agreement between the stored category fields and the JSON phase-space boundaries:
+
+```bash
+python3 validateTrialNano.py /path/to/out_nano_*.root \
+  --expected-categories 0-23,27-36 \
+  --min-events-per-populated-category 5000 --output trial_validation.json
+```
+
+The expected set above is the current 34-category trial. After adding and validating Z-to-nunu,
+replace it with `--expected-categories all`. Add `--require-cross-sections` before any
+physics-normalized staging; IDs 24--26 remain empty until the pending Z-to-nunu parent sample is
+recorded in `background_samples_2025.json`. With `--min-events-per-populated-category`, the report
+also gives each parent's least-populated child, scale factor, and estimated total output-file count.
+That estimate is meaningful when the pilot used representative files and CRAB `FileBased -n 1`.
+
+After validation, create physically separate fine-category shards:
+
+```bash
+python3 stageBackgrounds.py /path/to/out_nano_*.root \
+  --validation-report trial_validation.json --output staged_backgrounds
+```
+
+Staging refuses a failed report, a different input list, or a nonempty output directory. It writes
+`00_QCD_Pt15to50/`, ..., `36_TTbar_TT/` as applicable plus `manifest.json`. To train
+one QCD class, read all category directories listed under `training_groups.QCD`; do not rewrite the
+fine `Background_category` field.
+
 ---
 
 ## 6. Sample lists and search outputs
@@ -396,6 +482,10 @@ python3 crab.py --status --no-resubmit --work-area crab_2024
 
 | File | Contents | How to use |
 |---|---|---|
+| `backgrounds_2025_qcd.txt` | Flat-pT QCD parent (sample ID 0) | Use only with the `qcd` config |
+| `backgrounds_2025_wjets.txt` | Inclusive W+jets parent (sample ID 1) | Use only with the `wjets` config |
+| `backgrounds_2025_zjets.txt` | `MLL>50` DY parent (sample ID 2); Z-to-nunu remains an explicit pending addition | Use only with the `zjets` config |
+| `backgrounds_2025_ttbar.txt` | Inclusive ttbar parent (sample ID 3) | Use only with the `ttbar` config |
 | `datasets_2025.txt` | 7 `Run3Winter25Digi` datasets: DY→2ℓ, TT, W+jets, VBF H→bb, HHH→4b2τ, gg→HH→2b2τ, VBF H→ττ | `./makeConfig.sh 2025`, then submit as a DAS-dataset list |
 | `QCD_2025_dataset.txt` | The flat-pT QCD dataset `QCD_Bin-PT-15to7000_Par-PT-flat2022` (`Run3Winter25Digi`, about 30M events, on tape) | Kept separate because it has to be staged and submitted by block (Section 5) |
 | `QCD_2025_blocks_v1.txt` | The 10 QCD blocks (5000 files) already processed, one block per line. Output at `/store/user/mequinna/ntuples/QCD_25/`. | Exclude these when choosing new blocks; add a `_v2`, `_v3`, … file for each new batch |
@@ -434,7 +524,9 @@ root -l "root://cms-xrd-global.cern.ch//store/user/<username>/axoNano/.../out_na
 
 - `L1AXO_score`: real values (not all `-999`). Events with `L1_AXO_Tight = 1` should have high scores.
 - `genWeight`: present. For the flat-pT QCD sample it spans many orders of magnitude.
-- To normalise, sum `genEventSumw` from the `Runs` tree of all output files.
+- Normalize each `Background_sample` independently using its cross section and summed
+  `genEventSumw`; only then merge its fine categories into a training group. The validator checks
+  the `Runs` sum against the event-level `genWeight` sum and reports readiness.
 
 Existing samples are under `root://redirector.t2.ucsd.edu:1095//store/user/mequinna/ntuples/`.
 Those made before this README existed used the 2025 conditions for every input year, so 2023 and

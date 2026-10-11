@@ -66,10 +66,17 @@ l1EmulCaloClusterTable = cms.EDProducer("SimpleTriggerL1CaloClusterFlatTableProd
                                         )
 )
 
-# AXO emulated score
-l1EmulAXOTable = cms.EDProducer("AXOL1TLScoreTableProducer",
-    src  = cms.InputTag("simGtStage2Digis", "AXOScore"),
-    name = cms.string("L1AXO"),
+# Official and independently recomputed AXOL1TL/CICADA scores plus their exact model inputs.
+l1EmulAnomalyTable = cms.EDProducer("L1AnomalyScoreTableProducer",
+    axoScore = cms.InputTag("simGtStage2Digis", "AXOScore"),
+    cicadaScore = cms.InputTag("simCaloStage2Layer1Summary", "CICADAScore"),
+    muons = cms.InputTag("simGmtStage2Digis"),
+    egammas = cms.InputTag("simCaloStage2Digis"),
+    jets = cms.InputTag("simCaloStage2Digis"),
+    etsums = cms.InputTag("simCaloStage2Digis"),
+    regions = cms.InputTag("simCaloStage2Layer1Digis"),
+    cicadaModel = cms.string("CICADAModel_v2p2p0"),
+    maxScoreDifference = cms.double(1.e-6),
 )
 
 
@@ -78,7 +85,7 @@ l1CaloTPsNanoTask = cms.Task(l1CaloTPTable)
 l1CaloLayer1NanoTask = cms.Task(l1CaloTowerTable)
 l1EmulCaloTPsNanoTask = cms.Task(l1EmulCaloTPTable)
 l1EmulCaloLayer1NanoTask = cms.Task(l1EmulCaloTowerTable,l1EmulCaloClusterTable)
-l1EmulAXONanoTask = cms.Task(l1EmulAXOTable)
+l1EmulAnomalyNanoTask = cms.Task(l1EmulAnomalyTable)
 
 #Now L1 emulated objects 
 #Cloning the L1 object tables producers used for central NANO (unpacked objects)
