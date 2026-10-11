@@ -306,7 +306,8 @@ file or stage one as described below.
 
 ## 4. Input data on tape: stage it with Rucio
 
-Most `GEN-SIM-RAW` lives only on tape. Check where a dataset is:
+`GEN-SIM-RAW` placement changes over time and may be complete, partial, or tape-only. Check the live
+placement before each production campaign:
 
 ```bash
 dasgoclient --query="site dataset=/X/Y/GEN-SIM-RAW"
@@ -377,7 +378,7 @@ Main options:
 | `--max-units N` | Process only N files *in total* |
 | `--fnal` | Input files on FNAL EOS (`cmseos.fnal.gov`): run at US sites and read over xrootd |
 | `--cern` | Input files on CERN EOS: run at `T2_CH_CERN` |
-| `--ignore-locality` | Run at US T2s regardless of where the data is |
+| `--ignore-locality` | Run away from the input site and read remotely. This does not recall tape and cannot make a tape-only file readable. |
 | `--dryrun` | Print the CRAB configs without submitting. Do this first. |
 | `--status --work-area <dir>` | Status of every task in the work area; resubmits failed jobs |
 
@@ -409,9 +410,10 @@ python3 crab.py -p axoNano_2025_wjets_s1_cfg.py -i samplelists/backgrounds_2025_
 Repeat with the matching QCD, Z/DY, and ttbar config/list. Remove `--dryrun` only after inspecting
 the generated CRAB configs. `crab.py` submits unless `--dryrun` is present.
 
-**2025 flat-pT QCD, staged by block with Rucio (Section 4).** The dataset is about 30M events in
-29,900 files (500 files per block), all on tape. Stage and process 10–20 blocks at a time. The 10
-blocks in `samplelists/QCD_2025_blocks_v1.txt` are already processed, so take different ones:
+**2025 flat-pT QCD, processed by block.** The dataset is about 30M events in 29,900 files (500 files
+per block). Its live disk placement can change; use disk-resident blocks directly and stage only
+missing blocks with Rucio (Section 4). Process 10–20 blocks at a time. The 10 blocks in
+`samplelists/QCD_2025_blocks_v1.txt` are already processed, so take different ones:
 ```bash
 DATASET=$(cat samplelists/QCD_2025_dataset.txt)
 dasgoclient --query="block dataset=${DATASET}" | grep -v -F -f samplelists/QCD_2025_blocks_v1.txt \

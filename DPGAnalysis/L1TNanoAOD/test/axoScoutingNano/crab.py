@@ -365,7 +365,7 @@ def main():
                         )
     parser.add_argument('--ignore-locality',
                         action='store_true', default=False,
-                        help='Set ignoreLocality=True, allowing tape recall. No site whitelist applied.'
+                        help='Run jobs away from the input site and read remotely. This does not recall tape. No site whitelist applied.'
                         )
     parser.add_argument('--status',
                         action='store_true', default=False,
