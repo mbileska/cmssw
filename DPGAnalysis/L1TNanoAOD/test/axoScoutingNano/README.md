@@ -259,7 +259,24 @@ if the dataset is only on tape).
 ```bash
 voms-proxy-init --voms cms --valid 192:00
 DATASET=$(head -1 samplelists/backgrounds_2025_wjets.txt)
-LFN=$(dasgoclient --query="file dataset=${DATASET}" | head -1)
+
+# Do not assume the first DAS file has a disk replica. Probe a bounded set and
+# keep the first file that the global redirector can actually locate.
+LFN=
+while IFS= read -r candidate; do
+  echo "checking ${candidate}"
+  if timeout 45 xrdfs root://cms-xrd-global.cern.ch stat "${candidate}" >/dev/null 2>&1; then
+    LFN=${candidate}
+    break
+  fi
+done < <(dasgoclient --limit=50 --query="file dataset=${DATASET}")
+
+if [ -z "${LFN}" ]; then
+  echo "No readable disk replica found among the first 50 files. Dataset sites:"
+  dasgoclient --query="site dataset=${DATASET}" | sort -u
+  echo "Stage a file or block as described in Section 4, then retry."
+  false
+fi
 
 ./makeConfig.sh 2025 10 root://cms-xrd-global.cern.ch/${LFN} --background wjets --sample-id 1
 cmsRun test_2025_wjets_s1_cfg.py > test_2025_wjets_s1.log 2>&1; echo "exit code: $?"
@@ -273,6 +290,10 @@ Expected:
 - `genWeight` present
 
 The first few minutes go to loading the HLT menu, so 10 events take roughly 5–10 minutes.
+An xrootd `3011 No servers are available to read the file` error occurs before event processing and
+means that the selected LFN has no reachable disk replica; it is not an AXO/CICADA failure. Check
+the individual file with `dasgoclient --query="site file=${LFN}"`, then select another disk-resident
+file or stage one as described below.
 
 ---
 
