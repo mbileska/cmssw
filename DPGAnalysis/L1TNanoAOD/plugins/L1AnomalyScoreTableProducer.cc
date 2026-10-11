@@ -14,6 +14,7 @@
 #include "CondFormats/DataRecord/interface/L1TUtmTriggerMenuRcd.h"
 #include "CondFormats/L1TObjects/interface/L1TUtmTriggerMenu.h"
 #include "DataFormats/L1CaloTrigger/interface/CICADA.h"
+#include "DataFormats/L1CaloTrigger/interface/L1CaloCollections.h"
 #include "DataFormats/L1CaloTrigger/interface/L1CaloRegion.h"
 #include "DataFormats/L1TGlobal/interface/AXOL1TLScore.h"
 #include "DataFormats/L1Trigger/interface/EGamma.h"
