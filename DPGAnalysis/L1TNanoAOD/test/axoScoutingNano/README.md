@@ -44,6 +44,7 @@ the input MC.
 | `background_categories.json` | Authoritative 37-category partition and optional coarse training groups |
 | `background_samples_2025.json` | Parent-dataset IDs and normalization ledger; cross sections must be filled before physics normalization |
 | `validateTrialNano.py` | Fails on score disagreement, malformed tensors, duplicate events, invalid labels, or weights |
+| `plotBackgroundSurvey.py` | Streams completed files into category/score/weight QA plots and an exact JSON summary |
 | `stageBackgrounds.py` | Writes one set of Parquet shards per fine category; training groups remain a reversible mapping |
 
 The code changes this workflow needs live in two other packages of the branch:
@@ -476,6 +477,99 @@ crab resubmit -d crab_2024/crab_<task name>              # retry failed jobs
 python3 crab.py --status --work-area crab_2024           # all tasks; resubmits failures
 python3 crab.py --status --no-resubmit --work-area crab_2024
 ```
+
+For a failed task, get the actual failing job IDs and Framework exception before changing the
+CMSSW configuration:
+
+```bash
+TASK=crab_2025_zjets_survey100_v1/crab_DYto2L-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8
+mkdir -p diagnostics
+crab status -d "$TASK" --long --sort=exitcode --verboseErrors \
+  | tee diagnostics/zjets_status_verbose.txt
+
+# Replace the example IDs with failed IDs printed above.  --short works even though
+# General.transferLogs was false in these tasks.
+crab getlog --short -d "$TASK" --jobids 1,2,3
+find "$TASK/results" -type f -name 'job_out*' -print0 \
+  | xargs -0 grep -nE 'Fatal Exception|Exception Message|FileOpenError|Failed to open|8028|8001|8901'
+```
+
+Exit code 8028 is an input `FileOpenError` after the local and fallback access attempts. It is
+usually a file/replica/site problem, not an anomaly-score failure. Code 8001 is only the generic
+CMS-exception wrapper, so its `Exception Message` must be inspected. Code 8901 is abnormal job
+termination and also needs the short log. After recording those messages, retry the failed jobs
+once with `crab resubmit -d "$TASK"`. If the same 8028 files fail repeatedly, keep the successful
+survey files and choose a different fully disk-resident block for the replacement task instead of
+recalling a large dataset from tape.
+
+### Survey QA plots
+
+Make immutable, per-parent file lists from completed stage-out files. Missing files from failed
+jobs are expected at this point; the lists below let validation and plotting use only successful
+outputs while those jobs are diagnosed or retried.
+
+```bash
+SURVEY=/hdfs/store/user/mbileska/anomalyNano/2025/survey100
+mkdir -p survey_filelists survey_reports
+
+find "$SURVEY/QCD"   -type f -name 'out_nano_*.root' | sort > survey_filelists/qcd.txt
+find "$SURVEY/WJets" -type f -name 'out_nano_*.root' | sort > survey_filelists/wjets.txt
+find "$SURVEY/ZJets" -type f -name 'out_nano_*.root' | sort > survey_filelists/zjets.txt
+find "$SURVEY/TTbar" -type f -name 'out_nano_*.root' | sort > survey_filelists/ttbar.txt
+wc -l survey_filelists/*.txt
+
+sort -u survey_filelists/qcd.txt survey_filelists/wjets.txt \
+  survey_filelists/zjets.txt survey_filelists/ttbar.txt > survey_filelists/all.txt
+```
+
+First run the strict technical validator. This checks both official-versus-independent AXOL1TL
+and CICADA evaluations, tensor dimensions, finite weights, category consistency, event uniqueness,
+and `Runs/genEventSumw` accounting:
+
+```bash
+python3 validateTrialNano.py @survey_filelists/all.txt \
+  --output survey_reports/technical_validation.json
+```
+
+Then measure category coverage. This second command is allowed to exit nonzero: that means the
+100-file survey has identified an empty or under-5k category and tells us how far to scale the
+parent production; it does not by itself mean that a ROOT file is corrupt.
+
+```bash
+python3 validateTrialNano.py @survey_filelists/all.txt \
+  --expected-categories 0-23,27-36 \
+  --min-events-per-populated-category 5000 \
+  --output survey_reports/category_coverage.json
+```
+
+Finally make the QA plots. The reader streams through the ROOT files and retains bounded,
+deterministic random samples for distributions, so it does not load all events into login-node
+memory:
+
+```bash
+python3 plotBackgroundSurvey.py @survey_filelists/all.txt \
+  --output-dir survey_reports/plots
+```
+
+Inspect these first:
+
+- `survey_summary.json`: exact event/category counts, signed-weight sums, negative-weight
+  fractions, mean scores, maximum two-way score differences, and sampled quantiles.
+- `score_closure.png`: both maximum differences must be below `1e-6` (zero is expected for the
+  checked pilot).
+- `category_counts.png`: exposes empty/rare categories and determines full-campaign scaling.
+- `kinematic_shapes_*.png`: confirms that adjacent exclusive pT/HT categories meet at the intended
+  boundaries and do not overlap.
+- `score_distributions_by_process.png` and `category_scores_*.png`: catches constant, saturated,
+  discontinuous, or category-specific score behavior.
+- `axo_vs_cicada.png`: the two models need not agree event by event, but the cloud should be finite
+  and structured rather than a line caused by copied columns.
+- `genweight_magnitudes.png`: catches zero/non-finite or wildly inconsistent parent weights.
+
+These are **unweighted QA shapes**, not predicted rates. `background_samples_2025.json` still has
+null cross sections. Do not compare physical yields across QCD, W+jets, DY, and ttbar until every
+parent has a checked cross section and has independently been normalized by its own signed
+`sum(genWeight)`.
 
 ### Validate and stage completed trial output
 
