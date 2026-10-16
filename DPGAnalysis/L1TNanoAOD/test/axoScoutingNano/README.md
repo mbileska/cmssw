@@ -45,6 +45,9 @@ the input MC.
 | `background_samples_2025.json` | Parent-dataset IDs and normalization ledger; cross sections must be filled before physics normalization |
 | `validateTrialNano.py` | Fails on score disagreement, malformed tensors, duplicate events, invalid labels, or weights |
 | `plotBackgroundSurvey.py` | Streams completed files into category/score/weight QA plots and an exact JSON summary |
+| `auditBackgroundNano.py` | Streams the full production into raw and generator-weighted plots for all model-source and scouting features |
+| `backgroundAuditCore.py` | Bounded-reservoir, weighted-statistics, and histogram helpers used by the full audit |
+| `testBackgroundAuditCore.py` | Unit tests for the full-audit statistics, reservoirs, score residuals, and category schema |
 | `stageBackgrounds.py` | Writes one set of Parquet shards per fine category; training groups remain a reversible mapping |
 
 The code changes this workflow needs live in two other packages of the branch:
@@ -94,6 +97,72 @@ event weight = luminosity * parent cross section * genWeight / parent sum(genWei
 `Background_sample` ties every event to `background_samples_2025.json`. If several official
 Z-to-nunu HT slices are needed, each slice gets a separate sample ID, cross section, and sum of
 weights. Merge categories only after applying those parent weights.
+
+### Full input audit before conversion
+
+Run `auditBackgroundNano.py` on the completed native NanoAOD files before
+converting them into the padded NURD/AE tensors. It reads every event for exact
+counts, category coverage, score closure, and weight statistics, while using
+bounded random reservoirs for plotting. The exhaustive profile covers all
+numeric non-trigger branches plus derived multiplicity, summed-pT, leading
+object, pT-ranked object-slot, and direct PF-model-input quantities.
+
+For each feature it produces raw and within-parent `|genWeight|` shapes for all
+four parents, raw-versus-weighted plots per parent, and raw/weighted category
+overlays inside QCD, W+jets, Z+jets, and ttbar. Candidate-level weighted plots
+divide each event weight among that event's candidates so multiplicity does not
+silently add extra event weight. Every displayed curve is independently unit
+normalized: cross-process physical yields are intentionally omitted until the
+parent cross sections are filled in.
+
+First run a smoke test:
+
+```bash
+export PYTHONNOUSERSITE=1
+python3 auditBackgroundNano.py @production_filelists/all.txt \
+  --profile nurd --max-files 10 --max-plotted-features 20 \
+  --output-dir production_reports/background_input_audit_smoke \
+  2>&1 | tee production_reports/background_input_audit_smoke.log
+```
+
+Then use `tmux` for the complete campaign:
+
+```bash
+tmux new -s background_input_audit
+source /cvmfs/cms.cern.ch/cmsset_default.sh
+export SCRAM_ARCH=el9_amd64_gcc14
+cd /afs/hep.wisc.edu/user/mbileska/axo_sample_work/CMSSW_16_1_0_pre4/src
+cmsenv
+export PYTHONNOUSERSITE=1
+cd DPGAnalysis/L1TNanoAOD/test/axoScoutingNano
+mkdir -p production_reports
+set -o pipefail
+time python3 auditBackgroundNano.py @production_filelists/all.txt \
+  --profile exhaustive \
+  --output-dir production_reports/background_input_audit \
+  2>&1 | tee production_reports/background_input_audit.log
+```
+
+Detach with `Ctrl-b d` and return with
+`tmux attach -t background_input_audit`. Open
+`production_reports/background_input_audit/index.html` for the plot gallery.
+The same directory contains `audit_summary.json`, per-category and per-parent
+weight summaries, a complete feature inventory/ranking, weighted subcategory
+separation tables, and `model_input_contract.json`.
+
+The separation ranking is triage, not an automatic split/exclusion decision.
+A raw mode that disappears under generator weighting is a sampling artifact.
+Consider a finer category only when a weighted difference persists across
+several actual model inputs with adequate effective statistics, then confirm it
+with held-out classifier confusion and stability after conversion. Parent
+separation is useful classifier information, and physically valid overlap
+between Standard Model parents is not by itself a reason to remove a sample.
+
+For eventual training, do not compare the absolute `genWeight` scales of the
+four generators. Normalize mean `|genWeight|` to one separately within each
+parent before combining parents. The AE uses those generator weights without
+class equalization; NURD can subsequently combine them with its own class and
+nuisance-stratum balancing.
 
 ---
 
