@@ -8,7 +8,10 @@
       "process": "qcd",
       "dataset": "/QCD_Bin-PT-15to7000_Par-PT-flat2022_TuneCP5_13p6TeV_pythia8/Run3Winter25Digi-142X_mcRun3_2025_realistic_v9-v4/GEN-SIM-RAW",
       "allowed_category_ids": [0, 1, 2, 3, 4, 5],
-      "cross_section_pb": null,
+      "cross_section_pb": 1947000000.0,
+      "cross_section_kind": "official McM exact-sample generator cross section",
+      "cross_section_source": "https://cms-pdmv-prod.web.cern.ch/mcm/public/restapi/requests/get/JME-Run3Winter25GS-00001",
+      "cross_section_review": "The 2026-10-20 10k-event GenXSecAnalyzer check returned 1.425e9 +/- 9.216e6 pb. The exact-sample McM value is retained because this sample uses the PtHatEmpReweightUserHook; record the runtime value as a systematic cross-check rather than silently replacing the production normalization.",
       "weight_note": "Keep the signed generator weight; this flat-pT sample relies on its event weights."
     },
     {
@@ -17,7 +20,10 @@
       "process": "wjets",
       "dataset": "/WJetsToLNu_TuneCP5_13p6TeV_madgraphMLM-pythia8/Run3Winter25Digi-142X_mcRun3_2025_realistic_v7-v2/GEN-SIM-RAW",
       "allowed_category_ids": [6, 7, 8, 9, 10, 11, 12, 13, 14],
-      "cross_section_pb": null,
+      "cross_section_pb": 56120.0,
+      "cross_section_kind": "official McM exact-sample cross section after MLM matching",
+      "cross_section_source": "https://cms-pdmv-prod.web.cern.ch/mcm/public/restapi/requests/get/TSG-Run3Winter25wmLHEGS-00088",
+      "cross_section_review": "A partial 2026-10-20 GenXSecAnalyzer run returned 57450 +/- 1110 pb after matching, compatible with this value. Do not multiply by the separately reported matching efficiency again.",
       "weight_note": "One inclusive parent normalization is shared by its mutually exclusive decay/HT children."
     },
     {
@@ -26,7 +32,10 @@
       "process": "zjets",
       "dataset": "/DYto2L-4Jets_Bin-MLL-50_TuneCP5_13p6TeV_madgraphMLM-pythia8/Run3Winter25Digi-142X_mcRun3_2025_realistic_v7-v2/GEN-SIM-RAW",
       "allowed_category_ids": [15, 16, 17, 18, 19, 20, 21, 22, 23],
-      "cross_section_pb": null,
+      "cross_section_pb": 5433.0,
+      "cross_section_kind": "GenXSecAnalyzer exact-dataset cross section after MLM matching",
+      "cross_section_source": "local GenXSecAnalyzer run on 2026-10-20; 5433 +/- 29 pb",
+      "cross_section_review": "The exact McM request contains a placeholder-style 1 pb entry. The clean 50112-attempt runtime result is used instead. Do not multiply by the separately reported matching efficiency again.",
       "weight_note": "The MLL>50 phase-space definition is part of this parent sample and must not be mixed with another DY mass slice."
     },
     {
@@ -35,7 +44,10 @@
       "process": "ttbar",
       "dataset": "/TT_TuneCP5_13p6TeV_powheg-pythia8/Run3Winter25Digi-142X_mcRun3_2025_realistic_v7-v2/GEN-SIM-RAW",
       "allowed_category_ids": [27, 28, 29, 30, 31, 32, 33, 34, 35, 36],
-      "cross_section_pb": null,
+      "cross_section_pb": 923.6,
+      "cross_section_kind": "ATLAS/CMS NNLO+NNLL inclusive recommendation at 13.6 TeV",
+      "cross_section_source": "https://twiki.cern.ch/twiki/bin/view/LHCPhysics/TtbarNNLO",
+      "cross_section_review": "The exact-dataset GenXSecAnalyzer value is 814.5 +/- 0.22 pb. The analysis normalization uses the common higher-order prediction for mt=172.5 GeV and PDF4LHC21.",
       "weight_note": "One inclusive parent normalization is shared by the ten mutually exclusive W-decay pairs."
     }
   ],

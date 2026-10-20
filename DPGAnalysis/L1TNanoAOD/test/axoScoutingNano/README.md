@@ -42,8 +42,9 @@ the input MC.
 | `samplelists/` | Input lists for CRAB (Section 6) |
 | `samplesearch/` | Scripts used to find the input datasets in DAS, and their outputs (Section 6) |
 | `background_categories.json` | Authoritative 37-category partition and optional coarse training groups |
-| `background_samples_2025.json` | Parent-dataset IDs and normalization ledger; cross sections must be filled before physics normalization |
+| `background_samples_2025.json` | Parent-dataset IDs, reviewed cross sections, and normalization provenance |
 | `validateTrialNano.py` | Fails on score disagreement, malformed tensors, duplicate events, invalid labels, or weights |
+| `buildBackgroundWeights.py` | Checks parent/category normalization closure and survey-to-production stability, then exports one event-aligned all-background physics-weight vector |
 | `plotBackgroundSurvey.py` | Streams completed files into category/score/weight QA plots and an exact JSON summary |
 | `auditBackgroundNano.py` | Streams the full production into raw and generator-weighted plots for all model-source and scouting features |
 | `backgroundAuditCore.py` | Bounded-reservoir, weighted-statistics, and histogram helpers used by the full audit |
@@ -159,10 +160,45 @@ separation is useful classifier information, and physically valid overlap
 between Standard Model parents is not by itself a reason to remove a sample.
 
 For eventual training, do not compare the absolute `genWeight` scales of the
-four generators. Normalize mean `|genWeight|` to one separately within each
-parent before combining parents. The AE uses those generator weights without
-class equalization; NURD can subsequently combine them with its own class and
-nuisance-stratum balancing.
+four generators directly. The physical base weight is the reviewed parent
+cross section times `genWeight / parent sum(genWeight)`. This both removes the
+arbitrary generator-specific scale and supplies the physical relative rate of
+the four parents. A single global rescaling of all weights to mean one is
+allowed for numerical conditioning because it preserves every ratio. Do not
+renormalize each parent to equal mass in the AE; class and AE-nuisance
+balancing belong later in the NURD loss.
+
+### Production normalization and aligned weight export
+
+`background_samples_2025.json` records the selected parent cross sections and
+their provenance. The exclusive category cross sections are derived from the
+parent, never assigned independently:
+
+```
+category cross section = parent cross section
+                         * category sum(genWeight) / parent sum(genWeight)
+```
+
+After the full validator has passed, build an aligned NPZ. Comparing with the
+earlier survey checks that the incomplete CRAB tasks did not materially change
+either the raw or generator-weighted fine-category fractions:
+
+```bash
+export PYTHONNOUSERSITE=1
+python3 buildBackgroundWeights.py @production_filelists/all.txt \
+  --validation-report production_reports/technical_validation.json \
+  --reference-validation survey_reports/technical_validation.json \
+  --expected-files 2008 --expected-events 2582935 \
+  --output production_reports/background_physics_weights.npz \
+  2>&1 | tee production_reports/background_physics_weights.log
+```
+
+The NPZ contains `weights`, raw `gen_weight`, parent/category IDs, and a
+four-column `event_id = (Background_sample, run, luminosityBlock, event)`. The
+converter must preserve the same key and row order. The NURD loader verifies
+that key exactly before using the weights. The adjacent JSON report contains
+parent and category closure plus the survey comparison; the adjacent CSV is
+the derived fine-category cross-section table.
 
 ---
 
@@ -635,10 +671,9 @@ Inspect these first:
   and structured rather than a line caused by copied columns.
 - `genweight_magnitudes.png`: catches zero/non-finite or wildly inconsistent parent weights.
 
-These are **unweighted QA shapes**, not predicted rates. `background_samples_2025.json` still has
-null cross sections. Do not compare physical yields across QCD, W+jets, DY, and ttbar until every
-parent has a checked cross section and has independently been normalized by its own signed
-`sum(genWeight)`.
+These are **unweighted QA shapes**, not predicted rates. Do not compare physical yields across
+QCD, W+jets, DY, and ttbar using those plots. Build the physics weights below so that every parent
+uses its reviewed cross section and its own signed `sum(genWeight)` before the parents are merged.
 
 ### Validate and stage completed trial output
 
