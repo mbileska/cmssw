@@ -59,39 +59,23 @@ public:
 
 class MHHSums {
 public:
-    ap_int<12> Ex[3];
-    ap_int<12> Ey[3];
-    ap_uint<12> Ht;
-    ap_uint<12> SumET;
-    ap_uint<12> NObj;
+    ap_int<12> Ex, Ey, Htx, Hty;
+    ap_uint<12> SumET, Ht, NObj;
 
-    MHHSums() {
-        for (int i = 0; i < 3; ++i) {
-            Ex[i] = 0;
-            Ey[i] = 0;
-        }
-        Ht = 0;
-        SumET = 0;
-        NObj = 0;
-    }
+    MHHSums()
+        : Ex(0), Ey(0), Htx(0), Hty(0), SumET(0), Ht(0), NObj(0) {}
 
-    MHHSums(const MHHSums& rhs) {
-        for (int i = 0; i < 3; ++i) {
-            Ex[i] = rhs.Ex[i];
-            Ey[i] = rhs.Ey[i];
-        }
-        Ht = rhs.Ht;
-        SumET = rhs.SumET;
-        NObj = rhs.NObj;
-    }
+    MHHSums(const MHHSums& rhs)
+        : Ex(rhs.Ex), Ey(rhs.Ey), Htx(rhs.Htx), Hty(rhs.Hty),
+          SumET(rhs.SumET), Ht(rhs.Ht), NObj(rhs.NObj) {}
 
     MHHSums& operator=(const MHHSums& rhs) {
-        for (int i = 0; i < 3; ++i) {
-            Ex[i] = rhs.Ex[i];
-            Ey[i] = rhs.Ey[i];
-        }
-        Ht = rhs.Ht;
+        Ex = rhs.Ex;
+        Ey = rhs.Ey;
+        Htx = rhs.Htx;
+        Hty = rhs.Hty;
         SumET = rhs.SumET;
+        Ht = rhs.Ht;
         NObj = rhs.NObj;
         return *this;
     }

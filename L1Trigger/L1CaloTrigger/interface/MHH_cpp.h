@@ -27,39 +27,6 @@ static inline ap_uint<48> pack_had_output(const MHHObject& object) {
     return out;
 }
 
-static inline ap_int<12> unpack_signed_sum_component(
-    ap_uint<48> word,
-    ap_uint<2> scenario
-) {
-    #pragma HLS INLINE
-    switch (scenario) {
-        case 0: return (ap_int<12>)word.range(11, 0);
-        case 1: return (ap_int<12>)word.range(23, 12);
-        default: return (ap_int<12>)word.range(35, 24);
-    }
-}
-
-static inline ap_uint<12> unpack_unsigned_sum_component(ap_uint<48> word) {
-    #pragma HLS INLINE
-    return word.range(11, 0);
-}
-
-static inline ap_uint<48> pack_signed_sum_hypotheses(const ap_int<12> values[3]) {
-    #pragma HLS INLINE
-    ap_uint<48> out = 0;
-    out.range(11, 0) = (ap_uint<12>)values[0];
-    out.range(23, 12) = (ap_uint<12>)values[1];
-    out.range(35, 24) = (ap_uint<12>)values[2];
-    return out;
-}
-
-static inline ap_uint<48> pack_unsigned_sum_component(ap_uint<12> value) {
-    #pragma HLS INLINE
-    ap_uint<48> out = 0;
-    out.range(11, 0) = value;
-    return out;
-}
-
 static inline ap_uint<12> saturating_add(ap_uint<12> a, ap_uint<12> b) {
     #pragma HLS INLINE
     ap_uint<13> s = (ap_uint<13>)a + (ap_uint<13>)b;
@@ -396,27 +363,25 @@ void processInputLinks(
 
     }
 
-    ap_uint<576> hf_sums = link_in[MHH_HF_LINK_BASE + 2];
-    ap_uint<576> hgcal_sums = link_in[MHH_HGCAL_LINK_BASE + 2];
-    ap_uint<48> hf_ex = hf_sums.range(47, 0);
-    ap_uint<48> hf_ey = hf_sums.range(95, 48);
-    ap_uint<48> hgcal_ex = hgcal_sums.range(47, 0);
-    ap_uint<48> hgcal_ey = hgcal_sums.range(95, 48);
-
-    for (int scenario = 0; scenario < 3; ++scenario) {
-        #pragma HLS UNROLL
-        Sums.Ex[scenario] = unpack_signed_sum_component(hf_ex, scenario) +
-                            unpack_signed_sum_component(hgcal_ex, scenario);
-        Sums.Ey[scenario] = unpack_signed_sum_component(hf_ey, scenario) +
-                            unpack_signed_sum_component(hgcal_ey, scenario);
-    }
-
-    Sums.Ht = unpack_unsigned_sum_component(hf_sums.range(143, 96)) +
-              unpack_unsigned_sum_component(hgcal_sums.range(143, 96));
-    Sums.SumET = unpack_unsigned_sum_component(hf_sums.range(191, 144)) +
-                 unpack_unsigned_sum_component(hgcal_sums.range(191, 144));
-    Sums.NObj = unpack_unsigned_sum_component(hf_sums.range(239, 192)) +
-                unpack_unsigned_sum_component(hgcal_sums.range(239, 192));
+    // Sums ABI v2: both upstream sources provide global Cartesian energy-flow
+    // components. Preserve the firmware's 12-bit modular reduction at this
+    // source boundary and emit one global vector, not phi hypotheses.
+    const ap_uint<576> hf_sums = link_in[MHH_HF_LINK_BASE + 2];
+    const ap_uint<576> hgcal_sums = link_in[MHH_HGCAL_LINK_BASE + 2];
+    Sums.Ex = (ap_int<12>)hf_sums.range(11, 0) +
+              (ap_int<12>)hgcal_sums.range(11, 0);
+    Sums.Ey = (ap_int<12>)hf_sums.range(23, 12) +
+              (ap_int<12>)hgcal_sums.range(23, 12);
+    Sums.Htx = (ap_int<12>)hf_sums.range(35, 24) +
+               (ap_int<12>)hgcal_sums.range(35, 24);
+    Sums.Hty = (ap_int<12>)hf_sums.range(47, 36) +
+               (ap_int<12>)hgcal_sums.range(47, 36);
+    Sums.SumET = (ap_uint<12>)hf_sums.range(75, 64) +
+                 (ap_uint<12>)hgcal_sums.range(75, 64);
+    Sums.Ht = (ap_uint<12>)hf_sums.range(87, 76) +
+              (ap_uint<12>)hgcal_sums.range(87, 76);
+    Sums.NObj = (ap_uint<12>)hf_sums.range(99, 88) +
+                (ap_uint<12>)hgcal_sums.range(99, 88);
 }
 
 void sortGCTVars(
@@ -553,12 +518,14 @@ void processOutLinks(
         out_link1.range((i + 6) * 48 + 47, (i + 6) * 48) = pack_had_output(TausTop6[i]);
     }
 
-    // Preserve the three 12-bit Ex/Ey hypotheses required by downstream link C.
-    out_link2.range(47, 0) = pack_signed_sum_hypotheses(Sums.Ex);
-    out_link2.range(95, 48) = pack_signed_sum_hypotheses(Sums.Ey);
-    out_link2.range(143, 96) = pack_unsigned_sum_component(Sums.Ht);
-    out_link2.range(191, 144) = pack_unsigned_sum_component(Sums.SumET);
-    out_link2.range(239, 192) = pack_unsigned_sum_component(Sums.NObj);
+    // GCTS source-link sums ABI v2. Unused bits and words remain zero.
+    out_link2.range(11, 0) = Sums.Ex;
+    out_link2.range(23, 12) = Sums.Ey;
+    out_link2.range(35, 24) = Sums.Htx;
+    out_link2.range(47, 36) = Sums.Hty;
+    out_link2.range(75, 64) = Sums.SumET;
+    out_link2.range(87, 76) = Sums.Ht;
+    out_link2.range(99, 88) = Sums.NObj;
 
     link_out[MHH_CARD_A_OUTPUT_BASE + 0] = out_link0;
     link_out[MHH_CARD_A_OUTPUT_BASE + 1] = out_link1;

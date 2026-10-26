@@ -3,3 +3,6 @@
 
 <bin file="testPhase2L1GCTSumFirmware.cpp" name="testPhase2L1GCTSumFirmware"/>
 <test name="testPhase2L1GCTSumFirmware" command="testPhase2L1GCTSumFirmware"/>
+
+<bin file="testPhase2L1MHHFirmware.cpp" name="testPhase2L1MHHFirmware"/>
+<test name="testPhase2L1MHHFirmware" command="testPhase2L1MHHFirmware"/>

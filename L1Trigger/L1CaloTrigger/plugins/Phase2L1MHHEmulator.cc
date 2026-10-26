@@ -76,6 +76,10 @@ void Phase2L1MHHEmulator::produce(edm::Event& event, const edm::EventSetup&) {
 
   p2mhh::mhh_algo_top(linkIn.data(), linkOut.data());
 
+  // These are event-level 576-bit MHH source frames for GCTS. Links 0--2
+  // carry EG/EGiso, jets/taus, and sums ABI v2 respectively; links 3--5 are
+  // reserved zero outputs. Physical playback/capture timing is board-test
+  // transport and is intentionally not modeled by this physics emulator.
   for (int i = 0; i < p2mhh::MHH_N_OUTPUT_LINKS; ++i) {
     auto words = std::make_unique<std::vector<uint64_t>>();
     words->reserve(9);
