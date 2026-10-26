@@ -1427,7 +1427,8 @@ inline p2eg::Cluster p2eg::getClusterFromRegion3x4(p2eg::crystal temp[p2eg::CRYS
   float seedEnergyFloat = cluster_tmp.seedEnergy * ECAL_LSB;
 
   // Do not make cluster if seed is less than 1.0 GeV
-  if (seedEnergyFloat < 1.0) {
+  if (seedEnergyFloat < 511.5) { //turn off clustering
+  //if (seedEnergyFloat < 1.0) {
     cluster_tmp.energy = 0;
     cluster_tmp.phiMax = 0;
     cluster_tmp.etaMax = 0;

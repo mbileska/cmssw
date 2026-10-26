@@ -16,3 +16,6 @@
 #include "DataFormats/L1TCalorimeterPhase2/interface/DigitizedClusterGT.h"
 #include "DataFormats/L1TCalorimeterPhase2/interface/CaloPFCluster.h"
 #include "DataFormats/L1TCalorimeterPhase2/interface/Phase2L1CaloJet.h"
+#include "DataFormats/L1TCalorimeterPhase2/interface/RCT_output.h"
+#include "DataFormats/L1TCalorimeterPhase2/interface/GCT_output.h"
+#include "DataFormats/L1TCalorimeterPhase2/interface/HF_output.h"

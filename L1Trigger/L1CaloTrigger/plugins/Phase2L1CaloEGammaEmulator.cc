@@ -80,7 +80,7 @@ private:
   const HcalTopology* hcTopology_;
 };
 
-//////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 
 // Phase2L1CaloEGammaEmulator initializer, destructor, and produce methods
 
@@ -152,6 +152,7 @@ void Phase2L1CaloEGammaEmulator::produce(edm::Event& iEvent, const edm::EventSet
           2);  // also save the uint Et, this is to convert between 0.125 (in MC production) and 0.5 (in firmware based code)
       ehit.setPt();
       ecalhits.push_back(ehit);
+
     }
   }
 
@@ -409,11 +410,11 @@ void Phase2L1CaloEGammaEmulator::produce(edm::Event& iEvent, const edm::EventSet
     //-------------------------------------------//
     // Calibrate clusters
     //-------------------------------------------//
-    for (auto& c : cluster_list_merged[cc]) {
-      float realEta = c.realEta(cc);
-      c.calib = calib_(c.getPt(), std::abs(realEta));
-      c.applyCalibration(c.calib);
-    }
+    //for (auto& c : cluster_list_merged[cc]) {
+      //float realEta = c.realEta(cc);
+      //c.calib = calib_(c.getPt(), std::abs(realEta));
+      //c.applyCalibration(c.calib);
+    //}
 
     //-------------------------------------------//
     // Cluster shower shape flags
@@ -426,14 +427,14 @@ void Phase2L1CaloEGammaEmulator::produce(edm::Event& iEvent, const edm::EventSet
     //-------------------------------------------//
     // Calibrate towers
     //-------------------------------------------//
-    for (int ii = 0; ii < p2eg::n_towers_cardEta; ++ii) {    // 17 towers per card in eta
-      for (int jj = 0; jj < p2eg::n_towers_cardPhi; ++jj) {  // 4 towers per card in phi
-        float tRealEta = p2eg::getTowerEta_fromAbsID(
-            p2eg::getAbsID_iEta_fromFirmwareCardTowerLink(cc, ii, jj));  // real eta of center of tower
-        double tCalib = calib_(0, tRealEta);                             // calibration factor
-        towerECALCard[ii][jj][cc].applyCalibration(tCalib);
-      }
-    }
+    //for (int ii = 0; ii < p2eg::n_towers_cardEta; ++ii) {    // 17 towers per card in eta
+    //  for (int jj = 0; jj < p2eg::n_towers_cardPhi; ++jj) {  // 4 towers per card in phi
+    //    float tRealEta = p2eg::getTowerEta_fromAbsID(
+    //        p2eg::getAbsID_iEta_fromFirmwareCardTowerLink(cc, ii, jj));  // real eta of center of tower
+    //    double tCalib = calib_(0, tRealEta);                             // calibration factor
+    //    towerECALCard[ii][jj][cc].applyCalibration(tCalib);
+    //  }
+    //}
 
     //-------------------------------------------//
     // Calculate tower HoE
@@ -449,6 +450,7 @@ void Phase2L1CaloEGammaEmulator::produce(edm::Event& iEvent, const edm::EventSet
     //-----------------------------------------------------------//
     // Produce output RCT collections for event display and analyzer
     //-----------------------------------------------------------//
+
     for (auto& c : cluster_list_merged[cc]) {
       reco::Candidate::PolarLorentzVector p4calibrated(c.getPt(), c.realEta(cc), c.realPhi(cc), 0.);
 
@@ -477,8 +479,13 @@ void Phase2L1CaloEGammaEmulator::produce(edm::Event& iEvent, const edm::EventSet
       params["trkMatchWP_showerShape"] = c.getIsLooseTkss();
       cluster.setExperimentalParams(params);
 
+      if(c.getPt() > 0){
+
       L1EGXtalClusters->push_back(cluster);
+      }
     }
+
+
     // Output tower collections
     for (int ii = 0; ii < p2eg::n_towers_cardEta; ++ii) {    // 17 towers per card in eta
       for (int jj = 0; jj < p2eg::n_towers_cardPhi; ++jj) {  // 4 towers per card in phi

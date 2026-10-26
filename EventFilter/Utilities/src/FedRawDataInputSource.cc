@@ -66,6 +66,7 @@ FedRawDataInputSource::FedRawDataInputSource(edm::ParameterSet const& pset, edm:
           pset.getUntrackedParameter<std::vector<unsigned int>>("testTCDSFEDRange", std::vector<unsigned int>())),
       fileNames_(pset.getUntrackedParameter<std::vector<std::string>>("fileNames", std::vector<std::string>())),
       fileListMode_(pset.getUntrackedParameter<bool>("fileListMode", false)),
+      fileDiscoveryMode_(pset.getUntrackedParameter<bool>("fileDiscoveryMode", false)),
       fileListLoopMode_(pset.getUntrackedParameter<bool>("fileListLoopMode", false)),
       runNumber_(edm::Service<evf::EvFDaqDirector>()->getRunNumber()),
       daqProvenanceHelper_(edm::TypeID(typeid(FEDRawDataCollection))),
@@ -239,6 +240,8 @@ void FedRawDataInputSource::fillDescriptions(edm::ConfigurationDescriptions& des
       ->setComment("[min, max] range to search for TCDS FED ID in test setup");
   desc.addUntracked<bool>("fileListMode", false)
       ->setComment("Use fileNames parameter to directly specify raw files to open");
+  desc.addUntracked<bool>("fileDiscoveryMode", false)
+      ->setComment("Use filesystem discovery and assignment of files by renaming");
   desc.addUntracked<std::vector<std::string>>("fileNames", std::vector<std::string>())
       ->setComment("file list used when fileListMode is enabled");
   desc.setAllowAnything();
@@ -655,6 +658,7 @@ edm::Timestamp FedRawDataInputSource::fillFEDRawDataCollection(FEDRawDataCollect
   tcds_pointer_ = nullptr;
   tcdsInRange = false;
   uint16_t selectedTCDSFed = 0;
+  unsigned int fedsInEvent = 0;
   while (eventSize > 0) {
     assert(eventSize >= FEDTrailer::length);
     eventSize -= FEDTrailer::length;
@@ -693,11 +697,17 @@ edm::Timestamp FedRawDataInputSource::fillFEDRawDataCollection(FEDRawDataCollect
         GTPEventID_ = evf::evtn::gtpe_get(event + eventSize);
       }
     }
+    fedsInEvent++;
     FEDRawData& fedData = rawData.FEDData(fedId);
     fedData.resize(fedSize);
     memcpy(fedData.data(), event + eventSize, fedSize);
   }
   assert(eventSize == 0);
+
+  if (fedsInEvent != expectedFedsInEvent_ && expectedFedsInEvent_)
+    edm::LogWarning("DataModeFRDStriped:::fillFRDCollection")
+        << "Event " << event_->event() << " does not contain same number of FEDs as previous: " << fedsInEvent << "/"
+        << expectedFedsInEvent_;
 
   return tstamp;
 }
@@ -724,7 +734,7 @@ void FedRawDataInputSource::fileDeleter() {
         for (unsigned int i = 0; i < streamFileTracker_.size(); i++) {
           if (it->first == streamFileTracker_.at(i)) {
             //only skip if LS is open
-            if (fileLSOpen) {
+            if (fileLSOpen && (!fms_ || !fms_->streamIsIdle(i))) {
               fileIsBeingProcessed = true;
               break;
             }
@@ -840,6 +850,7 @@ void FedRawDataInputSource::readSupervisor() {
     uint32_t lsFromRaw = 0;
     int32_t serverEventsInNewFile = -1;
     int rawFd = -1;
+    uint16_t rawDataType = 0;
 
     int backoff_exp = 0;
 
@@ -885,7 +896,6 @@ void FedRawDataInputSource::readSupervisor() {
         //return LS if LS not set, otherwise return file
         status = getFile(ls, nextFile, fileSizeIndex, thisLockWaitTimeUs);
         if (status == evf::EvFDaqDirector::newFile) {
-          uint16_t rawDataType;
           if (evf::EvFDaqDirector::parseFRDFileHeader(nextFile,
                                                       rawFd,
                                                       rawHeaderSize,
@@ -912,10 +922,13 @@ void FedRawDataInputSource::readSupervisor() {
                                                      ls,
                                                      nextFile,
                                                      rawFd,
+                                                     rawDataType,
                                                      rawHeaderSize,
                                                      serverEventsInNewFile,
                                                      fileSizeFromMetadata,
-                                                     thisLockWaitTimeUs);
+                                                     thisLockWaitTimeUs,
+                                                     true,
+                                                     fileDiscoveryMode_);
       }
 
       setMonStateSup(inSupBusy);
@@ -1090,7 +1103,7 @@ void FedRawDataInputSource::readSupervisor() {
             uint16_t rawHeaderCheck;
             bool fileFound;
             eventsInNewFile = daqDirector_->grabNextJsonFromRaw(
-                nextFile, rawFdEmpty, rawHeaderCheck, fileSizeFromMetadata, fileFound, 0, true);
+                nextFile, rawFdEmpty, rawDataType, rawHeaderCheck, fileSizeFromMetadata, fileFound, 0, true);
             assert(fileFound && rawHeaderCheck == rawHeaderSize);
             daqDirector_->unlockFULocal();
           } else
@@ -1113,6 +1126,7 @@ void FedRawDataInputSource::readSupervisor() {
                                                               rawFile,
                                                               !fileListMode_,
                                                               rawFd,
+                                                              rawDataType,
                                                               fileSize,
                                                               rawHeaderSize,
                                                               neededChunks,

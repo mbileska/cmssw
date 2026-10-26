@@ -1,0 +1,4093 @@
+Starting the RCT Emulator...
+ECAL hit at with energy 30.375 at (eta , phi): -0.0117399 , 1.99926
+ECAL hit at with energy 13.5 at (eta , phi): -0.0302925 , 1.99925
+ECAL hit at with energy 16.375 at (eta , phi): 0.103817 , -1.12482
+ECAL hit at with energy 17.625 at (eta , phi): 0.103724 , -1.10748
+------------------------------------
+Adding energy 16.375 in card 7 at iEta 5 at iPhi 25
+Adding energy 17.625 in card 7 at iEta 5 at iPhi 26
+Adding energy 30.375 in card 18 at iEta 0 at iPhi 5
+------------------------------
+New emulator RCT outputs of card: 0
+Clusters:
+Cluster 0
+seed_pt: 0.5
+pt: 0.5
+eta: 124
+phi: 11
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 0
+Cluster 1
+seed_pt: 0.5
+pt: 0.5
+eta: 25
+phi: 29
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 2
+seed_pt: 0.5
+pt: 0.5
+eta: 14
+phi: 20
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 3
+seed_pt: 0.5
+pt: 0.5
+eta: 1
+phi: 29
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 0
+Cluster 4
+seed_pt: 0.5
+pt: 0.5
+eta: 40
+phi: 8
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 5
+seed_pt: 0.5
+pt: 0.5
+eta: 58
+phi: 20
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Cluster 6
+seed_pt: 0.5
+pt: 0.5
+eta: 58
+phi: 11
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Cluster 7
+seed_pt: 0.5
+pt: 0.5
+eta: 63
+phi: 26
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Cluster 8
+seed_pt: 0.5
+pt: 0.5
+eta: 78
+phi: 21
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Tower iPhi 0 and 1:
+Lower iPhi in this link:
+Tower iEta 3
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 9
+et: 1
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iEta 1
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 3
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 9
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 10
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 14
+et: 0.5
+hoe: 6
+fb: 0
+Tower iPhi 2 and 3:
+Lower iPhi in this link:
+Higher iPhi in this link:
+Tower iEta 10
+et: 1.5
+hoe: 6
+fb: 0
+Tower iEta 14
+et: 1
+hoe: 6
+fb: 0
+Tower iPhi 4 and 5:
+Lower iPhi in this link:
+Tower iEta 4
+et: 2
+hoe: 6
+fb: 0
+Tower iEta 8
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 10
+et: 0.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iEta 1
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 3
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 4
+et: 0.5
+hoe: 6
+fb: 0
+------------------------------
+New emulator RCT outputs of card: 1
+Clusters:
+Cluster 0
+seed_pt: 0.5
+pt: 0.5
+eta: 5
+phi: 2
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 1
+seed_pt: 0.5
+pt: 0.5
+eta: 5
+phi: 10
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 2
+seed_pt: 0.5
+pt: 0.5
+eta: 22
+phi: 27
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 3
+seed_pt: 0.5
+pt: 0.5
+eta: 124
+phi: 28
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 0
+Cluster 4
+seed_pt: 0.5
+pt: 0.5
+eta: 12
+phi: 3
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 5
+seed_pt: 0.5
+pt: 0.5
+eta: 53
+phi: 6
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 6
+seed_pt: 0.5
+pt: 0.5
+eta: 35
+phi: 28
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 7
+seed_pt: 0.5
+pt: 0.5
+eta: 63
+phi: 21
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Cluster 8
+seed_pt: 0.5
+pt: 1
+eta: 20
+phi: 25
+et5x5: 4
+wps: 0
+timing: 0
+spike: 0
+satur: 0
+brems: 1
+spare: 1
+Tower iPhi 0 and 1:
+Lower iPhi in this link:
+Tower iEta 0
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 1
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 4
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 9
+et: 0.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iPhi 2 and 3:
+Lower iPhi in this link:
+Tower iEta 7
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 14
+et: 0.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iEta 3
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 8
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 13
+et: 0.5
+hoe: 6
+fb: 0
+Tower iPhi 4 and 5:
+Lower iPhi in this link:
+Tower iEta 1
+et: 0.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+------------------------------
+New emulator RCT outputs of card: 2
+Clusters:
+Cluster 0
+seed_pt: 0
+pt: 0
+eta: 123
+phi: 29
+et5x5: 0
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 0
+Cluster 1
+seed_pt: 0
+pt: 0
+eta: 29
+phi: 29
+et5x5: 0
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 2
+seed_pt: 0.5
+pt: 0
+eta: 11
+phi: 26
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 3
+seed_pt: 0.5
+pt: 0.5
+eta: 12
+phi: 14
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 4
+seed_pt: 0.5
+pt: 0.5
+eta: 11
+phi: 26
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 5
+seed_pt: 0.5
+pt: 0.5
+eta: 122
+phi: 13
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 0
+Cluster 6
+seed_pt: 0.5
+pt: 0.5
+eta: 28
+phi: 14
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 7
+seed_pt: 1
+pt: 1
+eta: 25
+phi: 23
+et5x5: 4
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 8
+seed_pt: 2
+pt: 2
+eta: 42
+phi: 29
+et5x5: 8
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Tower iPhi 0 and 1:
+Lower iPhi in this link:
+Tower iEta 10
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 14
+et: 0.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iPhi 2 and 3:
+Lower iPhi in this link:
+Tower iEta 1
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 2
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 6
+et: 0.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iEta 1
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 5
+et: 1
+hoe: 6
+fb: 0
+Tower iPhi 4 and 5:
+Lower iPhi in this link:
+Tower iEta 15
+et: 0.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+------------------------------
+New emulator RCT outputs of card: 3
+Clusters:
+Cluster 0
+seed_pt: 0.5
+pt: 0.5
+eta: 28
+phi: 16
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 1
+seed_pt: 0.5
+pt: 0.5
+eta: 74
+phi: 4
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Cluster 2
+seed_pt: 0.5
+pt: 0.5
+eta: 65
+phi: 14
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Cluster 3
+seed_pt: 0.5
+pt: 0.5
+eta: 40
+phi: 9
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 4
+seed_pt: 0.5
+pt: 0.5
+eta: 47
+phi: 3
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 5
+seed_pt: 0.5
+pt: 0.5
+eta: 64
+phi: 25
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Cluster 6
+seed_pt: 1
+pt: 1
+eta: 122
+phi: 13
+et5x5: 4
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 0
+Cluster 7
+seed_pt: 1
+pt: 1
+eta: 34
+phi: 17
+et5x5: 4
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 8
+seed_pt: 1.5
+pt: 2
+eta: 65
+phi: 25
+et5x5: 8
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Tower iPhi 0 and 1:
+Lower iPhi in this link:
+Tower iEta 5
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 10
+et: 1
+hoe: 7
+fb: 0
+Higher iPhi in this link:
+Tower iEta 0
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 3
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 6
+et: 2.5
+hoe: 6
+fb: 0
+Tower iEta 7
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 12
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 14
+et: 1.5
+hoe: 6
+fb: 0
+Tower iPhi 2 and 3:
+Lower iPhi in this link:
+Higher iPhi in this link:
+Tower iEta 0
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 3
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 4
+et: 1.5
+hoe: 6
+fb: 0
+Tower iEta 12
+et: 2
+hoe: 6
+fb: 0
+Tower iEta 13
+et: 0.5
+hoe: 6
+fb: 0
+Tower iPhi 4 and 5:
+Lower iPhi in this link:
+Tower iEta 0
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 14
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 16
+et: 0.5
+hoe: 0
+fb: 0
+Higher iPhi in this link:
+------------------------------
+New emulator RCT outputs of card: 4
+Clusters:
+Cluster 0
+seed_pt: 0.5
+pt: 0.5
+eta: 8
+phi: 21
+et5x5: 4
+wps: 0
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 1
+seed_pt: 0.5
+pt: 0.5
+eta: 19
+phi: 8
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 2
+seed_pt: 0.5
+pt: 0.5
+eta: 28
+phi: 17
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 3
+seed_pt: 0.5
+pt: 0.5
+eta: 17
+phi: 1
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 4
+seed_pt: 0.5
+pt: 0.5
+eta: 14
+phi: 5
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 5
+seed_pt: 0.5
+pt: 0.5
+eta: 6
+phi: 29
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 6
+seed_pt: 0.5
+pt: 0.5
+eta: 44
+phi: 25
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 7
+seed_pt: 0.5
+pt: 0.5
+eta: 52
+phi: 6
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 8
+seed_pt: 0.5
+pt: 0.5
+eta: 74
+phi: 12
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Tower iPhi 0 and 1:
+Lower iPhi in this link:
+Tower iEta 3
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 13
+et: 1
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iEta 11
+et: 0.5
+hoe: 7
+fb: 0
+Tower iEta 13
+et: 0.5
+hoe: 7
+fb: 0
+Tower iEta 16
+et: 0.5
+hoe: 0
+fb: 0
+Tower iPhi 2 and 3:
+Lower iPhi in this link:
+Tower iEta 1
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 2
+et: 2.5
+hoe: 6
+fb: 0
+Tower iEta 5
+et: 1.5
+hoe: 6
+fb: 0
+Tower iEta 11
+et: 2.5
+hoe: 6
+fb: 0
+Tower iEta 13
+et: 0.5
+hoe: 7
+fb: 0
+Higher iPhi in this link:
+Tower iEta 3
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 11
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 12
+et: 0.5
+hoe: 7
+fb: 0
+Tower iPhi 4 and 5:
+Lower iPhi in this link:
+Tower iEta 1
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 10
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 13
+et: 0.5
+hoe: 7
+fb: 0
+Tower iEta 14
+et: 0.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+------------------------------
+New emulator RCT outputs of card: 5
+Clusters:
+Cluster 0
+seed_pt: 0
+pt: 0
+eta: 123
+phi: 29
+et5x5: 0
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 0
+Cluster 1
+seed_pt: 0.5
+pt: 0.5
+eta: 0
+phi: 12
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 0
+Cluster 2
+seed_pt: 0.5
+pt: 0.5
+eta: 29
+phi: 5
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 3
+seed_pt: 0.5
+pt: 0.5
+eta: 125
+phi: 0
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 0
+Cluster 4
+seed_pt: 0.5
+pt: 0.5
+eta: 31
+phi: 2
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 5
+seed_pt: 0.5
+pt: 0.5
+eta: 41
+phi: 0
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 6
+seed_pt: 0.5
+pt: 1
+eta: 6
+phi: 5
+et5x5: 4
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 7
+seed_pt: 1
+pt: 1
+eta: 16
+phi: 3
+et5x5: 4
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 8
+seed_pt: 0.5
+pt: 1
+eta: 52
+phi: 14
+et5x5: 4
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Tower iPhi 0 and 1:
+Lower iPhi in this link:
+Tower iEta 0
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 1
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 11
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 13
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 14
+et: 0.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iEta 0
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 3
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 5
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 8
+et: 0.5
+hoe: 6
+fb: 0
+Tower iPhi 2 and 3:
+Lower iPhi in this link:
+Higher iPhi in this link:
+Tower iPhi 4 and 5:
+Lower iPhi in this link:
+Higher iPhi in this link:
+Tower iEta 3
+et: 2
+hoe: 6
+fb: 0
+Tower iEta 10
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 13
+et: 0.5
+hoe: 6
+fb: 0
+------------------------------
+New emulator RCT outputs of card: 6
+Clusters:
+Cluster 0
+seed_pt: 0
+pt: 0
+eta: 3
+phi: 0
+et5x5: 0
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 0
+Cluster 1
+seed_pt: 0.5
+pt: 0.5
+eta: 126
+phi: 19
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 0
+Cluster 2
+seed_pt: 0.5
+pt: 0.5
+eta: 25
+phi: 8
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 3
+seed_pt: 0.5
+pt: 0.5
+eta: 19
+phi: 16
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 4
+seed_pt: 0.5
+pt: 0.5
+eta: 20
+phi: 5
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 5
+seed_pt: 0.5
+pt: 0.5
+eta: 52
+phi: 4
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 6
+seed_pt: 0.5
+pt: 0.5
+eta: 78
+phi: 27
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Cluster 7
+seed_pt: 0.5
+pt: 1
+eta: 125
+phi: 29
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 1
+spare: 0
+Cluster 8
+seed_pt: 1
+pt: 1.5
+eta: 17
+phi: 24
+et5x5: 4
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 2
+spare: 1
+Tower iPhi 0 and 1:
+Lower iPhi in this link:
+Tower iEta 1
+et: 2
+hoe: 6
+fb: 0
+Tower iEta 6
+et: 0.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iEta 3
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 7
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 12
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 13
+et: 0.5
+hoe: 6
+fb: 0
+Tower iPhi 2 and 3:
+Lower iPhi in this link:
+Higher iPhi in this link:
+Tower iEta 0
+et: 1.5
+hoe: 6
+fb: 0
+Tower iEta 2
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 3
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 9
+et: 0.5
+hoe: 6
+fb: 0
+Tower iPhi 4 and 5:
+Lower iPhi in this link:
+Tower iEta 8
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 12
+et: 1
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iEta 3
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 7
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 8
+et: 1
+hoe: 6
+fb: 0
+------------------------------
+New emulator RCT outputs of card: 7
+Clusters:
+Cluster 0
+seed_pt: 0.5
+pt: 0.5
+eta: 15
+phi: 8
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 1
+seed_pt: 0.5
+pt: 0.5
+eta: 39
+phi: 26
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 2
+seed_pt: 0.5
+pt: 0.5
+eta: 22
+phi: 22
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 3
+seed_pt: 0.5
+pt: 0.5
+eta: 19
+phi: 29
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 4
+seed_pt: 0.5
+pt: 0.5
+eta: 42
+phi: 26
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 5
+seed_pt: 0.5
+pt: 0.5
+eta: 35
+phi: 14
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 6
+seed_pt: 0.5
+pt: 0.5
+eta: 39
+phi: 11
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 7
+seed_pt: 0.5
+pt: 0.5
+eta: 58
+phi: 28
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Cluster 8
+seed_pt: 17.5
+pt: 49
+eta: 126
+phi: 26
+et5x5: 196
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 0
+Tower iPhi 0 and 1:
+Lower iPhi in this link:
+Tower iEta 8
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 9
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 13
+et: 1.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iPhi 2 and 3:
+Lower iPhi in this link:
+Tower iEta 1
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 3
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 9
+et: 0.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iEta 7
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 8
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 9
+et: 1.5
+hoe: 6
+fb: 0
+Tower iEta 11
+et: 2
+hoe: 6
+fb: 0
+Tower iEta 12
+et: 1.5
+hoe: 6
+fb: 0
+Tower iEta 14
+et: 3
+hoe: 6
+fb: 0
+Tower iPhi 4 and 5:
+Lower iPhi in this link:
+Tower iEta 2
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 8
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 11
+et: 1.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+------------------------------
+New emulator RCT outputs of card: 8
+Clusters:
+Cluster 0
+seed_pt: 0.5
+pt: 0.5
+eta: 24
+phi: 6
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 1
+seed_pt: 0.5
+pt: 0.5
+eta: 78
+phi: 6
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Cluster 2
+seed_pt: 0.5
+pt: 0.5
+eta: 41
+phi: 22
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 3
+seed_pt: 0.5
+pt: 0.5
+eta: 64
+phi: 29
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Cluster 4
+seed_pt: 0.5
+pt: 0.5
+eta: 29
+phi: 6
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 5
+seed_pt: 1
+pt: 1
+eta: 11
+phi: 29
+et5x5: 4
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 6
+seed_pt: 1
+pt: 1
+eta: 44
+phi: 0
+et5x5: 4
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 7
+seed_pt: 0.5
+pt: 1.5
+eta: 45
+phi: 23
+et5x5: 6
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 8
+seed_pt: 0.5
+pt: 1.5
+eta: 46
+phi: 23
+et5x5: 6
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Tower iPhi 0 and 1:
+Lower iPhi in this link:
+Tower iEta 4
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 5
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 6
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 12
+et: 0.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iEta 4
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 13
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 15
+et: 0.5
+hoe: 6
+fb: 0
+Tower iPhi 2 and 3:
+Lower iPhi in this link:
+Higher iPhi in this link:
+Tower iEta 11
+et: 0.5
+hoe: 7
+fb: 0
+Tower iPhi 4 and 5:
+Lower iPhi in this link:
+Tower iEta 8
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 13
+et: 0.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iEta 2
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 10
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 11
+et: 0.5
+hoe: 6
+fb: 0
+------------------------------
+New emulator RCT outputs of card: 9
+Clusters:
+Cluster 0
+seed_pt: 0.5
+pt: 0.5
+eta: 12
+phi: 7
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 1
+seed_pt: 0.5
+pt: 0.5
+eta: 53
+phi: 8
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 2
+seed_pt: 0.5
+pt: 0.5
+eta: 40
+phi: 2
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 3
+seed_pt: 0.5
+pt: 0.5
+eta: 33
+phi: 3
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 4
+seed_pt: 0.5
+pt: 0.5
+eta: 44
+phi: 12
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 5
+seed_pt: 0.5
+pt: 0.5
+eta: 76
+phi: 23
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Cluster 6
+seed_pt: 0.5
+pt: 0.5
+eta: 55
+phi: 28
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Cluster 7
+seed_pt: 0.5
+pt: 1
+eta: 51
+phi: 28
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 1
+spare: 2
+Cluster 8
+seed_pt: 1
+pt: 1
+eta: 63
+phi: 8
+et5x5: 4
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Tower iPhi 0 and 1:
+Lower iPhi in this link:
+Tower iEta 4
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 6
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 14
+et: 0.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iPhi 2 and 3:
+Lower iPhi in this link:
+Higher iPhi in this link:
+Tower iEta 4
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 5
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 8
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 13
+et: 0.5
+hoe: 6
+fb: 0
+Tower iPhi 4 and 5:
+Lower iPhi in this link:
+Tower iEta 10
+et: 0.5
+hoe: 7
+fb: 0
+Tower iEta 12
+et: 0.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+------------------------------
+New emulator RCT outputs of card: 10
+Clusters:
+Cluster 0
+seed_pt: 0.5
+pt: 0.5
+eta: 18
+phi: 28
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 1
+seed_pt: 0.5
+pt: 0.5
+eta: 19
+phi: 4
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 2
+seed_pt: 0.5
+pt: 0.5
+eta: 15
+phi: 1
+et5x5: 4
+wps: 0
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 3
+seed_pt: 0.5
+pt: 0.5
+eta: 19
+phi: 16
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 4
+seed_pt: 0.5
+pt: 0.5
+eta: 17
+phi: 1
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 5
+seed_pt: 0.5
+pt: 0.5
+eta: 51
+phi: 1
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 6
+seed_pt: 0.5
+pt: 0.5
+eta: 29
+phi: 6
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 7
+seed_pt: 0.5
+pt: 0.5
+eta: 74
+phi: 0
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Cluster 8
+seed_pt: 0.5
+pt: 0.5
+eta: 78
+phi: 6
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Tower iPhi 0 and 1:
+Lower iPhi in this link:
+Tower iEta 11
+et: 0.5
+hoe: 7
+fb: 0
+Higher iPhi in this link:
+Tower iEta 11
+et: 0.5
+hoe: 7
+fb: 0
+Tower iPhi 2 and 3:
+Lower iPhi in this link:
+Tower iEta 1
+et: 1.5
+hoe: 6
+fb: 0
+Tower iEta 8
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 10
+et: 0.5
+hoe: 7
+fb: 0
+Higher iPhi in this link:
+Tower iEta 12
+et: 0.5
+hoe: 6
+fb: 0
+Tower iPhi 4 and 5:
+Lower iPhi in this link:
+Tower iEta 2
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 10
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 11
+et: 0.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iEta 12
+et: 0.5
+hoe: 7
+fb: 0
+------------------------------
+New emulator RCT outputs of card: 11
+Clusters:
+Cluster 0
+seed_pt: 0.5
+pt: 0.5
+eta: 12
+phi: 22
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 1
+seed_pt: 0.5
+pt: 0.5
+eta: 63
+phi: 18
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Cluster 2
+seed_pt: 0.5
+pt: 0.5
+eta: 36
+phi: 22
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 3
+seed_pt: 0.5
+pt: 0.5
+eta: 7
+phi: 21
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 4
+seed_pt: 0.5
+pt: 0.5
+eta: 33
+phi: 9
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 5
+seed_pt: 0.5
+pt: 0.5
+eta: 74
+phi: 3
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Cluster 6
+seed_pt: 0.5
+pt: 0.5
+eta: 71
+phi: 28
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Cluster 7
+seed_pt: 0.5
+pt: 1
+eta: 4
+phi: 15
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 2
+spare: 1
+Cluster 8
+seed_pt: 0.5
+pt: 1
+eta: 51
+phi: 20
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 1
+spare: 2
+Tower iPhi 0 and 1:
+Lower iPhi in this link:
+Tower iEta 8
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 15
+et: 1
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iEta 3
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 7
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 8
+et: 0.5
+hoe: 6
+fb: 0
+Tower iPhi 2 and 3:
+Lower iPhi in this link:
+Higher iPhi in this link:
+Tower iEta 0
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 3
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 4
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 12
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 13
+et: 0.5
+hoe: 6
+fb: 0
+Tower iPhi 4 and 5:
+Lower iPhi in this link:
+Tower iEta 2
+et: 0.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iEta 4
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 12
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 13
+et: 2
+hoe: 6
+fb: 0
+------------------------------
+New emulator RCT outputs of card: 12
+Clusters:
+Cluster 0
+seed_pt: 0
+pt: 0
+eta: 123
+phi: 29
+et5x5: 0
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 0
+Cluster 1
+seed_pt: 0
+pt: 0
+eta: 18
+phi: 29
+et5x5: 0
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 2
+seed_pt: 0.5
+pt: 0
+eta: 18
+phi: 28
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 3
+seed_pt: 0.5
+pt: 0.5
+eta: 18
+phi: 28
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 4
+seed_pt: 0.5
+pt: 0.5
+eta: 7
+phi: 1
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 5
+seed_pt: 0.5
+pt: 0.5
+eta: 47
+phi: 13
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 6
+seed_pt: 0.5
+pt: 0.5
+eta: 24
+phi: 13
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 7
+seed_pt: 0.5
+pt: 1
+eta: 15
+phi: 7
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 2
+spare: 1
+Cluster 8
+seed_pt: 1
+pt: 1.5
+eta: 32
+phi: 22
+et5x5: 4
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 1
+spare: 2
+Tower iPhi 0 and 1:
+Lower iPhi in this link:
+Tower iEta 1
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 15
+et: 1
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iPhi 2 and 3:
+Lower iPhi in this link:
+Tower iEta 0
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 7
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 9
+et: 0.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iEta 6
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 9
+et: 0.5
+hoe: 6
+fb: 0
+Tower iPhi 4 and 5:
+Lower iPhi in this link:
+Tower iEta 0
+et: 1.5
+hoe: 6
+fb: 0
+Tower iEta 4
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 10
+et: 0.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+------------------------------
+New emulator RCT outputs of card: 13
+Clusters:
+Cluster 0
+seed_pt: 0.5
+pt: 0.5
+eta: 3
+phi: 1
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 0
+Cluster 1
+seed_pt: 0.5
+pt: 0.5
+eta: 22
+phi: 24
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 2
+seed_pt: 0.5
+pt: 0.5
+eta: 7
+phi: 9
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 3
+seed_pt: 0.5
+pt: 0.5
+eta: 33
+phi: 25
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 4
+seed_pt: 0.5
+pt: 0.5
+eta: 75
+phi: 14
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Cluster 5
+seed_pt: 0.5
+pt: 0.5
+eta: 78
+phi: 4
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Cluster 6
+seed_pt: 0.5
+pt: 0.5
+eta: 75
+phi: 5
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Cluster 7
+seed_pt: 1.5
+pt: 2
+eta: 46
+phi: 22
+et5x5: 8
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 8
+seed_pt: 3.5
+pt: 4.5
+eta: 48
+phi: 21
+et5x5: 26
+wps: 0
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Tower iPhi 0 and 1:
+Lower iPhi in this link:
+Tower iEta 1
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 2
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 6
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 13
+et: 1
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iEta 0
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 2
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 14
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 15
+et: 0.5
+hoe: 6
+fb: 0
+Tower iPhi 2 and 3:
+Lower iPhi in this link:
+Higher iPhi in this link:
+Tower iEta 6
+et: 2
+hoe: 6
+fb: 0
+Tower iEta 11
+et: 2.5
+hoe: 6
+fb: 0
+Tower iEta 13
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 15
+et: 1.5
+hoe: 6
+fb: 0
+Tower iPhi 4 and 5:
+Lower iPhi in this link:
+Tower iEta 3
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 6
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 7
+et: 1.5
+hoe: 6
+fb: 0
+Tower iEta 12
+et: 0.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iEta 1
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 3
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 7
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 11
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 12
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 13
+et: 1.5
+hoe: 6
+fb: 0
+------------------------------
+New emulator RCT outputs of card: 14
+Clusters:
+Cluster 0
+seed_pt: 0
+pt: 0
+eta: 123
+phi: 29
+et5x5: 0
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 0
+Cluster 1
+seed_pt: 0.5
+pt: 0.5
+eta: 49
+phi: 6
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 2
+seed_pt: 0.5
+pt: 0.5
+eta: 12
+phi: 7
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 3
+seed_pt: 0.5
+pt: 0.5
+eta: 124
+phi: 27
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 0
+Cluster 4
+seed_pt: 0.5
+pt: 0.5
+eta: 11
+phi: 25
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 5
+seed_pt: 0.5
+pt: 0.5
+eta: 54
+phi: 26
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Cluster 6
+seed_pt: 0.5
+pt: 0.5
+eta: 51
+phi: 26
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 7
+seed_pt: 0.5
+pt: 1
+eta: 4
+phi: 9
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 2
+spare: 1
+Cluster 8
+seed_pt: 2
+pt: 2
+eta: 49
+phi: 26
+et5x5: 10
+wps: 0
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Tower iPhi 0 and 1:
+Lower iPhi in this link:
+Tower iEta 7
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 10
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 12
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 13
+et: 0.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iEta 5
+et: 0.5
+hoe: 7
+fb: 0
+Tower iPhi 2 and 3:
+Lower iPhi in this link:
+Tower iEta 8
+et: 0.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iEta 0
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 12
+et: 0.5
+hoe: 6
+fb: 0
+Tower iPhi 4 and 5:
+Lower iPhi in this link:
+Tower iEta 0
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 10
+et: 2
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+------------------------------
+New emulator RCT outputs of card: 15
+Clusters:
+Cluster 0
+seed_pt: 0.5
+pt: 0.5
+eta: 15
+phi: 11
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 1
+seed_pt: 0.5
+pt: 0.5
+eta: 64
+phi: 5
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Cluster 2
+seed_pt: 0.5
+pt: 0.5
+eta: 69
+phi: 23
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Cluster 3
+seed_pt: 0.5
+pt: 0.5
+eta: 48
+phi: 29
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 4
+seed_pt: 0.5
+pt: 0.5
+eta: 72
+phi: 6
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Cluster 5
+seed_pt: 1
+pt: 1
+eta: 7
+phi: 27
+et5x5: 4
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 6
+seed_pt: 0.5
+pt: 1
+eta: 50
+phi: 25
+et5x5: 4
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 7
+seed_pt: 0.5
+pt: 1
+eta: 45
+phi: 29
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 1
+spare: 2
+Cluster 8
+seed_pt: 2
+pt: 2
+eta: 76
+phi: 24
+et5x5: 8
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Tower iPhi 0 and 1:
+Lower iPhi in this link:
+Tower iEta 3
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 5
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 8
+et: 2
+hoe: 6
+fb: 0
+Tower iEta 12
+et: 1
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iEta 3
+et: 2
+hoe: 6
+fb: 0
+Tower iEta 12
+et: 0.5
+hoe: 6
+fb: 0
+Tower iPhi 2 and 3:
+Lower iPhi in this link:
+Higher iPhi in this link:
+Tower iEta 1
+et: 0.5
+hoe: 7
+fb: 0
+Tower iEta 3
+et: 1.5
+hoe: 6
+fb: 0
+Tower iEta 12
+et: 1.5
+hoe: 6
+fb: 0
+Tower iPhi 4 and 5:
+Lower iPhi in this link:
+Tower iEta 2
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 3
+et: 1.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iEta 3
+et: 2
+hoe: 6
+fb: 0
+Tower iEta 7
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 8
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 9
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 14
+et: 1
+hoe: 6
+fb: 0
+------------------------------
+New emulator RCT outputs of card: 16
+Clusters:
+Cluster 0
+seed_pt: 0
+pt: 0
+eta: 123
+phi: 29
+et5x5: 0
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 0
+Cluster 1
+seed_pt: 0
+pt: 0
+eta: 18
+phi: 29
+et5x5: 0
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 2
+seed_pt: 0.5
+pt: 0.5
+eta: 39
+phi: 20
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 3
+seed_pt: 0.5
+pt: 0.5
+eta: 26
+phi: 26
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 4
+seed_pt: 0.5
+pt: 0.5
+eta: 7
+phi: 4
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 5
+seed_pt: 0.5
+pt: 0.5
+eta: 45
+phi: 4
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 6
+seed_pt: 0.5
+pt: 0.5
+eta: 35
+phi: 12
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 7
+seed_pt: 1
+pt: 1
+eta: 15
+phi: 11
+et5x5: 4
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 8
+seed_pt: 0.5
+pt: 1
+eta: 40
+phi: 27
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 1
+spare: 2
+Tower iPhi 0 and 1:
+Lower iPhi in this link:
+Tower iEta 11
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 15
+et: 1.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iPhi 2 and 3:
+Lower iPhi in this link:
+Tower iEta 7
+et: 3
+hoe: 6
+fb: 0
+Tower iEta 8
+et: 1.5
+hoe: 6
+fb: 0
+Tower iEta 9
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 14
+et: 0.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iEta 6
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 10
+et: 1.5
+hoe: 6
+fb: 0
+Tower iEta 15
+et: 1.5
+hoe: 6
+fb: 0
+Tower iPhi 4 and 5:
+Lower iPhi in this link:
+Tower iEta 5
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 6
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 11
+et: 1.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+------------------------------
+New emulator RCT outputs of card: 17
+Clusters:
+Cluster 0
+seed_pt: 0.5
+pt: 0.5
+eta: 14
+phi: 10
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 1
+seed_pt: 0.5
+pt: 0.5
+eta: 125
+phi: 23
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 0
+Cluster 2
+seed_pt: 0.5
+pt: 0.5
+eta: 20
+phi: 28
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 3
+seed_pt: 0.5
+pt: 0.5
+eta: 28
+phi: 10
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 4
+seed_pt: 0.5
+pt: 0.5
+eta: 26
+phi: 6
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 5
+seed_pt: 0.5
+pt: 0.5
+eta: 40
+phi: 5
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 6
+seed_pt: 0.5
+pt: 0.5
+eta: 6
+phi: 29
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 7
+seed_pt: 0.5
+pt: 0.5
+eta: 39
+phi: 15
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 8
+seed_pt: 0.5
+pt: 1
+eta: 123
+phi: 12
+et5x5: 4
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 0
+Tower iPhi 0 and 1:
+Lower iPhi in this link:
+Tower iEta 14
+et: 0.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iEta 10
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 11
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 12
+et: 1.5
+hoe: 6
+fb: 0
+Tower iEta 14
+et: 1.5
+hoe: 6
+fb: 0
+Tower iPhi 2 and 3:
+Lower iPhi in this link:
+Higher iPhi in this link:
+Tower iEta 7
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 13
+et: 0.5
+hoe: 6
+fb: 0
+Tower iPhi 4 and 5:
+Lower iPhi in this link:
+Higher iPhi in this link:
+Tower iEta 1
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 9
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 11
+et: 2.5
+hoe: 6
+fb: 0
+------------------------------
+New emulator RCT outputs of card: 18
+Clusters:
+Cluster 0
+seed_pt: 0.5
+pt: 0.5
+eta: 124
+phi: 10
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 0
+Cluster 1
+seed_pt: 0.5
+pt: 0.5
+eta: 48
+phi: 18
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 2
+seed_pt: 0.5
+pt: 0.5
+eta: 28
+phi: 16
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 3
+seed_pt: 0.5
+pt: 0.5
+eta: 44
+phi: 11
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 4
+seed_pt: 0.5
+pt: 0.5
+eta: 52
+phi: 26
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 5
+seed_pt: 0.5
+pt: 0.5
+eta: 56
+phi: 23
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Cluster 6
+seed_pt: 0.5
+pt: 1
+eta: 71
+phi: 21
+et5x5: 4
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Cluster 7
+seed_pt: 0.5
+pt: 1
+eta: 70
+phi: 23
+et5x5: 4
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Cluster 8
+seed_pt: 30
+pt: 50
+eta: 3
+phi: 5
+et5x5: 200
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 0
+Tower iPhi 0 and 1:
+Lower iPhi in this link:
+Tower iEta 0
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 8
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 11
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 12
+et: 0.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iPhi 2 and 3:
+Lower iPhi in this link:
+Tower iEta 7
+et: 0.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iEta 3
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 9
+et: 0.5
+hoe: 6
+fb: 0
+Tower iPhi 4 and 5:
+Lower iPhi in this link:
+Tower iEta 4
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 8
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 10
+et: 1
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+------------------------------
+New emulator RCT outputs of card: 19
+Clusters:
+Cluster 0
+seed_pt: 0.5
+pt: 0.5
+eta: 26
+phi: 28
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 1
+seed_pt: 0.5
+pt: 0.5
+eta: 34
+phi: 16
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 2
+seed_pt: 0.5
+pt: 0.5
+eta: 73
+phi: 28
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Cluster 3
+seed_pt: 0.5
+pt: 0.5
+eta: 27
+phi: 9
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 4
+seed_pt: 0.5
+pt: 0.5
+eta: 42
+phi: 0
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 5
+seed_pt: 0.5
+pt: 0.5
+eta: 75
+phi: 2
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Cluster 6
+seed_pt: 0.5
+pt: 1
+eta: 14
+phi: 23
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 1
+spare: 1
+Cluster 7
+seed_pt: 0.5
+pt: 1.5
+eta: 15
+phi: 26
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 1
+spare: 1
+Cluster 8
+seed_pt: 0.5
+pt: 1.5
+eta: 78
+phi: 16
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 1
+spare: 3
+Tower iPhi 0 and 1:
+Lower iPhi in this link:
+Tower iEta 6
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 13
+et: 1.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iEta 3
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 4
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 9
+et: 1.5
+hoe: 6
+fb: 0
+Tower iPhi 2 and 3:
+Lower iPhi in this link:
+Higher iPhi in this link:
+Tower iEta 3
+et: 2
+hoe: 6
+fb: 0
+Tower iEta 14
+et: 1.5
+hoe: 6
+fb: 0
+Tower iPhi 4 and 5:
+Lower iPhi in this link:
+Tower iEta 5
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 6
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 10
+et: 0.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iEta 3
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 5
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 8
+et: 1.5
+hoe: 6
+fb: 0
+Tower iEta 9
+et: 3.5
+hoe: 6
+fb: 0
+------------------------------
+New emulator RCT outputs of card: 20
+Clusters:
+Cluster 0
+seed_pt: 0.5
+pt: 0.5
+eta: 124
+phi: 14
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 0
+Cluster 1
+seed_pt: 0.5
+pt: 0.5
+eta: 66
+phi: 14
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Cluster 2
+seed_pt: 0.5
+pt: 0.5
+eta: 75
+phi: 22
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Cluster 3
+seed_pt: 0.5
+pt: 0.5
+eta: 39
+phi: 2
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 4
+seed_pt: 0.5
+pt: 1
+eta: 19
+phi: 17
+et5x5: 4
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 5
+seed_pt: 0.5
+pt: 1
+eta: 18
+phi: 17
+et5x5: 4
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 6
+seed_pt: 0.5
+pt: 1
+eta: 22
+phi: 26
+et5x5: 4
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 7
+seed_pt: 1
+pt: 1
+eta: 61
+phi: 15
+et5x5: 4
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Cluster 8
+seed_pt: 0.5
+pt: 1
+eta: 54
+phi: 3
+et5x5: 4
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Tower iPhi 0 and 1:
+Lower iPhi in this link:
+Tower iEta 8
+et: 1.5
+hoe: 6
+fb: 0
+Tower iEta 13
+et: 0.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iEta 10
+et: 1
+hoe: 7
+fb: 0
+Tower iPhi 2 and 3:
+Lower iPhi in this link:
+Tower iEta 10
+et: 1
+hoe: 7
+fb: 0
+Tower iEta 13
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 14
+et: 0.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iEta 3
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 10
+et: 0.5
+hoe: 7
+fb: 0
+Tower iPhi 4 and 5:
+Lower iPhi in this link:
+Tower iEta 8
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 14
+et: 1
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+------------------------------
+New emulator RCT outputs of card: 21
+Clusters:
+Cluster 0
+seed_pt: 0.5
+pt: 0.5
+eta: 23
+phi: 16
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 1
+seed_pt: 0.5
+pt: 0.5
+eta: 42
+phi: 5
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 2
+seed_pt: 0.5
+pt: 0.5
+eta: 50
+phi: 17
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 3
+seed_pt: 0.5
+pt: 0.5
+eta: 16
+phi: 7
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 4
+seed_pt: 0.5
+pt: 0.5
+eta: 39
+phi: 2
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 5
+seed_pt: 0.5
+pt: 0.5
+eta: 75
+phi: 6
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Cluster 6
+seed_pt: 0.5
+pt: 1
+eta: 2
+phi: 4
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 1
+spare: 0
+Cluster 7
+seed_pt: 0.5
+pt: 1
+eta: 26
+phi: 23
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 1
+spare: 1
+Cluster 8
+seed_pt: 0.5
+pt: 1
+eta: 42
+phi: 26
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 1
+spare: 2
+Tower iPhi 0 and 1:
+Lower iPhi in this link:
+Tower iEta 4
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 7
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 8
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 14
+et: 1.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iPhi 2 and 3:
+Lower iPhi in this link:
+Higher iPhi in this link:
+Tower iEta 8
+et: 0.5
+hoe: 6
+fb: 0
+Tower iPhi 4 and 5:
+Lower iPhi in this link:
+Higher iPhi in this link:
+Tower iEta 2
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 4
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 9
+et: 0.5
+hoe: 6
+fb: 0
+------------------------------
+New emulator RCT outputs of card: 22
+Clusters:
+Cluster 0
+seed_pt: 0.5
+pt: 0.5
+eta: 28
+phi: 17
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 1
+seed_pt: 0.5
+pt: 0.5
+eta: 33
+phi: 0
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 2
+seed_pt: 0.5
+pt: 0.5
+eta: 62
+phi: 5
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Cluster 3
+seed_pt: 0.5
+pt: 0.5
+eta: 57
+phi: 2
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Cluster 4
+seed_pt: 0.5
+pt: 0.5
+eta: 44
+phi: 16
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 5
+seed_pt: 0.5
+pt: 0.5
+eta: 73
+phi: 2
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Cluster 6
+seed_pt: 0.5
+pt: 1
+eta: 127
+phi: 27
+et5x5: 4
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 0
+Cluster 7
+seed_pt: 0.5
+pt: 1.5
+eta: 3
+phi: 6
+et5x5: 4
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 2
+spare: 0
+Cluster 8
+seed_pt: 0.5
+pt: 1.5
+eta: 123
+phi: 20
+et5x5: 4
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 1
+spare: 0
+Tower iPhi 0 and 1:
+Lower iPhi in this link:
+Tower iEta 8
+et: 1
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iPhi 2 and 3:
+Lower iPhi in this link:
+Tower iEta 10
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 12
+et: 0.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iEta 2
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 3
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 5
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 11
+et: 1
+hoe: 6
+fb: 0
+Tower iPhi 4 and 5:
+Lower iPhi in this link:
+Tower iEta 9
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 10
+et: 0.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+------------------------------
+New emulator RCT outputs of card: 23
+Clusters:
+Cluster 0
+seed_pt: 0.5
+pt: 0.5
+eta: 10
+phi: 23
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 1
+seed_pt: 0.5
+pt: 0.5
+eta: 55
+phi: 0
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Cluster 2
+seed_pt: 0.5
+pt: 0.5
+eta: 31
+phi: 13
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Cluster 3
+seed_pt: 0.5
+pt: 0.5
+eta: 71
+phi: 8
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 3
+Cluster 4
+seed_pt: 0.5
+pt: 0.5
+eta: 15
+phi: 18
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 5
+seed_pt: 0.5
+pt: 1
+eta: 21
+phi: 27
+et5x5: 2
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 1
+spare: 1
+Cluster 6
+seed_pt: 0.5
+pt: 1
+eta: 19
+phi: 24
+et5x5: 4
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 7
+seed_pt: 0.5
+pt: 1
+eta: 4
+phi: 19
+et5x5: 4
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 1
+Cluster 8
+seed_pt: 0.5
+pt: 1.5
+eta: 50
+phi: 12
+et5x5: 6
+wps: 1
+timing: 0
+spike: 0
+satur: 0
+brems: 0
+spare: 2
+Tower iPhi 0 and 1:
+Lower iPhi in this link:
+Tower iEta 2
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 5
+et: 0.5
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iEta 16
+et: 0.5
+hoe: 0
+fb: 0
+Tower iPhi 2 and 3:
+Lower iPhi in this link:
+Higher iPhi in this link:
+Tower iEta 1
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 3
+et: 1.5
+hoe: 6
+fb: 0
+Tower iEta 4
+et: 1.5
+hoe: 6
+fb: 0
+Tower iEta 9
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 11
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 13
+et: 1
+hoe: 6
+fb: 0
+Tower iPhi 4 and 5:
+Lower iPhi in this link:
+Tower iEta 1
+et: 1
+hoe: 6
+fb: 0
+Tower iEta 4
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 5
+et: 1.5
+hoe: 6
+fb: 0
+Tower iEta 14
+et: 1
+hoe: 6
+fb: 0
+Higher iPhi in this link:
+Tower iEta 3
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 12
+et: 0.5
+hoe: 6
+fb: 0
+Tower iEta 15
+et: 1.5
+hoe: 6
+fb: 0

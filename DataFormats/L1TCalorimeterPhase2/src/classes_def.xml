@@ -60,5 +60,21 @@
   <class name="l1tp2::Phase2L1CaloJetCollection" />
   <class name="edm::Wrapper<l1tp2::Phase2L1CaloJetCollection>" />
 
+  <class name="l1tp2::rctOutputLink" ClassVersion="4">
+       <version ClassVersion="4" checksum="1641614881"/>
+  </class>
+  <class name="std::vector<l1tp2::rctOutputLink>" />
+  <class name="l1tp2::rctOutputLinkCollection" />
+  <class name="edm::Wrapper<l1tp2::rctOutputLinkCollection>" />
+  <class name="l1tp2::gctOutputLink" ClassVersion="4">
+       <version ClassVersion="4" checksum="2861325974"/>
+  </class>
+  <class name="std::vector<l1tp2::gctOutputLink>" />
+  <class name="l1tp2::gctOutputLinkCollection" />
+  <class name="edm::Wrapper<l1tp2::gctOutputLinkCollection>" />
+  <class name="l1tp2::hfOutputLink" /> <class 
+  name="std::vector<l1tp2::hfOutputLink>" /> <class 
+  name="l1tp2::hfOutputLinkCollection" /> <class 
+  name="edm::Wrapper<l1tp2::hfOutputLinkCollection>" />
 </lcgdict>
 

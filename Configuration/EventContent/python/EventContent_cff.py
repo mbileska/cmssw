@@ -1,4 +1,5 @@
 import FWCore.ParameterSet.Config as cms
+import copy
 
 #
 # Event Content definition
@@ -95,6 +96,13 @@ from L1Trigger.Configuration.L1Trigger_EventContent_cff import *
 #
 #
 from HLTrigger.Configuration.HLTrigger_EventContent_cff import *
+from HLTrigger.Configuration.HLTScouting_EventContent_cff import HLTScoutingExtra
+# Extend HLT dataformats to the previous scouting objects, to keep them when running on old data/MC
+HLTriggerMINIAODSIM.outputCommands.extend(HLTScoutingExtra.outputCommands)
+HLTriggerMINIAOD.outputCommands.extend(HLTScoutingExtra.outputCommands)
+HLTriggerAOD.outputCommands.extend(HLTScoutingExtra.outputCommands)
+HLTriggerRECO.outputCommands.extend(HLTScoutingExtra.outputCommands)
+HLTDebugFEVT.outputCommands.extend(HLTScoutingExtra.outputCommands)
 #
 #
 # DQM
@@ -264,6 +272,7 @@ from Configuration.Eras.Modifier_phase2_timing_layer_cff import phase2_timing_la
 from Configuration.Eras.Modifier_run2_GEM_2017_cff import run2_GEM_2017
 from Configuration.Eras.Modifier_run3_GEM_cff import run3_GEM
 from Configuration.ProcessModifiers.pp_on_AA_cff import pp_on_AA
+from Configuration.ProcessModifiers.phase2_l1scout_cff import phase2_l1scout
 from RecoLocalFastTime.Configuration.RecoLocalFastTime_EventContent_cff import *
 from RecoMTD.Configuration.RecoMTD_EventContent_cff import *
 
@@ -939,12 +948,18 @@ REDIGIEventContent.inputCommands.append('drop *_randomEngineStateProducer_*_*')
 # ROOT automatically determine when to flush is a surprisingly big overhead.
 #
 from PhysicsTools.PatAlgos.slimming.slimming_cff import MicroEventContent,MicroEventContentMC,MicroEventContentGEN
+from PhysicsTools.PatAlgos.slimming.MicroEventContent_cff import MiniAODOverrideBranchesSplitLevel
 
 MINIAODEventContent= cms.PSet(
     outputCommands = cms.untracked.vstring('drop *'),
     eventAutoFlushCompressedSize=cms.untracked.int32(-900),
     compressionAlgorithm=cms.untracked.string("LZMA"),
-    compressionLevel=cms.untracked.int32(4)
+    compressionLevel=cms.untracked.int32(4),
+    overrideBranchesSplitLevel=copy.deepcopy(MiniAODOverrideBranchesSplitLevel),
+    splitLevel=cms.untracked.int32(0),
+    dropMetaData=cms.untracked.string('ALL'),
+    fastCloning=cms.untracked.bool(False),
+    overrideInputFileSplitLevels=cms.untracked.bool(True)
 )
 MINIAODEventContent.outputCommands.extend(MicroEventContent.outputCommands)
 MINIAODEventContent.outputCommands.extend(HLTriggerMINIAOD.outputCommands)
@@ -953,10 +968,17 @@ MINIAODSIMEventContent= cms.PSet(
     outputCommands = cms.untracked.vstring('drop *'),
     eventAutoFlushCompressedSize=cms.untracked.int32(-900),
     compressionAlgorithm=cms.untracked.string("LZMA"),
-    compressionLevel=cms.untracked.int32(4)
+    compressionLevel=cms.untracked.int32(4),
+    overrideBranchesSplitLevel=copy.deepcopy(MiniAODOverrideBranchesSplitLevel),
+    splitLevel=cms.untracked.int32(0),
+    dropMetaData=cms.untracked.string('ALL'),
+    fastCloning=cms.untracked.bool(False),
+    overrideInputFileSplitLevels=cms.untracked.bool(True)
 )
 MINIAODSIMEventContent.outputCommands.extend(MicroEventContentMC.outputCommands)
-MINIAODSIMEventContent.outputCommands.extend(HLTriggerMINIAOD.outputCommands)
+MINIAODSIMEventContent.outputCommands.extend(HLTriggerMINIAODSIM.outputCommands)
+
+phase2_l1scout.toModify(MINIAODSIMEventContent, outputCommands = L1TriggerPhase2L1ScoutMINIAODSIM.outputCommands)
 
 MINIGENEventContent= cms.PSet(
     outputCommands = cms.untracked.vstring('drop *'),
@@ -972,7 +994,12 @@ RAWMINIAODEventContent= cms.PSet(
     outputCommands = cms.untracked.vstring('drop *'),
     eventAutoFlushCompressedSize=cms.untracked.int32(20*1024*1024),
     compressionAlgorithm=cms.untracked.string("LZMA"),
-    compressionLevel=cms.untracked.int32(4)
+    compressionLevel=cms.untracked.int32(4),
+    overrideBranchesSplitLevel=copy.deepcopy(MiniAODOverrideBranchesSplitLevel),
+    splitLevel=cms.untracked.int32(0),
+    dropMetaData=cms.untracked.string('ALL'),
+    fastCloning=cms.untracked.bool(False),
+    overrideInputFileSplitLevels=cms.untracked.bool(True)
 )
 RAWMINIAODEventContent.outputCommands.extend(MicroEventContent.outputCommands)
 RAWMINIAODEventContent.outputCommands.extend(L1TriggerRAW.outputCommands)
@@ -985,7 +1012,12 @@ RAWMINIAODSIMEventContent= cms.PSet(
     outputCommands = cms.untracked.vstring('drop *'),
     eventAutoFlushCompressedSize=cms.untracked.int32(20*1024*1024),
     compressionAlgorithm=cms.untracked.string("LZMA"),
-    compressionLevel=cms.untracked.int32(4)
+    compressionLevel=cms.untracked.int32(4),
+    overrideBranchesSplitLevel=copy.deepcopy(MiniAODOverrideBranchesSplitLevel),
+    splitLevel=cms.untracked.int32(0),
+    dropMetaData=cms.untracked.string('ALL'),
+    fastCloning=cms.untracked.bool(False),
+    overrideInputFileSplitLevels=cms.untracked.bool(True)
 )
 RAWMINIAODSIMEventContent.outputCommands.extend(RAWMINIAODEventContent.outputCommands)
 RAWMINIAODSIMEventContent.outputCommands.extend(MicroEventContentMC.outputCommands)
@@ -1014,3 +1046,36 @@ for _entry in [FEVTDEBUGHLTEventContent,FEVTDEBUGEventContent,RECOSIMEventConten
 for _entry in [MINIAODEventContent, MINIAODSIMEventContent]:
     fastSim.toModify(_entry, outputCommands = _entry.outputCommands + fastSimEC.dropPatTrigger)
 
+# Tau Embedding EventContent
+from TauAnalysis.MCEmbeddingTools.Embedding_EventContent_cff import (
+    TauEmbCleaning,
+    TauEmbMerge,
+    TauEmbNano,
+    TauEmbSelection,
+    TauEmbSimGen,
+    TauEmbSimHLT,
+    TauEmbSimReco,
+)
+
+TauEmbeddingSelectionEventContent = RAWRECOEventContent.clone()
+TauEmbeddingSelectionEventContent.outputCommands.extend(TauEmbSelection.outputCommands)
+
+TauEmbeddingCleaningEventContent = RAWRECOEventContent.clone()
+TauEmbeddingCleaningEventContent.outputCommands.extend(TauEmbCleaning.outputCommands)
+
+TauEmbeddingSimGenEventContent = RAWSIMEventContent.clone()
+TauEmbeddingSimGenEventContent.outputCommands.extend(TauEmbSimGen.outputCommands)
+
+TauEmbeddingSimHLTEventContent = RAWSIMEventContent.clone()
+TauEmbeddingSimHLTEventContent.outputCommands.extend(TauEmbSimHLT.outputCommands)
+
+TauEmbeddingSimRecoEventContent = RAWRECOSIMHLTEventContent.clone()
+TauEmbeddingSimRecoEventContent.outputCommands.extend(TauEmbSimReco.outputCommands)
+
+# needs to have MINIAOD in its name to be recognized by cmsDriver as a MINIAOD output so that miniAOD_customizeOutput is applied
+TauEmbeddingMergeMINIAODEventContent = MINIAODSIMEventContent.clone()
+TauEmbeddingMergeMINIAODEventContent.outputCommands.extend(TauEmbMerge.outputCommands)
+
+# needs to have NANOAOD in its name to be recognized by cmsDriver as a NANOAOD output so that NanoAODOutputModule is used
+TauEmbeddingNANOAODEventContent = NANOAODSIMEventContent.clone()
+TauEmbeddingNANOAODEventContent.outputCommands.extend(TauEmbNano.outputCommands)

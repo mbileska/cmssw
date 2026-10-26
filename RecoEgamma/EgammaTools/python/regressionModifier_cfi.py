@@ -3,6 +3,7 @@ import FWCore.ParameterSet.Config as cms
 regressionModifier106XUL = cms.PSet(
     modifierName = cms.string('EGRegressionModifierV3'),       
     rhoTag = cms.InputTag('fixedGridRhoFastjetAllTmp'),
+    rhoMaps = cms.VInputTag(),
     useClosestToCentreSeedCrysDef = cms.bool(False),
     useBuggedHOverE = cms.bool(False),
     maxRawEnergyForLowPtEBSigma = cms.double(-1), 
@@ -94,6 +95,7 @@ regressionModifier106XUL = cms.PSet(
 regressionModifier103XLowPtPho = cms.PSet(
     modifierName = cms.string('EGRegressionModifierV3'),       
     rhoTag = cms.InputTag('fixedGridRhoFastjetAllTmp'),
+    rhoMaps = cms.VInputTag(),
     useClosestToCentreSeedCrysDef = cms.bool(False),
     useBuggedHOverE = cms.bool(False),
     maxRawEnergyForLowPtEBSigma = cms.double(-1), 
@@ -266,9 +268,9 @@ regressionModifierRun3 = regressionModifierRun2.clone(
 from Configuration.Eras.Modifier_run3_egamma_cff import run3_egamma
 run3_egamma.toReplaceWith(regressionModifier,regressionModifierRun3)
 
-from Configuration.Eras.Era_Run3_2023_UPC_cff import Run3_2023_UPC
+from Configuration.Eras.Modifier_run3_upc_2023_cff import run3_upc_2023
 from Configuration.Eras.Modifier_run3_egamma_2023_cff import run3_egamma_2023
-(run3_egamma_2023 & Run3_2023_UPC).toModify(regressionModifier103XLowPtPho,
+(run3_egamma_2023 & run3_upc_2023).toModify(regressionModifier103XLowPtPho,
     eleRegs = dict(
         ecalOnlyMean = dict(
             rangeMinHighEt = 0.2,

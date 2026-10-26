@@ -1,0 +1,303 @@
+%MSG-i ThreadStreamSetup:  (NoModuleName) 26-Jun-2026 12:27:02 CDT pre-events
+setting # threads 8
+setting # streams 8
+%MSG
+26-Jun-2026 12:27:14 CDT  Initiating request to open file file:///hdfs/store/user/emettner/Misc/00ea2d85-25bf-4c64-8e71-d3d6726028c4.root
+26-Jun-2026 12:28:15 CDT  Successfully opened file file:///hdfs/store/user/emettner/Misc/00ea2d85-25bf-4c64-8e71-d3d6726028c4.root
+Begin processing the 1st record. Run 1, Event 196001, LumiSection 197 on stream 7 at 26-Jun-2026 12:31:10.133 CDT
+Starting the HF Emulator...
+cluster 0 43
+cluster 1 42
+cluster 2 33
+cluster 3 31
+cluster 4 30
+cluster 5 28
+cluster 6 24
+cluster 7 22
+cluster 8 0
+cluster 9 0
+cluster 10 0
+cluster 11 0
+cluster 12 0
+cluster 13 0
+cluster 14 0
+cluster sorted 0 43
+cluster sorted 1 42
+cluster sorted 2 33
+cluster sorted 3 31
+cluster sorted 4 30
+cluster sorted 5 28
+cluster sorted 6 24
+cluster sorted 7 22
+cluster sorted 8 0
+cluster sorted 9 0
+cluster sorted 10 0
+cluster sorted 11 0
+cluster sorted 12 0
+cluster sorted 13 0
+cluster sorted 14 0
+cluster 0 27
+cluster 1 23
+cluster 2 0
+cluster 3 0
+cluster 4 0
+cluster 5 0
+cluster 6 0
+cluster 7 0
+cluster 8 0
+cluster 9 0
+cluster 10 0
+cluster 11 0
+cluster 12 0
+cluster 13 0
+cluster 14 0
+cluster sorted 0 27
+cluster sorted 1 23
+cluster sorted 2 0
+cluster sorted 3 0
+cluster sorted 4 0
+cluster sorted 5 0
+cluster sorted 6 0
+cluster sorted 7 0
+cluster sorted 8 0
+cluster sorted 9 0
+cluster sorted 10 0
+cluster sorted 11 0
+cluster sorted 12 0
+cluster sorted 13 0
+cluster sorted 14 0
+cluster 0 48
+cluster 1 44
+cluster 2 42
+cluster 3 31
+cluster 4 31
+cluster 5 25
+cluster 6 0
+cluster 7 0
+cluster 8 0
+cluster 9 0
+cluster 10 0
+cluster 11 0
+cluster 12 0
+cluster 13 0
+cluster 14 0
+cluster sorted 0 48
+cluster sorted 1 44
+cluster sorted 2 42
+cluster sorted 3 31
+cluster sorted 4 31
+cluster sorted 5 25
+cluster sorted 6 0
+cluster sorted 7 0
+cluster sorted 8 0
+cluster sorted 9 0
+cluster sorted 10 0
+cluster sorted 11 0
+cluster sorted 12 0
+cluster sorted 13 0
+cluster sorted 14 0
+cluster 0 43
+cluster 1 42
+cluster 2 27
+cluster 3 24
+cluster 4 0
+cluster 5 0
+cluster 6 0
+cluster 7 0
+cluster 8 0
+cluster 9 0
+cluster 10 0
+cluster 11 0
+cluster 12 0
+cluster 13 0
+cluster 14 0
+cluster sorted 0 43
+cluster sorted 1 42
+cluster sorted 2 27
+cluster sorted 3 24
+cluster sorted 4 0
+cluster sorted 5 0
+cluster sorted 6 0
+cluster sorted 7 0
+cluster sorted 8 0
+cluster sorted 9 0
+cluster sorted 10 0
+cluster sorted 11 0
+cluster sorted 12 0
+cluster sorted 13 0
+cluster sorted 14 0
+cluster 0 47
+cluster 1 33
+cluster 2 30
+cluster 3 0
+cluster 4 0
+cluster 5 0
+cluster 6 0
+cluster 7 0
+cluster 8 0
+cluster 9 0
+cluster 10 0
+cluster 11 0
+cluster 12 0
+cluster 13 0
+cluster 14 0
+cluster sorted 0 47
+cluster sorted 1 33
+cluster sorted 2 30
+cluster sorted 3 0
+cluster sorted 4 0
+cluster sorted 5 0
+cluster sorted 6 0
+cluster sorted 7 0
+cluster sorted 8 0
+cluster sorted 9 0
+cluster sorted 10 0
+cluster sorted 11 0
+cluster sorted 12 0
+cluster sorted 13 0
+cluster sorted 14 0
+cluster 0 48
+cluster 1 39
+cluster 2 32
+cluster 3 29
+cluster 4 23
+cluster 5 17
+cluster 6 0
+cluster 7 0
+cluster 8 0
+cluster 9 0
+cluster 10 0
+cluster 11 0
+cluster 12 0
+cluster 13 0
+cluster 14 0
+cluster sorted 0 48
+cluster sorted 1 39
+cluster sorted 2 32
+cluster sorted 3 29
+cluster sorted 4 23
+cluster sorted 5 17
+cluster sorted 6 0
+cluster sorted 7 0
+cluster sorted 8 0
+cluster sorted 9 0
+cluster sorted 10 0
+cluster sorted 11 0
+cluster sorted 12 0
+cluster sorted 13 0
+cluster sorted 14 0
+tau 0 47
+tau 1 46
+tau 2 46
+tau 3 45
+tau 4 42
+tau 5 42
+tau 6 42
+tau 7 42
+tau 8 41
+tau 9 40
+tau 10 40
+tau 11 39
+tau 12 38
+tau 13 36
+tau 14 35
+sorted tau 0 47
+sorted tau 1 46
+sorted tau 2 46
+sorted tau 3 45
+sorted tau 4 42
+sorted tau 5 42
+sorted tau 6 42
+sorted tau 7 42
+sorted tau 8 41
+sorted tau 9 40
+sorted tau 10 40
+sorted tau 11 39
+sorted tau 12 38
+sorted tau 13 36
+sorted tau 14 35
+jets 0 265
+jets 1 262
+jets 2 250
+jets 3 220
+jets 4 158
+jets 5 153
+jets 6 151
+jets 7 144
+jets 8 120
+jets 9 34
+jets 10 0
+jets 11 0
+jets 12 0
+jets 13 0
+jets 14 0
+sorted jets 0 265
+sorted jets 1 262
+sorted jets 2 250
+sorted jets 3 220
+sorted jets 4 158
+sorted jets 5 153
+sorted jets 6 151
+sorted jets 7 144
+sorted jets 8 120
+sorted jets 9 34
+sorted jets 10 0
+sorted jets 11 0
+sorted jets 12 0
+sorted jets 13 0
+sorted jets 14 0
+=== Region 0 ===
+  etaCenter=6 phiCenter=5
+  In[0]: Pt=43 Eta=3 Phi=7
+  In[1]: Pt=42 Eta=5 Phi=4
+  In[2]: Pt=33 Eta=4 Phi=7
+  In[3]: Pt=31 Eta=4 Phi=3
+  In[4]: Pt=30 Eta=7 Phi=3
+  In[5]: Pt=28 Eta=6 Phi=7
+  Out[0]: Pt=39.75 Eta=11 Phi=9
+  Out[1]: Pt=16.5 Eta=10 Phi=8
+  Out[2]: Pt=14 Eta=13 Phi=8
+=== Region 1 ===
+  etaCenter=6 phiCenter=17
+  In[0]: Pt=27 Eta=2 Phi=7
+  In[1]: Pt=23 Eta=7 Phi=3
+=== Region 2 ===
+  etaCenter=6 phiCenter=29
+  In[0]: Pt=48 Eta=2 Phi=4
+  In[1]: Pt=44 Eta=4 Phi=7
+  In[2]: Pt=42 Eta=3 Phi=7
+  In[3]: Pt=31 Eta=7 Phi=4
+  In[4]: Pt=31 Eta=6 Phi=3
+  In[5]: Pt=25 Eta=5 Phi=4
+  Out[0]: Pt=47.5 Eta=8 Phi=33
+  Out[1]: Pt=16.5 Eta=12 Phi=32
+  Out[2]: Pt=16.5 Eta=13 Phi=33
+=== Region 3 ===
+  etaCenter=6 phiCenter=41
+  In[0]: Pt=43 Eta=3 Phi=4
+  In[1]: Pt=42 Eta=2 Phi=3
+  In[2]: Pt=27 Eta=5 Phi=5
+  In[3]: Pt=24 Eta=6 Phi=7
+  Out[0]: Pt=41.25 Eta=9 Phi=45
+  Out[1]: Pt=39.75 Eta=8 Phi=44
+=== Region 4 ===
+  etaCenter=6 phiCenter=53
+  In[0]: Pt=47 Eta=3 Phi=4
+  In[1]: Pt=33 Eta=6 Phi=3
+  In[2]: Pt=30 Eta=5 Phi=3
+  Out[0]: Pt=46.25 Eta=9 Phi=57
+  Out[1]: Pt=21.5 Eta=12 Phi=56
+  Out[2]: Pt=14 Eta=11 Phi=56
+=== Region 5 ===
+  etaCenter=6 phiCenter=65
+  In[0]: Pt=48 Eta=6 Phi=5
+  In[1]: Pt=39 Eta=2 Phi=5
+  In[2]: Pt=32 Eta=4 Phi=3
+  In[3]: Pt=29 Eta=4 Phi=4
+  In[4]: Pt=23 Eta=5 Phi=5
+  In[5]: Pt=17 Eta=4 Phi=3
+  Out[0]: Pt=47.5 Eta=12 Phi=70
+  Out[1]: Pt=35 Eta=8 Phi=70
+  Out[2]: Pt=19 Eta=10 Phi=68
+  Out[3]: Pt=11.75 Eta=10 Phi=69
+26-Jun-2026 12:31:10 CDT  Closed file file:///hdfs/store/user/emettner/Misc/00ea2d85-25bf-4c64-8e71-d3d6726028c4.root

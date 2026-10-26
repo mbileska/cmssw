@@ -7,6 +7,7 @@
 //#include <memory>
 //#include <mutex>
 //#include <thread>
+#include <memory>
 #include <queue>
 
 #include "FWCore/Framework/interface/EventPrincipal.h"
@@ -91,8 +92,10 @@ public:
   std::vector<std::string> fileNames_;
   std::vector<uint64_t> diskFileSizes_;
   std::vector<uint64_t> bufferOffsets_;
+  std::vector<uint64_t> bufferEnds_;
   std::vector<uint64_t> fileSizes_;
   std::vector<unsigned int> fileOrder_;
+  std::vector<uint16_t> fileDataType_;
   bool deleteFile_;
   int rawFd_;
   uint64_t fileSize_;
@@ -113,6 +116,7 @@ public:
             std::string const& name = std::string(),
             bool deleteFile = true,
             int rawFd = -1,
+            uint16_t rawDataType = 0,
             uint64_t fileSize = 0,
             uint16_t rawHeaderSize = 0,
             uint16_t nChunks = 0,
@@ -132,9 +136,11 @@ public:
         nProcessed_(0) {
     fileNames_.push_back(name);
     fileOrder_.push_back(fileOrder_.size());
+    fileDataType_.push_back(rawDataType);
     diskFileSizes_.push_back(fileSize);
     fileSizes_.push_back(0);
     bufferOffsets_.push_back(0);
+    bufferEnds_.push_back(fileSize);
     chunks_.reserve(nChunks_);
     for (unsigned int i = 0; i < nChunks; i++)
       chunks_.push_back(nullptr);
@@ -152,12 +158,15 @@ public:
   void appendFile(std::string const& name, uint64_t size) {
     size_t prevOffset = bufferOffsets_.back();
     size_t prevSize = diskFileSizes_.back();
+    size_t prevAccumSize = diskFileSizes_.back();
     numFiles_++;
     fileNames_.push_back(name);
     fileOrder_.push_back(fileOrder_.size());
+    fileDataType_.push_back(0);
     diskFileSizes_.push_back(size);
     fileSizes_.push_back(0);
     bufferOffsets_.push_back(prevOffset + prevSize);
+    bufferEnds_.push_back(prevAccumSize + size);
   }
 
   bool waitForChunk(unsigned int chunkid) {
@@ -186,6 +195,27 @@ public:
   }
   uint64_t currentChunkSize() const { return chunks_[currentChunk_]->size_; }
   int64_t fileSizeLeft() const { return (int64_t)fileSize_ - (int64_t)bufferPosition_; }
+  int64_t fileSizeLeft(size_t fidx) const { return (int64_t)diskFileSizes_[fidx] - (int64_t)bufferOffsets_[fidx]; }
+
+  bool complete() const { return bufferPosition_ == fileSize_; }
+
+  bool buffersComplete() const {
+    unsigned complete = 0;
+    for (size_t fidx = 0; fidx < bufferOffsets_.size(); fidx++) {
+      if ((int64_t)bufferEnds_[fidx] - (int64_t)bufferOffsets_[fidx] == 0)
+        complete++;
+    }
+    if (complete && complete < bufferOffsets_.size())
+      throw cms::Exception("InputFile") << "buffers are inconsistent for input files with primary " << fileName_;
+    return complete > 0;
+  }
+  void setFileDataType(unsigned int j, uint16_t dataType) { fileDataType_[j] = dataType; }
+  int daqRunEndFlagIndex() const {
+    for (unsigned j = 0; j < fileDataType_.size(); j++)
+      if (fileDataType_[j] == 0xffff)
+        return (int)j;
+    return -1;
+  }
 };
 
 class DAQSource;
@@ -197,21 +227,28 @@ public:
                std::string const& name = std::string(),
                bool deleteFile = true,
                int rawFd = -1,
+               uint16_t rawDataType = 0,
                uint64_t fileSize = 0,
                uint16_t rawHeaderSize = 0,
                uint32_t nChunks = 0,
                int nEvents = 0,
                DAQSource* parent = nullptr)
-      : InputFile(status, lumi, name, deleteFile, rawFd, fileSize, rawHeaderSize, nChunks, nEvents, nullptr),
+      : InputFile(
+            status, lumi, name, deleteFile, rawFd, rawDataType, fileSize, rawHeaderSize, nChunks, nEvents, nullptr),
         sourceParent_(parent) {}
   bool advance(std::mutex& m, std::condition_variable& cv, unsigned char*& dataPosition, const size_t size);
   void advance(const size_t size) {
     chunkPosition_ += size;
     bufferPosition_ += size;
   }
+  void advanceBuffers(const size_t size) {
+    for (size_t bidx = 0; bidx < bufferOffsets_.size(); bidx++)
+      bufferOffsets_[bidx] += size;
+  }
+  void advanceBuffer(const size_t size, const size_t bidx) { bufferOffsets_[bidx] += size; }
   void queue(UnpackedRawEventWrapper* ec) {
     if (!frdcQueue_.get())
-      frdcQueue_.reset(new std::queue<std::unique_ptr<UnpackedRawEventWrapper>>());
+      frdcQueue_ = std::make_unique<std::queue<std::unique_ptr<UnpackedRawEventWrapper>>>();
     std::unique_ptr<UnpackedRawEventWrapper> uptr(ec);
     frdcQueue_->push(std::move(uptr));
   }

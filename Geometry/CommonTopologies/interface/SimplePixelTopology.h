@@ -349,6 +349,9 @@ namespace pixelTopology {
     static constexpr uint16_t last_barrel_detIndex = 504;
 
     static constexpr uint32_t maxPixInModule = 6000;
+    static constexpr uint32_t maxPixInModuleForMorphing = 0;
+    static constexpr uint32_t maxIterClustering = 16;
+
     static constexpr uint32_t maxNumClustersPerModules = phase2PixelTopology::maxNumClustersPerModules;
     static constexpr uint32_t maxHitsInModule = phase2PixelTopology::maxNumClustersPerModules;
 
@@ -366,9 +369,6 @@ namespace pixelTopology {
     static constexpr float bigPixYCorrection = 0.0f;
 
     static constexpr float dzdrFact = 8 * 0.0285 / 0.015;  // from dz/dr to "DY"
-
-    static constexpr int minYsizeB1 = 25;
-    static constexpr int minYsizeB2 = 15;
 
     static constexpr int nPairsMinimal = 33;
     static constexpr int nPairsFarForwards = nPairsMinimal + 8;  // include barrel "jumping" layer pairs
@@ -446,6 +446,9 @@ namespace pixelTopology {
     static constexpr uint16_t last_barrel_detIndex = 1184;
 
     static constexpr uint32_t maxPixInModule = 6000;
+    static constexpr uint32_t maxPixInModuleForMorphing = maxPixInModule * 2 / 5;
+    static constexpr uint32_t maxIterClustering = 24;
+
     static constexpr uint32_t maxNumClustersPerModules = phase1PixelTopology::maxNumClustersPerModules;
     static constexpr uint32_t maxHitsInModule = phase1PixelTopology::maxNumClustersPerModules;
 
@@ -463,9 +466,6 @@ namespace pixelTopology {
     static constexpr float bigPixYCorrection = 8.0f;
 
     static constexpr float dzdrFact = 8 * 0.0285 / 0.015;  // from dz/dr to "DY"
-
-    static constexpr int minYsizeB1 = 36;
-    static constexpr int minYsizeB2 = 28;
 
     static constexpr int nPairsForQuadruplets = 13;                     // quadruplets require hits in all layers
     static constexpr int nPairsForTriplets = nPairsForQuadruplets + 2;  // include barrel "jumping" layer pairs
@@ -560,6 +560,8 @@ namespace pixelTopology {
     static constexpr uint32_t maxNumberOfQuadruplets = maxNumberOfTuples;
 
     static constexpr uint32_t maxPixInModule = 10000;
+    static constexpr uint32_t maxPixInModuleForMorphing = maxPixInModule * 1 / 10;
+    static constexpr uint32_t maxIterClustering = 32;
 
     static constexpr uint32_t maxNumOfActiveDoublets =
         maxNumberOfDoublets / 4;  // TODO need to think a better way to avoid this duplication

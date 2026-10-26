@@ -14,6 +14,7 @@ def Custom_Muon_Task(process):
     process.nanoTableTaskCommon.remove(process.boostedTauTablesTask)
     process.nanoTableTaskCommon.remove(process.jetPuppiTablesTask)
     process.nanoTableTaskCommon.remove(process.jetAK8TablesTask)
+    process.nanoTableTaskCommon.remove(process.jetConstituentsTablesTask)
 
     process.nanoTableTaskFS.remove(process.electronMCTask)
     process.nanoTableTaskFS.remove(process.lowPtElectronMCTask)
@@ -24,7 +25,8 @@ def Custom_Muon_Task(process):
     process.nanoTableTaskFS.remove(process.metMCTable)
     process.nanoTableTaskFS.remove(process.ttbarCatMCProducersTask)
     process.nanoTableTaskFS.remove(process.ttbarCategoryTableTask)
-    
+    process.nanoTableTaskFS.remove(process.tauSpinnerTableTask)
+
     return process
 
 def AddPFTracks(proc):
@@ -363,6 +365,13 @@ def IncreaseGenPrecesion(process):
     
     return process
 
+def ModifyMuonSelection(process):
+
+    process.finalMuons.cut = cms.string("pt > 2")
+
+    return process
+
+
 def PrepMuonCustomNanoAOD(process):
     
     process = Custom_Muon_Task(process)
@@ -370,6 +379,6 @@ def PrepMuonCustomNanoAOD(process):
     process = AddVariablesForMuon(process)
     process = AddTriggerObjectBits(process)
     process = IncreaseGenPrecesion(process)
-
+    process = ModifyMuonSelection(process)
 
     return process
