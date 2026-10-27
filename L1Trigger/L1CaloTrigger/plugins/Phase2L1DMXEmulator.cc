@@ -37,7 +37,7 @@
 #include "FWCore/Utilities/interface/Exception.h"
 #include "L1Trigger/L1CaloTrigger/interface/MHH_h.h"
 #include "L1Trigger/L1CaloTrigger/interface/Phase2L1CaloJetEmulator.h"
-#include "L1Trigger/L1CaloTrigger/interface/Phase2L1DMXSums.h"
+#include "L1Trigger/L1CaloTrigger/interface/Phase2L1MHHLinkPacker.h"
 
 namespace {
 
@@ -108,20 +108,11 @@ void sortAndTrim(std::vector<Candidate>& candidates) {
 }
 
 ap_uint<48> packGamma(const Candidate& candidate) {
-  ap_uint<48> word = 0;
-  word.range(11, 0) = candidate.et;
-  word.range(18, 12) = candidate.eta;
-  word.range(27, 19) = candidate.phi;
-  return word;
+  return p2mhhlink::packGamma(candidate.et, candidate.eta, candidate.phi);
 }
 
 ap_uint<48> packHadron(const Candidate& candidate) {
-  ap_uint<48> word = 0;
-  word.range(11, 0) = candidate.et;
-  word.range(17, 12) = candidate.eta;
-  word.range(26, 18) = candidate.phi;
-  word.range(30, 27) = candidate.seedRatio;
-  return word;
+  return p2mhhlink::packHadron(candidate.et, candidate.eta, candidate.phi, candidate.seedRatio);
 }
 
 template <typename Pack>
@@ -315,13 +306,13 @@ void Phase2L1DMXEmulator::produce(edm::Event& event, const edm::EventSetup&) {
   putCandidates(links[kHgcalLinkBase + 1], 0, jetCandidates, packHadron);
   putCandidates(links[kHgcalLinkBase + 1], kObjectsPerCategory, tauCandidates, packHadron);
 
-  links[kHgcalLinkBase + 2] = p2dmx::packSumsV2(quantizeSigned(ex, etLsb_),
-                                                quantizeSigned(ey, etLsb_),
-                                                quantizeSigned(htx, etLsb_),
-                                                quantizeSigned(hty, etLsb_),
-                                                quantizeUnsigned(sumEt, etLsb_, 0xFFF),
-                                                quantizeUnsigned(ht, etLsb_, 0xFFF),
-                                                std::min(nObjects, 0xFFFU));
+  links[kHgcalLinkBase + 2] = p2mhhlink::packSumsV2(quantizeSigned(ex, etLsb_),
+                                                    quantizeSigned(ey, etLsb_),
+                                                    quantizeSigned(htx, etLsb_),
+                                                    quantizeSigned(hty, etLsb_),
+                                                    quantizeUnsigned(sumEt, etLsb_, 0xFFF),
+                                                    quantizeUnsigned(ht, etLsb_, 0xFFF),
+                                                    std::min(nObjects, 0xFFFU));
 
   if (debug_) {
     edm::LogVerbatim("Phase2L1DMXEmulator")

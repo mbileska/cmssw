@@ -7,7 +7,7 @@
 #include <string>
 
 #include "L1Trigger/L1CaloTrigger/interface/MHH_h.h"
-#include "L1Trigger/L1CaloTrigger/interface/Phase2L1DMXSums.h"
+#include "L1Trigger/L1CaloTrigger/interface/Phase2L1MHHLinkPacker.h"
 #include "L1Trigger/L1CaloTrigger/interface/bitonicSort32_MHH_h.h"
 #include "L1Trigger/L1CaloTrigger/interface/bitonicSort32_MHH_cpp.h"
 #include "L1Trigger/L1CaloTrigger/interface/MHH_cpp.h"
@@ -28,31 +28,37 @@ ap_uint<48> objectAt(const ap_uint<576>& link, unsigned int slot) {
 }
 
 ap_uint<48> gamma(unsigned int et, unsigned int eta, unsigned int phi, bool hgcal) {
-  ap_uint<48> out = 0;
-  out.range(11, 0) = et;
-  out.range(18, 12) = eta;
-  out.range(27, 19) = phi;
+  ap_uint<48> out = p2mhhlink::packGamma(et, eta, phi);
   out[47] = hgcal;
   return out;
 }
 
 ap_uint<48> hadron(unsigned int et, unsigned int eta, unsigned int phi, unsigned int ratio, bool hgcal) {
-  ap_uint<48> out = 0;
-  out.range(11, 0) = et;
-  out.range(17, 12) = eta;
-  out.range(26, 18) = phi;
-  out.range(30, 27) = ratio;
+  ap_uint<48> out = p2mhhlink::packHadron(et, eta, phi, ratio);
   out[47] = hgcal;
   return out;
 }
 
 ap_uint<576> sourceSums(
     int ex, int ey, int htx, int hty, unsigned int sumEt, unsigned int ht, unsigned int count) {
-  return p2dmx::packSumsV2(ex, ey, htx, hty, sumEt, ht, count);
+  return p2mhhlink::packSumsV2(ex, ey, htx, hty, sumEt, ht, count);
 }
 
-void testDMXSumsPacking() {
-  const ap_uint<576> sums = p2dmx::packSumsV2(-17, 23, -31, 47, 101, 79, 13);
+void testSourceLinkPacking() {
+  const ap_uint<48> packedGamma = p2mhhlink::packGamma(0xABC, 84, 359);
+  require(packedGamma.range(11, 0) == 0xABC, "source gamma ET packing differs from MHH");
+  require(packedGamma.range(18, 12) == 84, "source gamma eta packing differs from MHH");
+  require(packedGamma.range(27, 19) == 359, "source gamma phi packing differs from MHH");
+  require(packedGamma.range(47, 28) == 0, "source gamma spare bits are nonzero");
+
+  const ap_uint<48> packedHadron = p2mhhlink::packHadron(0x789, 6, 23, 11);
+  require(packedHadron.range(11, 0) == 0x789, "source hadron ET packing differs from MHH");
+  require(packedHadron.range(17, 12) == 6, "source hadron eta packing differs from MHH");
+  require(packedHadron.range(26, 18) == 23, "source hadron phi packing differs from MHH");
+  require(packedHadron.range(30, 27) == 11, "source hadron ratio packing differs from MHH");
+  require(packedHadron.range(47, 31) == 0, "source hadron spare bits are nonzero");
+
+  const ap_uint<576> sums = p2mhhlink::packSumsV2(-17, 23, -31, 47, 101, 79, 13);
 
   require((ap_int<12>)sums.range(11, 0) == -17, "DMX Ex packing is not sums ABI v2");
   require((ap_int<12>)sums.range(23, 12) == 23, "DMX Ey packing is not sums ABI v2");
@@ -150,7 +156,7 @@ int sc_main(int, char**) {
 int main() {
 #endif
   try {
-    testDMXSumsPacking();
+    testSourceLinkPacking();
     testSumsAbiV2AndReservedLinks();
     testBoundaryStitchingAndPacking();
   } catch (const std::exception& error) {
