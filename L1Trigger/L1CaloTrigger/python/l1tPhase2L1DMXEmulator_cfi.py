@@ -10,7 +10,8 @@ l1tPhase2L1DMXEmulator = cms.EDProducer(
     zSide=cms.int32(1),
     etaMin=cms.double(1.479),
     etaMax=cms.double(3.045),
-    etLsb=cms.double(1.0),
+    # MHH/GCTB source-sums ABI v2 energy quantum.
+    etLsb=cms.double(0.5),
     phiOffset=cms.double(0.0),
     minTowerEt=cms.double(1.0),
     minEgEt=cms.double(0.0),

@@ -6,9 +6,12 @@
  * into the 16 x 576-bit input-link contract consumed by Phase2L1MHHEmulator.
  * Only HGCAL links 8, 9, and 10 are populated; all other links are zero-filled.
  *
- * The link serialization matches the MHH firmware interface.  The candidate
- * construction is provisional until the authoritative DMX object-building,
- * quantization, isolation, and partial-sum specifications are available.
+ * The link serialization matches MHH sums ABI v2.  Ex/Ey and total ET are
+ * formed from the accepted HGCAL towers; NObj counts those towers.  HTx/HTy
+ * and total HT are formed from the accepted jets.  Cartesian components are
+ * global energy-flow sums, not negated missing-energy vectors.  The
+ * object-building and isolation choices remain provisional until an
+ * authoritative DMX specification exists.
  */
 
 #include <ap_int.h>
@@ -34,6 +37,7 @@
 #include "FWCore/Utilities/interface/Exception.h"
 #include "L1Trigger/L1CaloTrigger/interface/MHH_h.h"
 #include "L1Trigger/L1CaloTrigger/interface/Phase2L1CaloJetEmulator.h"
+#include "L1Trigger/L1CaloTrigger/interface/Phase2L1DMXSums.h"
 
 namespace {
 
@@ -117,23 +121,6 @@ ap_uint<48> packHadron(const Candidate& candidate) {
   word.range(17, 12) = candidate.eta;
   word.range(26, 18) = candidate.phi;
   word.range(30, 27) = candidate.seedRatio;
-  return word;
-}
-
-ap_uint<48> packSignedHypotheses(int value) {
-  ap_uint<48> word = 0;
-  const ap_uint<12> packed = static_cast<ap_int<12> >(value);
-  // The three upstream sum hypotheses are not yet defined for DMX.  Replicate
-  // the nominal tower sum so the three fields remain deterministic and usable.
-  word.range(11, 0) = packed;
-  word.range(23, 12) = packed;
-  word.range(35, 24) = packed;
-  return word;
-}
-
-ap_uint<48> packUnsigned(unsigned int value) {
-  ap_uint<48> word = 0;
-  word.range(11, 0) = value;
   return word;
 }
 
@@ -276,8 +263,10 @@ void Phase2L1DMXEmulator::produce(edm::Event& event, const edm::EventSetup&) {
     const unsigned int iPhi = phiBin(tower->phi(), kTowerPhiBins, phiOffset_);
     towerGrid[iEta][iPhi] += static_cast<float>(et);
     sumEt += et;
-    ex += et * std::cos(normalizedPhi(tower->phi(), phiOffset_));
-    ey += et * std::sin(normalizedPhi(tower->phi(), phiOffset_));
+    // The grid offset is only a binning convention.  Source-sum components
+    // must remain in the detector-global Cartesian frame.
+    ex += et * std::cos(tower->phi());
+    ey += et * std::sin(tower->phi());
     ++nObjects;
   }
 
@@ -285,6 +274,8 @@ void Phase2L1DMXEmulator::produce(edm::Event& event, const edm::EventSetup&) {
   gctobj::makeST_hgcal(towerGrid, superTowers);
 
   double ht = 0.;
+  double htx = 0.;
+  double hty = 0.;
   for (int i = 0; i < nJets; ++i) {
     const gctobj::jetInfo jet = gctobj::getRegion(superTowers, static_cast<float>(jetSeedThreshold_));
     if (jet.energy <= 0.) {
@@ -299,6 +290,14 @@ void Phase2L1DMXEmulator::produce(edm::Event& event, const edm::EventSetup&) {
     if (jetCandidate.et != 0) {
       jetCandidates.push_back(jetCandidate);
       ht += jet.energy;
+
+      // phiCenter is the 5-degree tower-bin index in the offset grid.  Use
+      // its bin centre and undo the grid rotation to recover global phi.
+      const double jetPhi = normalizedPhi(
+          (static_cast<double>(jet.phiCenter) + 0.5) * 2. * kPi / static_cast<double>(kTowerPhiBins),
+          -phiOffset_);
+      htx += jet.energy * std::cos(jetPhi);
+      hty += jet.energy * std::sin(jetPhi);
     }
 
     Candidate tauCandidate = jetCandidate;
@@ -316,17 +315,20 @@ void Phase2L1DMXEmulator::produce(edm::Event& event, const edm::EventSetup&) {
   putCandidates(links[kHgcalLinkBase + 1], 0, jetCandidates, packHadron);
   putCandidates(links[kHgcalLinkBase + 1], kObjectsPerCategory, tauCandidates, packHadron);
 
-  links[kHgcalLinkBase + 2].range(47, 0) = packSignedHypotheses(quantizeSigned(ex, etLsb_));
-  links[kHgcalLinkBase + 2].range(95, 48) = packSignedHypotheses(quantizeSigned(ey, etLsb_));
-  links[kHgcalLinkBase + 2].range(143, 96) = packUnsigned(quantizeUnsigned(ht, etLsb_, 0xFFF));
-  links[kHgcalLinkBase + 2].range(191, 144) = packUnsigned(quantizeUnsigned(sumEt, etLsb_, 0xFFF));
-  links[kHgcalLinkBase + 2].range(239, 192) = packUnsigned(std::min(nObjects, 0xFFFU));
+  links[kHgcalLinkBase + 2] = p2dmx::packSumsV2(quantizeSigned(ex, etLsb_),
+                                                quantizeSigned(ey, etLsb_),
+                                                quantizeSigned(htx, etLsb_),
+                                                quantizeSigned(hty, etLsb_),
+                                                quantizeUnsigned(sumEt, etLsb_, 0xFFF),
+                                                quantizeUnsigned(ht, etLsb_, 0xFFF),
+                                                std::min(nObjects, 0xFFFU));
 
   if (debug_) {
     edm::LogVerbatim("Phase2L1DMXEmulator")
         << "event=" << event.id().event() << " zSide=" << zSide_ << " EG=" << egCandidates.size()
         << " isoEG=" << isoEgCandidates.size() << " jet=" << jetCandidates.size()
-        << " tau=" << tauCandidates.size() << " towers=" << nObjects;
+        << " tau=" << tauCandidates.size() << " towers=" << nObjects << " Ex=" << ex << " Ey=" << ey
+        << " HTx=" << htx << " HTy=" << hty << " ET=" << sumEt << " HT=" << ht;
   }
 
   for (int link = 0; link < p2mhh::MHH_N_INPUT_LINKS; ++link) {
@@ -344,7 +346,7 @@ void Phase2L1DMXEmulator::fillDescriptions(edm::ConfigurationDescriptions& descr
   description.add<int>("zSide", 1);
   description.add<double>("etaMin", 1.479);
   description.add<double>("etaMax", 3.045);
-  description.add<double>("etLsb", 1.0);
+  description.add<double>("etLsb", 0.5);
   description.add<double>("phiOffset", 0.0);
   description.add<double>("minTowerEt", 1.0);
   description.add<double>("minEgEt", 0.0);

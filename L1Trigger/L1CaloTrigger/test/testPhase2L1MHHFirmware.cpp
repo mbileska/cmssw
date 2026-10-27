@@ -7,6 +7,7 @@
 #include <string>
 
 #include "L1Trigger/L1CaloTrigger/interface/MHH_h.h"
+#include "L1Trigger/L1CaloTrigger/interface/Phase2L1DMXSums.h"
 #include "L1Trigger/L1CaloTrigger/interface/bitonicSort32_MHH_h.h"
 #include "L1Trigger/L1CaloTrigger/interface/bitonicSort32_MHH_cpp.h"
 #include "L1Trigger/L1CaloTrigger/interface/MHH_cpp.h"
@@ -47,15 +48,22 @@ ap_uint<48> hadron(unsigned int et, unsigned int eta, unsigned int phi, unsigned
 
 ap_uint<576> sourceSums(
     int ex, int ey, int htx, int hty, unsigned int sumEt, unsigned int ht, unsigned int count) {
-  ap_uint<576> out = 0;
-  out.range(11, 0) = ap_int<12>(ex);
-  out.range(23, 12) = ap_int<12>(ey);
-  out.range(35, 24) = ap_int<12>(htx);
-  out.range(47, 36) = ap_int<12>(hty);
-  out.range(75, 64) = ap_uint<12>(sumEt);
-  out.range(87, 76) = ap_uint<12>(ht);
-  out.range(99, 88) = ap_uint<12>(count);
-  return out;
+  return p2dmx::packSumsV2(ex, ey, htx, hty, sumEt, ht, count);
+}
+
+void testDMXSumsPacking() {
+  const ap_uint<576> sums = p2dmx::packSumsV2(-17, 23, -31, 47, 101, 79, 13);
+
+  require((ap_int<12>)sums.range(11, 0) == -17, "DMX Ex packing is not sums ABI v2");
+  require((ap_int<12>)sums.range(23, 12) == 23, "DMX Ey packing is not sums ABI v2");
+  require((ap_int<12>)sums.range(35, 24) == -31, "DMX HTx packing is not sums ABI v2");
+  require((ap_int<12>)sums.range(47, 36) == 47, "DMX HTy packing is not sums ABI v2");
+  require((ap_uint<12>)sums.range(75, 64) == 101, "DMX total-ET packing is not sums ABI v2");
+  require((ap_uint<12>)sums.range(87, 76) == 79, "DMX total-HT packing is not sums ABI v2");
+  require((ap_uint<12>)sums.range(99, 88) == 13, "DMX NObj packing is not sums ABI v2");
+  require(sums.range(63, 48) == 0, "DMX word-0 reserved bits are nonzero");
+  require(sums.range(127, 100) == 0, "DMX word-1 reserved bits are nonzero");
+  require(sums.range(575, 128) == 0, "DMX reserved transport words are nonzero");
 }
 
 std::array<ap_uint<576>, p2mhh::MHH_N_OUTPUT_LINKS> run(
@@ -142,6 +150,7 @@ int sc_main(int, char**) {
 int main() {
 #endif
   try {
+    testDMXSumsPacking();
     testSumsAbiV2AndReservedLinks();
     testBoundaryStitchingAndPacking();
   } catch (const std::exception& error) {
