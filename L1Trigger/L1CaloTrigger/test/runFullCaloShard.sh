@@ -23,7 +23,7 @@ cd "${_CONDOR_SCRATCH_DIR:?Run this on a Condor worker}"
 grep -qm1 avx2 /proc/cpuinfo
 voms-proxy-info -exists -valid 0:30
 test -f "$package/test/runFullCaloMHHGCTS_cfg.py"
-test -f "$analyzer/python/mhhGCTSTrainingNtuplizer_cfi.py"
+test -f "$analyzer/python/mhhGCTSFullCaloTrainingNtuplizer_cfi.py"
 
 {
   printf 'source_lfn=%s\nsource_pfn=%s\ndataset=%s\n' "$lfn" "$pfn" "$dataset"
@@ -74,7 +74,7 @@ cmsRun "$package/test/runFullCaloMHHGCTSTraining_cfg.py" \
   > "training_${shard}.log" 2>&1
 
 python3 "$analyzer/test/check_mhh_gcts_training_ntuple.py" \
-  "$requested_training" --expected-edm "$requested_edm" --require-truth \
+  "$requested_training" --expected-edm "$requested_edm" --expect-full-gctb --require-truth \
   > "analyzer_validation_${shard}.txt"
 python3 "$package/test/checkFullCaloTraining.py" "$requested_training" \
   --min-events 1 > "fullcalo_validation_${shard}.txt"

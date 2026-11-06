@@ -2,15 +2,15 @@
 
 ## Status and source basis
 
-This is a **local, unpushed** branch of `https://github.com/mbileska/cmssw.git`.
+This is the `dist-trigger-poc` branch of `https://github.com/mbileska/cmssw.git`.
 It starts from `emulator-gcts-mhh-clean` at
 `22778e9794fc65ccf0866af773275a2529b75159` and targets
 `CMSSW_20_0_0_patch2`, `el9_amd64_gcc13`. The independent emulator source
 reviewed on 2026-11-06 is
 `cms-caloL1-emulator/cmssw:gct-update-latest-firmware` at
 `62ab98fc3dd85dc31a04aa0e48a03818e619b289`. The companion user-owned
-analyzer is `mbileska/L1CaloPhase2Analyzer:cmssw20-mhh-gcts-workflow` at
-`e2821ccf6be384119c70f260f8d9ddce6baf7e07`.
+analyzer is `mbileska/L1CaloPhase2Analyzer:dist-trigger-poc` at
+`d3879c57c5c34d7ef47d15252f6317c2f9297f44`.
 
 The branch contains the current CaloL1 RCT, GCTB IP1/IP2, HF and HGCAL
 emulator code plus the user's ABI-v2 MHH/GCTS chain. The latest upstream IP1
@@ -138,7 +138,7 @@ Flattened stage branch order is:
   validated global coordinates; derived ST sums do not establish final MET
   physics performance.
 
-## Wisconsin run recipe after review and publication of this branch
+## Wisconsin run recipe
 
 Set up the CMSSW area and check out this branch under
 `$CMSSW_BASE/src/L1Trigger/L1CaloTrigger`. Check out the pinned analyzer under
@@ -167,7 +167,8 @@ cmsRun L1Trigger/L1CaloTrigger/test/runFullCaloMHHGCTSTraining_cfg.py \
   cmsswCommit="$(git rev-parse HEAD)" \
   analyzerCommit="$(git -C L1Trigger/L1CaloPhase2Analyzer rev-parse HEAD)"
 python3 L1Trigger/L1CaloPhase2Analyzer/test/check_mhh_gcts_training_ntuple.py \
-  fullcalo_training.root --expected-edm fullcalo_edm.root --require-truth
+  fullcalo_training.root --expected-edm fullcalo_edm.root \
+  --expect-full-gctb --require-truth
 python3 L1Trigger/L1CaloTrigger/test/checkFullCaloTraining.py \
   fullcalo_training.root --min-events 10
 ```

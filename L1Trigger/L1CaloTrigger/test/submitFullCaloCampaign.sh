@@ -28,7 +28,7 @@ package="$CMSSW_BASE/src/L1Trigger/L1CaloTrigger"
 analyzer="$CMSSW_BASE/src/L1Trigger/L1CaloPhase2Analyzer"
 runner="$package/test/runFullCaloShard.sh"
 test -x "$runner" || { echo "Missing executable $runner" >&2; exit 3; }
-test -f "$analyzer/python/mhhGCTSTrainingNtuplizer_cfi.py" || {
+test -f "$analyzer/python/mhhGCTSFullCaloTrainingNtuplizer_cfi.py" || {
   echo 'Pinned mbileska analyzer checkout is missing' >&2
   exit 3
 }
@@ -37,7 +37,7 @@ test "$(git -C "$package" branch --show-current)" = dist-trigger-poc || {
   exit 3
 }
 test "$(git -C "$analyzer" rev-parse HEAD)" = \
-  e2821ccf6be384119c70f260f8d9ddce6baf7e07 || {
+  d3879c57c5c34d7ef47d15252f6317c2f9297f44 || {
   echo 'Analyzer is not at the reviewed revision; revalidate before submitting' >&2
   exit 3
 }
