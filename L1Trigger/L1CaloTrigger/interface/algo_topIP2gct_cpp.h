@@ -33,9 +33,7 @@ inline void fillInputEG(const LinkWord& input0,
                         const LinkWord& input2,
                         const LinkWord& input3,
                         std::array<GctEcalCluster, kEcalClustersPerRegion>& clusters) {
-#pragma HLS INLINE
   for (std::size_t i = 0; i < 8; ++i) {
-#pragma HLS UNROLL
     const int start = static_cast<int>(64 * i);
     const int end = start + 63;
     clusters[i].fillFrom64(input0.range(end, start));
@@ -52,16 +50,13 @@ inline void fillInputST(const LinkWord& input0,
                         const LinkWord& input4,
                         const LinkWord& input5,
                         std::array<std::array<STower, kPaddedPhi>, kPaddedEta>& towers) {
-#pragma HLS INLINE
   const std::array<LinkWord, 6> inputs{{input0, input1, input2, input3, input4, input5}};
 
   // Literal attached-firmware slot contract:
   //   slots 0..5  = eta 0..5 for the first phi ST column
   //   slots 6..11 = eta 0..5 for the second phi ST column.
   for (std::size_t link = 0; link < inputs.size(); ++link) {
-#pragma HLS UNROLL
     for (std::size_t eta = 0; eta < kRegionEta; ++eta) {
-#pragma HLS UNROLL
       const int firstStart = static_cast<int>(48 * eta);
       const int secondStart = static_cast<int>(48 * (kRegionEta + eta));
       towers[eta + 2][2 * link].fill(inputs[link].range(firstStart + 47, firstStart));
@@ -72,9 +67,7 @@ inline void fillInputST(const LinkWord& input0,
 
 inline void fillOverlap(std::array<std::array<STower, kPaddedPhi>, kPaddedEta>& positive,
                         std::array<std::array<STower, kPaddedPhi>, kPaddedEta>& negative) {
-#pragma HLS INLINE
   for (std::size_t phi = 0; phi < kPaddedPhi; ++phi) {
-#pragma HLS UNROLL
     const std::size_t mirrored = kPaddedPhi - 1 - phi;
     positive[1][phi] = negative[2][mirrored];
     positive[0][phi] = negative[3][mirrored];
@@ -84,11 +77,8 @@ inline void fillOverlap(std::array<std::array<STower, kPaddedPhi>, kPaddedEta>& 
 }
 
 inline void assignLocalCoordinates(std::array<std::array<STower, kPaddedPhi>, kPaddedEta>& towers) {
-#pragma HLS INLINE
   for (std::size_t eta = 0; eta < kPaddedEta; ++eta) {
-#pragma HLS UNROLL
     for (std::size_t phi = 0; phi < kPaddedPhi; ++phi) {
-#pragma HLS UNROLL
       towers[eta][phi].eta = static_cast<unsigned int>(eta);
       towers[eta][phi].phi = static_cast<unsigned int>(phi);
     }
@@ -99,7 +89,6 @@ inline void assignLocalCoordinates(std::array<std::array<STower, kPaddedPhi>, kP
 
 inline void algoTop(const std::array<LinkWord, kInputLinks>& input,
                     std::array<LinkWord, kOutputLinks>& output) {
-#pragma HLS INLINE
   Region positive;
   Region negative;
 

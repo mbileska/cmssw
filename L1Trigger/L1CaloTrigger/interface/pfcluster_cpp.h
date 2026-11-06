@@ -1,6 +1,8 @@
 #include "algo_topIP1gct_h.h"
 #include "bitonicSort16_h.h"
 
+namespace gctip1 {
+
     
      loop  bestOf2e(const ap_uint<12>& e0, const ap_uint<12>& e1) {
         loop x = (e0 > e1) ? 0:1 ;
@@ -94,7 +96,6 @@ void getseedposition(rcttower towers[TEN][TEN], rcttower &Seed){
         rcttower towers1D[TEN] ;
 
                         for(loop j=0; j<TEN; j++){
-						#pragma HLS PIPELINE
 
                         rcttower tmp = towers[i][j] ;
                         towers1D[j] = tmp ;
@@ -107,7 +108,6 @@ void getseedposition(rcttower towers[TEN][TEN], rcttower &Seed){
                 rcttower towers1D[TEN] ;
   
                                 for(loop j=0; j<TEN; j++){
-								//#pragma HLS UNROLL
                                 rcttower tmp = towers[i][j] ;
                                 towers1D[j] = tmp ;
                                 }
@@ -223,7 +223,6 @@ void getcluster(rcttower towers[TEN][TEN], rcttower Seed, PFcluster &output) {
 	output.energy = tmpValue ;
 	output.eta = Seed.eta ;
 	output.phi = Seed.phi ;
-	output.getHoE() ; 
 }
 
 
@@ -368,3 +367,5 @@ PFcluster pfclusters_all[Nbclusters];
 
 
 }
+
+}  // namespace gctip1

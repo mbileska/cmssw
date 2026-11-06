@@ -6,3 +6,9 @@
 
 <bin file="testPhase2L1MHHFirmware.cpp" name="testPhase2L1MHHFirmware"/>
 <test name="testPhase2L1MHHFirmware" command="testPhase2L1MHHFirmware"/>
+
+<bin file="test_algo_topIP1gct.cpp" name="test_algo_topIP1gct"/>
+<test name="test_algo_topIP1gct" command="test_algo_topIP1gct"/>
+
+<bin file="test_algo_topIP2gct.cpp" name="test_algo_topIP2gct"/>
+<test name="test_algo_topIP2gct" command="test_algo_topIP2gct"/>

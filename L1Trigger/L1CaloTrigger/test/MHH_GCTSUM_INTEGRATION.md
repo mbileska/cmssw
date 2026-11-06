@@ -1,5 +1,10 @@
 # HF/HGCAL -> MHH -> GCT Sum integration
 
+The full-calorimeter proof-of-concept with RCT/GCTB inputs, explicit
+assumptions, ROOT stage trees, validation gates, and Condor commands is
+documented in [DIST_TRIGGER_POC.md](DIST_TRIGGER_POC.md). This page describes
+the earlier endcap-only smoke chain.
+
 ## Scope
 
 The existing `Phase2L1CaloL1HFEmulator` and its firmware headers are not

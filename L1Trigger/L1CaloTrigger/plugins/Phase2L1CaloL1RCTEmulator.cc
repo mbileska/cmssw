@@ -19,6 +19,7 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "FWCore/Framework/interface/EventSetup.h"
+#include "FWCore/Utilities/interface/Exception.h"
 #include "FWCore/ParameterSet/interface/ConfigurationDescriptions.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "FWCore/ParameterSet/interface/ParameterSetDescription.h"
@@ -150,6 +151,9 @@ void Phase2L1CaloL1RCTEmulator::produce(edm::Event& iEvent, const edm::EventSetu
   //***************************************************//
   edm::Handle<EcalEBTrigPrimDigiCollection> pcalohits;
   iEvent.getByToken(ecalTPEBToken_, pcalohits);
+  if (!pcalohits.isValid())
+    throw cms::Exception("MissingRCTInput")
+        << "ECAL EB trigger primitives are missing; check the RCT ecalTPEB InputTag";
 
   // Initialize array of energies to all 0s
   float crystalEnergies[p2rctIO::N_CARDS][p2rctIO::N_TOWERS_ETA*p2rctIO::CRYSTALS_IN_TOWER_ETA][p2rctIO::N_TOWERS_PHI*p2rctIO::CRYSTALS_IN_TOWER_PHI] = {{{ 0 }}};
@@ -204,6 +208,9 @@ void Phase2L1CaloL1RCTEmulator::produce(edm::Event& iEvent, const edm::EventSetu
   //***************************************************//
   edm::Handle<edm::SortedCollection<HcalTriggerPrimitiveDigi>> hbhecoll;
   iEvent.getByToken(hcalTPToken_, hbhecoll);
+  if (!hbhecoll.isValid())
+    throw cms::Exception("MissingRCTInput")
+        << "HCAL trigger primitives are missing; check the RCT hcalTP InputTag";
 
   // Initialize array of energies to all 0s
   //float HCALtowerEnergies[p2rctIO::N_CARDS][p2rctIO::TOWERS_IN_REGION_ETA*p2rctIO::REGIONS_IN_CARD_ETA][p2rctIO::TOWERS_IN_REGION_PHI*p2rctIO::REGIONS_IN_CARD_PHI] = {{{ 0 }}};

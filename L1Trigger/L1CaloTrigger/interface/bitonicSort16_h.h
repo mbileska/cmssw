@@ -9,11 +9,15 @@
 
 using namespace std;
 
+namespace gctip1 {
+
 class GreaterSmaller{
 public:
     PFcluster greater, smaller;
 };
 
 void bitonicSort16AB(PFcluster in[Nbclusters], PFcluster out[Nbclusters]);
+
+}  // namespace gctip1
 
 #endif

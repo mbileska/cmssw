@@ -15,9 +15,9 @@
  *   intentionally preserved.
  *
  *   IMPORTANT:
- *   This file does not "complete" behavior that is absent from the attached
- *   firmware.  In particular, the attached source only fills two jet slots,
- *   two tau slots, uses fixed EG source indices, and leaves Ex/Ey at zero.
+ *   This file does not "complete" behavior that is absent from the supplied
+ *   firmware.  In particular, the source uses fixed EG source indices and
+ *   leaves Ex/Ey at zero.
  */
 
 #ifndef L1Trigger_L1CaloTrigger_algo_topIP2gct_h_h
@@ -195,7 +195,6 @@ struct Region {
   void fillEGLink(LinkWord& output) const {
     output = 0;
     for (std::size_t i = 0; i < kEGsPerRegion; ++i) {
-#pragma HLS UNROLL
       output.range(static_cast<int>(48 * i + 47), static_cast<int>(48 * i)) = egs[i].pack();
     }
     // Slots 6..11 remain zero exactly as fillEGlink() in the attached source.
@@ -204,11 +203,9 @@ struct Region {
   void fillJetTauLink(LinkWord& output) const {
     output = 0;
     for (std::size_t i = 0; i < kJetsPerRegion; ++i) {
-#pragma HLS UNROLL
       output.range(static_cast<int>(48 * i + 47), static_cast<int>(48 * i)) = jets[i].pack();
     }
     for (std::size_t i = 0; i < kTausPerRegion; ++i) {
-#pragma HLS UNROLL
       const std::size_t slot = i + kJetsPerRegion;
       output.range(static_cast<int>(48 * slot + 47), static_cast<int>(48 * slot)) = taus[i].pack();
     }

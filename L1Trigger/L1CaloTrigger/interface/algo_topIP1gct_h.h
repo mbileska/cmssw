@@ -1,5 +1,5 @@
-#ifndef _ALGO_TOPIP2_H_
-#define _ALGO_TOPIP2_H_
+#ifndef L1Trigger_L1CaloTrigger_algo_topIP1gct_h_h
+#define L1Trigger_L1CaloTrigger_algo_topIP1gct_h_h
 
 
 
@@ -37,6 +37,8 @@
 
 using namespace std;
 
+namespace gctip1 {
+
 typedef ap_uint<8> loop;
 
 class towermask{
@@ -69,23 +71,21 @@ class towermask{
 };
 
 class PFcluster{
-    public:
+public:
     ap_uint<12> energy;
-    ap_int<8> eta;
-    ap_int<7> phi;
-    ap_uint<4> hoe;
+    ap_int<7>   eta;
+    ap_int<7>   phi;
     ap_uint<12> ECAL;
-    ap_uint<12> HCAL;
-    ap_uint<9> spare;
+    ap_uint<6>  FB;
+    ap_uint<20> spare;
     ap_uint<64> data;
 
     PFcluster(){
     energy=0;
     eta=0;
     phi=0;
-    hoe=0;
     ECAL=0;
-    HCAL=0;
+    FB=0;
     spare=0;
     data=0;
     }
@@ -94,82 +94,36 @@ class PFcluster{
         energy = rhs.energy;
         eta = rhs.eta;
         phi = rhs.phi;
-        hoe = rhs.hoe;
         ECAL = rhs.ECAL;
-        HCAL = rhs.HCAL;
+        FB = rhs.FB;
         spare = rhs.spare;
         data = rhs.data;
         return *this;
     }
 
     ap_uint<64> getPFcluster(void){
-      data = (energy) | 
-      (((ap_uint<64>) eta)  << 12) | 
-      (((ap_uint<64>) phi)  << 20) | 
-      (((ap_uint<64>) hoe)       << 27) |
-      (((ap_uint<64>) ECAL)       << 31) |
-      (((ap_uint<64>) HCAL)       << 43) |
-      (((ap_uint<64>) spare)       << 55);
-    return data ;
+        data = 0;
+        data.range(11, 0)  = energy;
+        data.range(18, 12) = eta.range(6, 0);
+        data.range(25, 19) = phi.range(6, 0);
+        data.range(37, 26) = ECAL;
+        data.range(43, 38) = FB;
+        data.range(63, 44) = spare;
+        return data;
     }
 
     void fillPFcluster(ap_uint<64> i){
     	this->energy = i.range(11, 0);
-    	this->eta = i.range(19, 12);
-    	this->phi = i.range(26, 20);
-    	this->hoe = i.range(30, 27);
-    	this->ECAL = i.range(42, 31);
-    	this->HCAL = i.range(54, 43);
-    	this->spare = i.range(63, 55);
+        this->eta = i.range(18, 12);
+        this->phi = i.range(25, 19);
+        this->ECAL = i.range(37, 26);
+        this->FB = i.range(43, 38);
+        this->spare = i.range(63, 44);
     }
 
-    void getHoE(){
-
-	ap_uint<1> hoeLSB = 0 ;
-	ap_uint<3> he = 0 ;
-	ap_uint<12> A;
-	ap_uint<12> B;
-
-	A = (ECAL > HCAL)?ECAL:HCAL;
-	B = (ECAL > HCAL)?HCAL:ECAL;
- 
-	if( HCAL >= ECAL) hoeLSB = 0 ;
-	else hoeLSB = 1 ;
-	 /*if( A > B ){
- 	  if(A > 2*B) he = 0b001 ;
-  	  if(A > 4*B) he = 0b010 ;
-  	  if(A > 8*B) he = 0b011 ;
-  	  if(A > 16*B) he = 0b100 ;
-  	  if(A > 32*B) he = 0b101 ;
-  	  if(A > 64*B) he = 0b110 ;
- 	  if(A > 128*B) he = 0b111 ;
- 	 }*/
-	/*if (A > B) {
-	  if (A > 128 * B) he = 0b111;
-	  else if (A > 64 * B) he = 0b110;
-	  else if (A > 32 * B) he = 0b101;
-	  else if (A > 16 * B) he = 0b100;
-	  else if (A > 8 * B) he = 0b011;
-	  else if (A > 4 * B) he = 0b010;
-	  else if (A > 2 * B) he = 0b001;
-	  else he = 0b000;
-	}*/
-
-	if (A > (B << 7)) he = 0b111;
-	else if (A > (B << 6)) he = 0b110;
-	else if (A > (B << 5)) he = 0b101;
-	else if (A > (B << 4)) he = 0b100;
-	else if (A > (B << 3)) he = 0b011;
-	else if (A > (B << 2)) he = 0b010;
-	else if (A > (B << 1)) he = 0b001;
-	else he = 0b000;
-
-	hoe = hoeLSB | (he << 1) ;
-   }
-
     ap_uint<12> Energy(void) {return energy;}
-    ap_uint<8> Eta(void) {return eta;}
-    ap_uint<7> Phi(void) {return phi;}
+    ap_int<7> Eta(void) {return eta;}
+    ap_int<7> Phi(void) {return phi;}
     ap_uint<64> Data(void) {return data;}
 	
 
@@ -181,15 +135,13 @@ class EGcluster{
     ap_uint<12> energy;
     ap_int<7> eta;
     ap_int<7> phi;
-    ap_uint<4> hoe;
-    ap_uint<2> hoeWP;
-    ap_uint<3> iso;
-    ap_uint<2> isoWP;
-    ap_uint<6> FB;
+    ap_uint<6> hoe;
+    ap_uint<6> iso;
+    ap_uint<6> shape;
+    ap_uint<3> WP;
     ap_uint<5> timing;
-    ap_uint<2> shapeWP;
     ap_uint<2> brems;
-    ap_uint<12> spare;
+    ap_uint<10> spare;
     ap_uint<64> data;
 
     EGcluster(){
@@ -197,12 +149,10 @@ class EGcluster{
     eta=0;
     phi=0;
     hoe=0;
-    hoeWP=0;
     iso=0;
-    isoWP=0;
-    FB=0;
+    shape=0;
+    WP=0;
     timing=0;
-    shapeWP=0;
     brems=0;
     spare=0;
     data=0;
@@ -213,12 +163,10 @@ class EGcluster{
         eta = rhs.eta;
         phi = rhs.phi;
         hoe = rhs.hoe;
-        hoeWP = rhs.hoeWP;
         iso = rhs.iso;
-        isoWP = rhs.isoWP;
-        FB = rhs.FB;
+        shape = rhs.shape;
+        WP = rhs.WP;
         timing = rhs.timing;
-        shapeWP = rhs.shapeWP;
         brems = rhs.brems;
         spare = rhs.spare;
         data = rhs.data;
@@ -226,39 +174,36 @@ class EGcluster{
     }
 
     ap_uint<64> getEGcluster(void){
-      data = (energy) | 
-      (((ap_uint<64>) eta)  << 12) | 
-      (((ap_uint<64>) phi)  << 19) | 
-      (((ap_uint<64>) hoe)       << 26) |
-      (((ap_uint<64>) hoeWP)       << 30) |
-      (((ap_uint<64>) iso)       << 32) |
-      (((ap_uint<64>) isoWP)       << 35) |
-      (((ap_uint<64>) FB)       << 37) |
-      (((ap_uint<64>) timing)       << 43) |
-      (((ap_uint<64>) shapeWP)       << 48) |
-      (((ap_uint<64>) brems)       << 50) |
-      (((ap_uint<64>) spare)       << 52);
-    return data ;
+        data = 0;
+        data.range(11, 0)  = energy;
+        data.range(18, 12) = eta.range(6, 0);
+        data.range(25, 19) = phi.range(6, 0);
+        data.range(31, 26) = energy.range(5, 0);
+        data.range(37, 32) = energy.range(5, 0);
+        data.range(43, 38) = energy.range(5, 0);
+        data.range(46, 44) = energy.range(2, 0);
+        data.range(51, 47) = energy.range(4, 0);
+        data.range(53, 52) = energy.range(1, 0);
+        data.range(63, 54) = spare;
+        return data;
     }
 
     void fillEGcluster(ap_uint<64> i){
     	this->energy = i.range(11, 0);
     	this->eta = i.range(18, 12);
     	this->phi = i.range(25, 19);
-    	this->hoe = i.range(29, 26);
-    	this->hoeWP = i.range(31, 30);
-    	this->iso= i.range(34, 32);
-    	this->isoWP= i.range(36, 35);
-    	this->FB = i.range(42, 37);
-    	this->timing = i.range(47, 43);
-    	this->shapeWP = i.range(49, 48);
-    	this->brems = i.range(51, 50);
-    	this->spare = i.range(63, 52);
+        this->hoe = i.range(31, 26);
+        this->iso = i.range(37, 32);
+        this->shape = i.range(43, 38);
+        this->WP = i.range(46, 44);
+        this->timing = i.range(51, 47);
+        this->brems = i.range(53, 52);
+        this->spare = i.range(63, 54);
     }
 
     ap_uint<12> Energy(void) {return energy;}
-    ap_uint<8> Eta(void) {return eta;}
-    ap_uint<7> Phi(void) {return phi;}
+    ap_int<7> Eta(void) {return eta;}
+    ap_int<7> Phi(void) {return phi;}
     ap_uint<64> Data(void) {return data;}
 	
 
@@ -693,7 +638,7 @@ towermask Grid[N_RCT_CLUSTERS_REGION] ;
           {    
 
 		start=(i+1)*64 ; end=start+63; 
-		link_out1.range(end, start) = egclusters[i].getEGcluster() ; 
+		link_out1.range(end, start) = egclusters[i+1].getEGcluster() ;
 	  }
 	}
 
@@ -706,7 +651,7 @@ towermask Grid[N_RCT_CLUSTERS_REGION] ;
           {    
 
 		start=i*64 ; end=start+63; 
-		link_out1.range(end, start) = egclusters[i].getEGcluster() ; 
+		link_out1.range(end, start) = egclusters[i+1].getEGcluster() ;
 	  }
 	}
 
@@ -719,14 +664,14 @@ towermask Grid[N_RCT_CLUSTERS_REGION] ;
           {    
 
 		start=(i+8)*64 ; end=start+63; 
-		link_out1.range(end, start) = egclusters[i].getEGcluster() ; 
+		link_out1.range(end, start) = egclusters[i+1].getEGcluster() ;
 	  }
 
         for(loop i=1; i<8; i++)
           {    
 
 		start=(i-1)*64 ; end=start+63; 
-		link_out2.range(end, start) = egclusters[i].getEGcluster() ; 
+		link_out2.range(end, start) = egclusters[i+1].getEGcluster() ;
 	  }
 	}
 
@@ -739,14 +684,14 @@ towermask Grid[N_RCT_CLUSTERS_REGION] ;
           {    
 
 		start=(i+7)*64 ; end=start+63; 
-		link_out1.range(end, start) = egclusters[i].getEGcluster() ; 
+		link_out1.range(end, start) = egclusters[i+1].getEGcluster() ;
 	  }
 
         for(loop i=2; i<8; i++)
           {    
 
 		start=(i-2)*64 ; end=start+63; 
-		link_out2.range(end, start) = egclusters[i].getEGcluster() ; 
+		link_out2.range(end, start) = egclusters[i+1].getEGcluster() ;
 	  }
 	}
 
@@ -806,7 +751,7 @@ towermask Grid[N_RCT_CLUSTERS_REGION] ;
           {    
 
 		start=i*64 ; end=start+63; 
-		link_out2.range(end, start) = pfclusters[i].getPFcluster() ; 
+		link_out2.range(end, start) = pfclusters[i+3].getPFcluster() ;
 	  }
 }
 
@@ -815,6 +760,8 @@ towermask Grid[N_RCT_CLUSTERS_REGION] ;
 
 void createPFClusters(rcttower regiongcttowers[22][10], PFcluster pfclusters[N_GCT_PFCLUSTERS_REGION]) ;
 void algo_topIP1gct(ap_uint<576> link_in[N_INPUT_LINKS], ap_uint<576> link_out[N_OUTPUT_LINKS]);
+
+}  // namespace gctip1
 
 #endif
 

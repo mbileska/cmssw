@@ -2,6 +2,8 @@
 
 #include "algo_topIP1gct_h.h"
 
+namespace gctip1 {
+
 void fillInputClusters(ap_uint<576> input, rctecalcluster rctecalclusters[N_RCT_CLUSTERS_REGION], towermask Grid[N_RCT_CLUSTERS_REGION]){
 
 
@@ -99,7 +101,11 @@ void buildfulltowers(rcttower rcttowers[N_GCT_TOWERS_REGION_ETA+5][N_GCT_TOWERS_
 	    for (loop m = 2; m < N_GCT_TOWERS_REGION_PHI+2; m++) {
 	      for (loop k = 2; k < N_GCT_TOWERS_REGION_ETA+2; k++) {
 	        if (Grid[i].eta == k && Grid[i].phi == m) {
-	          rcttowers_seq[k][m].energy += tmp1;
+	          ap_uint<13> total = rcttowers_seq[k][m].energy + tmp1;
+	          if (total > 1023)
+	            rcttowers_seq[k][m].energy = 1023;
+	          else
+	            rcttowers_seq[k][m].energy = total;
 	        }
 	      }
 	    }
@@ -150,10 +156,10 @@ bool phi1 = (rctecalclusters1[j].phi == 29) ? true : false ;
 bool phi2 = (rctecalclusters2[i].phi == 0) ? true : false ;
 
 
-ap_uint<5> eta1 = rctecalclusters1[j].eta ;
-ap_uint<5> eta2 = rctecalclusters2[i].eta ;
+ap_uint<7> eta1 = rctecalclusters1[j].eta ;
+ap_uint<7> eta2 = rctecalclusters2[i].eta ;
 
-ap_uint<5> dEta = (eta1 > eta2) ? (eta1 - eta2) : (eta2 - eta1) ;
+ap_uint<7> dEta = (eta1 > eta2) ? (eta1 - eta2) : (eta2 - eta1) ;
 bool deta = (dEta <= 1) ? true : false ;
 
 bool stitch = phi1 && phi2 && deta ;
@@ -375,3 +381,5 @@ void algo_topIP1gct(ap_uint<576> link_in[N_INPUT_LINKS], ap_uint<576> link_out[N
 
     copy_to_output(link_tmp, link_out); //ap_vld sync
 }
+
+}  // namespace gctip1

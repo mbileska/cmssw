@@ -1,5 +1,7 @@
 #include "bitonicSort16_h.h"
 
+namespace gctip1 {
+
 //Main CAE block (compare and exchange)
 
 GreaterSmaller AscendDescend(PFcluster &x, PFcluster &y){
@@ -189,4 +191,6 @@ for(loop i=0; i<Nbclusters/2; i++){
 //out[0] = in[0] ;
 
 }
+
+}  // namespace gctip1
 

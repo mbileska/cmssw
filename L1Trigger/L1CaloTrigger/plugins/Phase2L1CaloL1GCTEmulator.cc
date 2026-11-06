@@ -268,7 +268,7 @@ Phase2L1CaloL1GCTEmulator::IP1Output Phase2L1CaloL1GCTEmulator::runIP1(const IP1
     firmwareOutput[index] = 0;
   }
 
-  algo_topIP1gct(firmwareInput, firmwareOutput);
+  gctip1::algo_topIP1gct(firmwareInput, firmwareOutput);
 
   IP1Output output{};
   for (int index = 0; index < N_OUTPUT_LINKS; ++index) {

@@ -1,4 +1,6 @@
 <use   name="FWCore/Framework"/>
+<use   name="CommonTools/UtilAlgos"/>
+<use   name="FWCore/ServiceRegistry"/>
 <use   name="Geometry/CaloGeometry"/>
 <use   name="Geometry/HcalTowerAlgo"/>
 <use   name="Geometry/EcalAlgo"/>
